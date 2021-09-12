@@ -3,7 +3,7 @@ from functools import lru_cache
 from pathlib import Path
 import sys
 
-from PIL import Image
+from PIL import Image  # type: ignore
 from PIL import ImageDraw
 from PIL import ImageFont
 
@@ -44,11 +44,11 @@ def get_font(size: int = 10) -> ImageFont:
     return ImageFont.truetype(FONT, size=size)
 
 
-def get_max_text_size(image: Image) -> tuple[int, int]:
+def get_max_text_size(image: Image) -> tuple[float, float]:
     return MAX_TEXT_SIZE * image.size
 
 
-def get_text_position(image: Image) -> tuple[int, int]:
+def get_text_position(image: Image) -> tuple[float, float]:
     return TEXT_POSITION * image.size
 
 
