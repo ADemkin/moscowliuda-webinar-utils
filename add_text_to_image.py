@@ -68,7 +68,7 @@ def add_text_to_image_file(template: str, text: str, save_to: str) -> None:
             xy=get_text_position(image),
             font=get_font(font_size),
             text=text,
-            anchor="ma",
+            anchor="ma",  # middle & top edge is anchor point
             fill=BLACK,
         )
         # image.show()
