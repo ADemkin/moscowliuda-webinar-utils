@@ -29,7 +29,6 @@ class RelativePosition:
 
 MAX_TEXT_SIZE = RelativePosition(width=0.8, height=0.5)
 TEXT_POSITION = RelativePosition(width=0.50, height=0.61)
-FONT_SIZE_MODIFIER = -2
 FONT = "Helvetica"
 MIN_FONT_SIZE = 20
 MAX_FONT_SIZE = 35
