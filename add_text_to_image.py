@@ -52,17 +52,22 @@ def get_text_position(image: Image) -> tuple[float, float]:
     return TEXT_POSITION * image.size
 
 
-def add_text_to_image_file(template: str, name: str, save_to: str) -> None:
+def calculate_largest_font_size_for_text(image: Image, text: str) -> ImageFont:
+    max_text_size = get_max_text_size(image)
+    for font_size in range(MIN_FONT_SIZE, MAX_FONT_SIZE):
+        font = get_font(size=font_size)
+        if font.getsize_multiline(text) > max_text_size:
+            break
+    return font_size
+
+
+def add_text_to_image_file(template: str, text: str, save_to: str) -> None:
     with Image.open(template) as image:
-        max_text_size = get_max_text_size(image)
-        for font_size in range(MIN_FONT_SIZE, MAX_FONT_SIZE):
-            font = get_font(size=font_size)
-            if font.getsize_multiline(name) > max_text_size:
-                break
+        font_size = calculate_largest_font_size_for_text(image, text)
         ImageDraw.Draw(image).multiline_text(
             xy=get_text_position(image),
-            font=font,
-            text=name,
+            font=get_font(font_size),
+            text=text,
             anchor="ma",
             fill=BLACK,
         )
