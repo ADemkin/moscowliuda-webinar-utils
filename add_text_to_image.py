@@ -77,6 +77,12 @@ def add_text_to_image_file(template: str, text: str, save_to: str) -> None:
 
 
 def main() -> None:
+    if not TEMPLATE.exists():
+        print(f"{str(TEMPLATE)!r} not found.")
+        sys.exit(1)
+    if not INPUTFILE.exists():
+        print(f"{str(INPUTFILE)!r} not found.")
+        sys.exit(1)
     if CLEANUP and OUTDIR.exists():
         for item in OUTDIR.iterdir():
             item.unlink()
@@ -84,12 +90,6 @@ def main() -> None:
         print(f"cleanup for {str(OUTDIR)!r}")
     if not OUTDIR.exists():
         OUTDIR.mkdir()
-    if not TEMPLATE.exists():
-        print(f"{str(TEMPLATE)!r} not found.")
-        sys.exit(1)
-    if not INPUTFILE.exists():
-        print(f"{str(INPUTFILE)!r} not found.")
-        sys.exit(1)
     names = load_names_from_file(INPUTFILE)
     for name in names:
         save_to = OUTDIR / f"{name}.jpeg"
