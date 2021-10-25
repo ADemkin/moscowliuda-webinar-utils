@@ -35,9 +35,16 @@ def run_tests() -> None:
     name_form_and_given_form = [
         ('Пупкин Василий Александрович', 'Пупкину Василию Александровичу'),
         ('Ермолина Лариса Васильевна', 'Ермолиной Ларисе Васильевне'),
+        ('Каприян Елизавета', 'Каприян Елизавете'),
+        ('Кляузер Марина Николаевна', 'Кляузер Марине Николаевне'),
+        ('Ватненко Ирина Михайловна', 'Ватненко Ирине Михайловне'),
+        ('Потолока Ксения Вадимовна', 'Потолоке Ксении Вадимовне'),
+        ('Крюкова Ангелина Генадиевна', 'Крюковой Ангелине Генадиевне'),
+        ('Пирков Дмитрий Игоревич', 'Пиркову Дмитрию Игоревичу'),
     ]
     for name_form, given_form in name_form_and_given_form:
-        assert get_fio_in_given_form(name_form) == given_form
+        given_form_got = get_fio_in_given_form(name_form)
+        assert given_form_got == given_form, f"{given_form_got=}!={given_form=}"
     with pytest.raises(WordMorphError) as err:
         get_fio_in_given_form("not in russian")
     assert str(err.value) == "Error (496): 'Не найдено русских слов.'", err.value
