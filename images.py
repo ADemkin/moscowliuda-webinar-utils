@@ -110,18 +110,31 @@ class Certificate:
             year: str,
     ) -> None:
         self.template: Path = template
-        self._path: Path = path
+        self.path: Path = path
         self.name: str = name
         self.date: str = date
         self.year: str = year
         self._image: Image = None
 
-    def exists(self) -> bool:
-        return self._path.exists() and self._path.is_file()
+    @classmethod
+    def create(
+            cls,
+            template: Path,
+            certs_dir: Path,
+            name: str,
+            date: str,
+            year: str,
+    ) -> 'Certificate':
+        return cls(
+            template=template,
+            path=certs_dir / f"{name}.jpeg",
+            name=name,
+            date=date,
+            year=year,
+        )
 
-    @property
-    def path(self) -> str:
-        return str(self._path)
+    def exists(self) -> bool:
+        return self.path.exists() and self.path.is_file()
 
     @property
     def image(self) -> Image:
@@ -137,7 +150,7 @@ class Certificate:
     def create_file(self) -> None:
         if not self.exists():
             logger.info(f"{self.path} taken")
-            self.image.save(self.path)
+            self.image.save(str(self.path))
             logger.info(f"{self.path} done")
 
 
@@ -154,16 +167,16 @@ def main() -> None:
     webinar_dir.mkdir(exist_ok=True)
     for name in names:
         save_to = webinar_dir / f"{name}.jpeg"
-        cert = Certificate(
+        cert = Certificate.create(
             template=TEMPLATE,
-            path=save_to,
+            certs_dir=webinar_dir,
             name=name,
             date=date,
             year=year,
         )
         cert.create_file()
         assert cert.exists()
-        assert cert.path == str(save_to)
+        assert cert.path == save_to, (cert.path, save_to)
 
 
 if __name__ == "__main__":
