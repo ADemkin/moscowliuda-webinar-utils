@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from time import sleep
 from datetime import datetime
 from pathlib import Path
 import sys
@@ -11,6 +10,7 @@ from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
 from images import Certificate
+from send_email import EmailMock
 from send_email import GMail
 from word_morph import Morph
 
@@ -142,6 +142,10 @@ class Webinar:
         if not cert_template.exists():
             logger.error(f"{cert_template} not found")
             sys.exit(1)
+        certs_parent_dir = Path('.') / 'certificates'
+        certs_parent_dir.mkdir(exist_ok=True)
+        certs_dir = certs_parent_dir / f"{date_str}-{year}"
+        certs_dir.mkdir(exist_ok=True)
         email = GMail.from_environ()
         return cls(
             document=document,
@@ -149,7 +153,7 @@ class Webinar:
             title=title,
             date_str=date_str,
             year=year,
-            certs_dir=Path('.') / 'certificates' / f"{date_str}-{year}",
+            certs_dir=certs_dir,
             cert_template=cert_template,
             email=email,
         )
@@ -161,6 +165,7 @@ class Webinar:
     @property
     def cert_sheet(self) -> Worksheet:
         headers = ['fio', 'given_fio', 'name', 'email', 'custom_text']
+        # TODO: add instagram after email
         if self._cert_sheet is None:
             try:
                 self._cert_sheet = self.document.worksheet(CERTIFICATES)
@@ -185,7 +190,7 @@ class Webinar:
                 fio_given = morph.fio_given
                 name = morph.name
             except Exception as err:
-                logger.exception("Unable to morph {participant.fio}", err)
+                logger.exception(f"Unable to morph {participant.fio}", err)
                 fio_given = ''
                 name = ''
             row = [
@@ -196,12 +201,20 @@ class Webinar:
                 '',
             ]
             self.cert_sheet.append_row(row)
-            logger.info("{participant.fio} done")
+            logger.info(f"{participant.fio} done")
         logger.info("filling certificates done")
 
     def certificates_generate(self) -> None:
         logger.info("generating certs")
-        for _, given_fio, _, _, _ in self.cert_sheet.get_all_values():
+        len(values) == len(self.participants)
+        cert_sheet_rows = self.cert_sheet.get_all_values()
+        if len(cert_sheet_rows) == len(self.participants):
+            logger.debug("already filled")
+            return
+        elif 0 < len(cert_sheet_rows) < len(self.participants):
+            logger.error("looks like table is filled up partially, unable to process")
+            return
+        for _, given_fio, _, _, _ in cert_sheet_rows:
             logger.debug(f"{given_fio} taken")
             cert = Certificate.create(
                 template=self.cert_template,
@@ -245,7 +258,6 @@ class Webinar:
                 attachments=[str(cert.path)],
             )
             logger.info(f"{fio} done")
-            sleep(3)
         logger.info("sending emails done")
 
 
@@ -254,5 +266,5 @@ if __name__ == '__main__':
     # NOTE: DO NOT FORGET GMAILACCOUNT and GMAILAPPLICATIONPASSWORD !!!
     webinar = Webinar.from_url(URL)
     webinar.certificates_sheet_fill()
-    # webinar.certificates_generate()
-    # webinar.send_emails_with_certificates()
+
+    # webinar.email = EmailMock()
