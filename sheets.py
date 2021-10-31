@@ -10,7 +10,7 @@ from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
 from images import Certificate
-from send_email import EmailMock
+from send_email import MailStub
 from send_email import GMail
 from word_morph import Morph
 
@@ -124,7 +124,8 @@ class Webinar:
         self._cert_sheet: Worksheet = None
         self.certs_dir = certs_dir
         self.cert_template = cert_template
-        self.email = email
+        # self.email = email
+        self.email = None
 
     @classmethod
     def from_url(cls, url: str = URL) -> 'Webinar':
@@ -179,8 +180,22 @@ class Webinar:
                 logger.info("done")
         return self._cert_sheet
 
+    def certificates_sheet_is_filled(self) -> bool:
+        cert_sheet_rows = self.cert_sheet.get_all_values()
+        if len(cert_sheet_rows) == len(self.participants):
+            logger.debug("already filled")
+            return True
+        elif len(cert_sheet_rows) > len(self.participants):
+            logger.warning("already filled but rows > participants, need checking")
+            return True
+        elif 0 < len(cert_sheet_rows) < len(self.participants):
+            logger.error("looks like table is filled up partially, unable to process")
+        return False
+
     def certificates_sheet_fill(self) -> None:
         logger.info("filling certificates")
+        if self.certificates_sheet_is_filled():
+            return
         for participant in self.participants:
             # TODO: check if participant already in table
             logger.info(f"{participant.fio} taken")
@@ -206,15 +221,9 @@ class Webinar:
 
     def certificates_generate(self) -> None:
         logger.info("generating certs")
-        len(values) == len(self.participants)
-        cert_sheet_rows = self.cert_sheet.get_all_values()
-        if len(cert_sheet_rows) == len(self.participants):
-            logger.debug("already filled")
-            return
-        elif 0 < len(cert_sheet_rows) < len(self.participants):
-            logger.error("looks like table is filled up partially, unable to process")
-            return
-        for _, given_fio, _, _, _ in cert_sheet_rows:
+        # TODO: get exact values, even if they are ''
+        for row in self.cert_sheet.get_all_values():
+            given_fio = row[1]
             logger.debug(f"{given_fio} taken")
             cert = Certificate.create(
                 template=self.cert_template,
@@ -230,8 +239,12 @@ class Webinar:
     def send_emails_with_certificates(self) -> None:
         # headers = ['name', 'given_name', 'just_name', 'email', 'custom_text']
         logger.info("sending emails")
-        rows = self.cert_sheet.get_all_values()
-        for fio, given_fio, name, email, custom_text in rows:
+        for row in self.cert_sheet.get_all_values():
+            if len(row) == 4:
+                fio, given_fio, name, email = row
+                custom_text = ''
+            else:
+                fio, given_fio, name, email, custom_text = row
             logger.debug(f"{fio} taken")
             cert = Certificate.create(
                 template=self.cert_template,
@@ -265,6 +278,8 @@ if __name__ == '__main__':
     print(URL)
     # NOTE: DO NOT FORGET GMAILACCOUNT and GMAILAPPLICATIONPASSWORD !!!
     webinar = Webinar.from_url(URL)
-    webinar.certificates_sheet_fill()
+    # webinar.certificates_sheet_fill()
+    # webinar.certificates_generate()
 
-    # webinar.email = EmailMock()
+    webinar.email = MailStub()
+    webinar.send_emails_with_certificates()
