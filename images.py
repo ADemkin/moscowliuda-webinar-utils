@@ -3,15 +3,14 @@ from functools import lru_cache
 from pathlib import Path
 import sys
 
+from loguru import logger
 from PIL import Image  # type: ignore
 from PIL import ImageDraw
 from PIL import ImageFont
 
 
-TEMPLATE = Path("template.jpeg")
-INPUTFILE = Path("список.txt")
-OUTDIR = Path(".") / "out"
-CLEANUP = True
+TEMPLATE = Path("template_without_date.jpeg")
+OUTDIR = Path(".") / "certificates"
 
 BLACK = (0, 0, 0)
 
@@ -29,14 +28,12 @@ class RelativePosition:
 
 MAX_TEXT_SIZE = RelativePosition(width=0.8, height=0.5)
 TEXT_POSITION = RelativePosition(width=0.50, height=0.61)
+DATE_POSITION = RelativePosition(width=0.40, height=0.69)
+YEAR_POSITION = RelativePosition(width=0.40, height=0.72)
 FONT = "Helvetica"
 MIN_FONT_SIZE = 20
 MAX_FONT_SIZE = 35
-
-
-def load_names_from_file(filename: Path) -> list[str]:
-    with open(filename, "r", encoding="utf-8") as fd:
-        return [line.strip() for line in fd.readlines() if line != '\n']
+DATE_FONT_SIZE = 35
 
 
 @lru_cache(maxsize=MAX_FONT_SIZE - MIN_FONT_SIZE)
@@ -52,6 +49,14 @@ def get_text_position(image: Image) -> tuple[float, float]:
     return TEXT_POSITION * image.size
 
 
+def get_date_position(image: Image) -> tuple[float, float]:
+    return DATE_POSITION * image.size
+
+
+def get_year_position(image: Image) -> tuple[float, float]:
+    return YEAR_POSITION * image.size
+
+
 def calculate_largest_font_size_for_text(image: Image, text: str) -> ImageFont:
     max_text_size = get_max_text_size(image)
     for font_size in range(MIN_FONT_SIZE, MAX_FONT_SIZE):
@@ -61,39 +66,104 @@ def calculate_largest_font_size_for_text(image: Image, text: str) -> ImageFont:
     return font_size
 
 
-def add_text_to_image_file(template: str, text: str, save_to: str) -> None:
+def create_certificate(
+        template: Path,
+        name: str,
+        date: str,
+        year: str,
+) -> Image:
     with Image.open(template) as image:
-        font_size = calculate_largest_font_size_for_text(image, text)
+        # fill name
         ImageDraw.Draw(image).multiline_text(
             xy=get_text_position(image),
-            font=get_font(font_size),
-            text=text,
+            font=get_font(calculate_largest_font_size_for_text(image, name)),
+            text=name,
             anchor="ma",  # middle & top edge is anchor point
             fill=BLACK,
         )
-        # image.show()
-        image.save(save_to)
-        print(f"saved to: {save_to}")
+        # fill webinar date
+        ImageDraw.Draw(image).multiline_text(
+            xy=get_date_position(image),
+            font=get_font(DATE_FONT_SIZE),
+            text=date,
+            anchor="ma",  # middle & top edge is anchor point
+            fill=BLACK,
+        )
+        # fill webinar year
+        ImageDraw.Draw(image).multiline_text(
+            xy=get_year_position(image),
+            font=get_font(DATE_FONT_SIZE),
+            text=year,
+            anchor="ma",  # middle & top edge is anchor point
+            fill=BLACK,
+        )
+        return image
+
+
+class Certificate:
+    def __init__(
+            self,
+            template: Path,
+            path: Path,
+            name: str,
+            date: str,
+            year: str,
+    ) -> None:
+        self.template: Path = template
+        self._path: Path = path
+        self.name: str = name
+        self.date: str = date
+        self.year: str = year
+        self._image: Image = None
+
+    def exists(self) -> bool:
+        return self._path.exists() and self._path.is_file()
+
+    @property
+    def path(self) -> str:
+        return str(self._path)
+
+    @property
+    def image(self) -> Image:
+        if self._image is None:
+            self._image = create_certificate(
+                template=self.template,
+                name=self.name,
+                date=self.date,
+                year=self.year,
+            )
+        return self._image
+
+    def create_file(self) -> None:
+        if not self.exists():
+            logger.info(f"{self.path} taken")
+            self.image.save(self.path)
+            logger.info(f"{self.path} done")
+
 
 
 def main() -> None:
     if not TEMPLATE.exists():
-        print(f"{str(TEMPLATE)!r} not found.")
+        logger.error(f"{str(TEMPLATE)!r} not found.")
         sys.exit(1)
-    if not INPUTFILE.exists():
-        print(f"{str(INPUTFILE)!r} not found.")
-        sys.exit(1)
-    if CLEANUP and OUTDIR.exists():
-        for item in OUTDIR.iterdir():
-            item.unlink()
-        OUTDIR.rmdir()
-        print(f"cleanup for {str(OUTDIR)!r}")
-    if not OUTDIR.exists():
-        OUTDIR.mkdir()
-    names = load_names_from_file(INPUTFILE)
+    OUTDIR.mkdir(exist_ok=True)
+    names = ["Пупкину Весилию Андреевичу"]
+    date = "30-31 октября"
+    year = "2021 г."
+    webinar_dir = OUTDIR / f"{date} - {year}"
+    webinar_dir.mkdir(exist_ok=True)
     for name in names:
-        save_to = OUTDIR / f"{name}.jpeg"
-        add_text_to_image_file(str(TEMPLATE), name, str(save_to))
+        save_to = webinar_dir / f"{name}.jpeg"
+        cert = Certificate(
+            template=TEMPLATE,
+            path=save_to,
+            name=name,
+            date=date,
+            year=year,
+        )
+        cert.create_file()
+        assert cert.exists()
+        assert cert.path == str(save_to)
 
 
 if __name__ == "__main__":
