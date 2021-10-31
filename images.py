@@ -123,14 +123,14 @@ class Certificate:
             certs_dir: Path,
             name: str,
             date: str,
-            year: str,
+            year: int,
     ) -> 'Certificate':
         return cls(
             template=template,
             path=certs_dir / f"{name}.jpeg",
             name=name,
             date=date,
-            year=year,
+            year=f"{year} г.",
         )
 
     def exists(self) -> bool:
