@@ -42,12 +42,30 @@ class GMail:
         )
 
 
+class MailStub:
+    def send(
+            self,
+            to: str,
+            bcc: list[str] = None,
+            subject: str = None,
+            contents: str = None,
+            attachments: list[Union[str, IOBase, PosixPath]] = None,
+    ) -> None:
+        print(f"""--- sending email ---
+    {to=}
+    {bcc=}
+    {subject=}
+    {contents=}
+    {attachments=}
+--- done ---""")
+
+
 def run_tests():
     from unittest.mock import patch
     # test_mail_creates_from_credentials
     user = 'username'
     password = 'random-password'
-    with patch("send_gmail.SMTP") as smtp_mock:
+    with patch(f"{__name__}.SMTP") as smtp_mock:
         mail = GMail.from_credentials(user=user, password=password)
     smtp_mock.assert_called_once_with(user=user, password=password)
 
@@ -74,3 +92,15 @@ def run_tests():
         contents=contents,
         attachments=attachments,
     )
+    mail = MailStub()
+    mail.send(
+        to=to,
+        bcc=bcc,
+        subject=subject,
+        contents=contents,
+        attachments=attachments,
+    )
+
+
+if __name__ == '__main__':
+    run_tests()
