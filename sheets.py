@@ -62,7 +62,7 @@ def sanitize_temporary_row_data(row_data: list[str]) -> list[str]:
     # sanitize phone
     phones = row_data[1].strip().split(',')
     if len(phones) > 1:
-        logger.warning("{row_data[0]} has multiple phones: {phones}")
+        logger.warning(f"{row_data[0]} has multiple phones: {phones}")
     row_data[1] = phones[0].replace(' ', '')
     # sanitize email
     row_data[2] = row_data[2].strip().replace(' ', '')
@@ -121,7 +121,7 @@ class Webinar:
         self.title: str = title
         self.date_str: str = date_str
         self.year: int = year
-        self.cert_sheet: Worksheet = None
+        self._cert_sheet: Worksheet = None
         self.certs_dir = certs_dir
         self.cert_template = cert_template
         self.email = email
@@ -158,30 +158,30 @@ class Webinar:
         values = self.document.worksheet(sheet_name).get_all_values()
         return len(values) == len(self.participants)
 
-    def certificates_sheet_create(self, fill: bool = False) -> None:
-        # TODO: headers are subject to change
+    @property
+    def cert_sheet(self) -> Worksheet:
         headers = ['fio', 'given_fio', 'name', 'email', 'custom_text']
-        try:
-            self.cert_sheet = self.document.worksheet(CERTIFICATES)
-        except WorksheetNotFound:
-            logger.info("certificates sheet not found. creating...")
-            self.cert_sheet = self.document.add_worksheet(
-                title=CERTIFICATES,
-                rows=len(self.participants),
-                cols=len(headers),
-            )
-            logger.info("done")
-        if fill and not self._is_sheet_filled(CERTIFICATES):
-            self.certificates_sheet_fill()
+        if self._cert_sheet is None:
+            try:
+                self._cert_sheet = self.document.worksheet(CERTIFICATES)
+            except WorksheetNotFound:
+                logger.info("creating certificates sheet")
+                self._cert_sheet = self.document.add_worksheet(
+                    title=CERTIFICATES,
+                    rows=len(self.participants),
+                    cols=len(headers),
+                )
+                logger.info("done")
+        return self._cert_sheet
 
     def certificates_sheet_fill(self) -> None:
         logger.info("filling certificates")
         for participant in self.participants:
             # TODO: check if participant already in table
-            logger.info("{participant.fio} taken")
+            logger.info(f"{participant.fio} taken")
             try:
                 morph = Morph.from_fio(participant.fio)
-                logger.info("{participant.fio} morphed")
+                logger.info(f"{participant.fio} morphed")
                 fio_given = morph.fio_given
                 name = morph.name
             except Exception as err:
@@ -195,9 +195,9 @@ class Webinar:
                 participant.email,
                 '',
             ]
-            # append every row because Morph is unstable and may fail
             self.cert_sheet.append_row(row)
             logger.info("{participant.fio} done")
+        logger.info("filling certificates done")
 
     def certificates_generate(self) -> None:
         logger.info("generating certs")
@@ -250,8 +250,9 @@ class Webinar:
 
 
 if __name__ == '__main__':
+    print(URL)
+    # NOTE: DO NOT FORGET GMAILACCOUNT and GMAILAPPLICATIONPASSWORD !!!
     webinar = Webinar.from_url(URL)
-    webinar.certificates_sheet_create(fill=False)
     webinar.certificates_sheet_fill()
-    webinar.certificates_generate()
-    webinar.send_emails_with_certificates()
+    # webinar.certificates_generate()
+    # webinar.send_emails_with_certificates()
