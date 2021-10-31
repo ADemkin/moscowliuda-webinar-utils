@@ -154,7 +154,6 @@ class Certificate:
             logger.info(f"{self.path} done")
 
 
-
 def main() -> None:
     if not TEMPLATE.exists():
         logger.error(f"{str(TEMPLATE)!r} not found.")
@@ -162,7 +161,7 @@ def main() -> None:
     OUTDIR.mkdir(exist_ok=True)
     names = ["Пупкину Весилию Андреевичу"]
     date = "30-31 октября"
-    year = "2021 г."
+    year = 2021
     webinar_dir = OUTDIR / f"{date} - {year}"
     webinar_dir.mkdir(exist_ok=True)
     for name in names:

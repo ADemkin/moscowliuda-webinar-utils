@@ -13,7 +13,7 @@ from requests import request
 MORPHER_URL = 'https://ws3.morpher.ru/russian/declension'
 
 
-class WordMorphError(Exception):
+class MorphError(Exception):
     pass
 
 
@@ -30,7 +30,7 @@ def get_morph_data(fio: str) -> dict[str, str]:
     resp = request('get', MORPHER_URL, params={'s': fio, 'format': 'json'})
     json = resp.json()
     if not resp.ok:
-        raise WordMorphError(f'Error ({resp.status_code}): {json["message"]!r}')
+        raise MorphError(f'Error ({resp.status_code}): {json["message"]!r}')
     return json
 
 
@@ -56,11 +56,15 @@ class Morph:
 
 
 def run_tests() -> None:
-    import pytest  # pylint: disable=import-outside-toplevel
+    # import pytest  # pylint: disable=import-outside-toplevel
 
     # test conversion
     name_form_and_given_form = [
-        ('Пупкин Василий Александрович', 'Пупкину Василию Александровичу', 'Василий'),
+        (
+            'Пупкин Василий Александрович',
+            'Пупкину Василию Александровичу',
+            'Василий',
+        ),
         # ('Ермолина Лариса Васильевна', 'Ермолиной Ларисе Васильевне'),
         # ('Каприян Елизавета', 'Каприян Елизавете'),
         # ('Кляузер Марина Николаевна', 'Кляузер Марине Николаевне'),
@@ -78,7 +82,8 @@ def run_tests() -> None:
     # test service error
     # with pytest.raises(WordMorphError) as err:
     #     Morph.from_fio("not in russian")
-    # assert str(err.value) == "Error (496): 'Не найдено русских слов.'", err.value
+    # err_expected ="Error (496): 'Не найдено русских слов.'"
+    # assert str(err.value) == err_expected, err.value
 
     print('tests ok')
 

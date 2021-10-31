@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from time import sleep
 from datetime import datetime
 from pathlib import Path
 import sys
@@ -14,8 +15,9 @@ from send_email import GMail
 from word_morph import Morph
 
 
-# URL = "https://docs.google.com/spreadsheets/d/1ROpqWDORLkllt4-QPYiufGg2CRv1oRMxIK35ZU8JnPg/edit?usp=sharing"
-URL = "https://docs.google.com/spreadsheets/d/1kY2oVoqIK_5pc_wn6ZjZtojoQa0xnWNOd-SCHyHtGHU/edit?usp=sharing"
+URL_BASE = "https://docs.google.com/spreadsheets/d/"
+# URL = URL_BASE + "1ROpqWDORLkllt4-QPYiufGg2CRv1oRMxIK35ZU8JnPg"  # real
+URL = URL_BASE + "1kY2oVoqIK_5pc_wn6ZjZtojoQa0xnWNOd-SCHyHtGHU"  # copy
 
 CERTIFICATES = "сертификаты"
 PARTICIPANTS = "участники"
@@ -156,7 +158,7 @@ class Webinar:
         values = self.document.worksheet(sheet_name).get_all_values()
         return len(values) == len(self.participants)
 
-    def cert_sheet_create(self) -> None:
+    def certificates_sheet_create(self, fill: bool = False) -> None:
         # TODO: headers are subject to change
         headers = ['name', 'given_name', 'just_name', 'email', 'custom_text']
         try:
@@ -169,12 +171,13 @@ class Webinar:
                 cols=len(headers),
             )
             logger.info("done")
-        if self._is_sheet_filled(CERTIFICATES):
-            self.cert_sheet_fill()
+        if fill and not self._is_sheet_filled(CERTIFICATES):
+            self.certificates_sheet_fill()
 
-    def cert_sheet_fill(self) -> None:
+    def certificates_sheet_fill(self) -> None:
         logger.info("filling certificates")
         for participant in self.participants:
+            # TODO: check if participant already in table
             logger.info("{participant.fio} taken")
             try:
                 morph = Morph.from_fio(participant.fio)
@@ -193,7 +196,7 @@ class Webinar:
             self.cert_sheet.append_row(row)
             logger.info("{participant.fio} done")
 
-    def generate_certificates(self) -> None:
+    def certificates_generate(self) -> None:
         logger.info("generating certs")
         for _, given_fio, _, _, _ in self.cert_sheet.get_all_values():
             logger.debug(f"{given_fio} taken")
@@ -231,7 +234,7 @@ class Webinar:
             )
             logger.info(f"{fio} sending email to {email}")
             self.email.send(
-                # to=email,
+                # to=email,  # TODO
                 to=f"antondemkin+{fio.replace(' ', '-')}@yandex.ru",
                 bcc=["antondemkin+python@yandex.ru"],
                 subject=self.title,
@@ -239,4 +242,13 @@ class Webinar:
                 attachments=[str(cert.path)],
             )
             logger.info(f"{fio} done")
+            sleep(3)
         logger.info("sending emails done")
+
+
+if __name__ == '__main__':
+    webinar = Webinar.from_url(URL)
+    webinar.certificates_sheet_create(fill=False)
+    webinar.certificates_sheet_fill()
+    webinar.certificates_generate()
+    webinar.send_emails_with_certificates()
