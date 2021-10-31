@@ -18,6 +18,13 @@ class GMail:
     def from_credentials(cls, user: str, password: str) -> 'GMail':
         return cls(smtp=SMTP(user=user, password=password))
 
+    @classmethod
+    def from_environ(cls) -> 'Gmail':
+        return cls(smtp=SMTP(
+            user=environ.get("GMAILACCOUNT"),
+            password=environ.get("GMAILAPPLICATIONPASSWORD"),
+        ))
+
     def send(
             self,
             to: str,
