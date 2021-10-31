@@ -1,12 +1,16 @@
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+import sys
 
 from gspread import service_account
 from gspread import Spreadsheet
 from gspread import Worksheet
-from gspread.exceptions import APIError
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
+from images import Certificate
+from send_email import GMail
 from word_morph import Morph
 
 
@@ -15,6 +19,16 @@ URL = "https://docs.google.com/spreadsheets/d/1kY2oVoqIK_5pc_wn6ZjZtojoQa0xnWNOd
 
 CERTIFICATES = "сертификаты"
 PARTICIPANTS = "участники"
+
+EMAIL_MESSAGE_TEMPLATE = """Hello, {name}!
+
+Thank you for participating in my webinar!
+
+Your certificate is in attachment.
+{custom_text}
+
+Regards, Python
+"""
 
 
 @dataclass
@@ -95,12 +109,20 @@ class Webinar:
             participants: list[Participant],
             title: str,
             date_str: str,
+            year: int,
+            certs_dir: Path,
+            cert_template: Path,
+            email: GMail,
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
         self.title: str = title
         self.date_str: str = date_str
-        self.certificates_sheet: Worksheet = None
+        self.year: int = year
+        self.cert_sheet: Worksheet = None
+        self.certs_dir = certs_dir
+        self.cert_template = cert_template
+        self.email = email
 
     @classmethod
     def from_url(cls, url: str = URL) -> 'Webinar':
@@ -111,55 +133,110 @@ class Webinar:
             participants_sheet,
             first_row=5,  # NOTE: current sheet only, change in future
         )
-        webinar_title = get_webinar_topic_from_sheet(participants_sheet)
-        webinar_date_str = get_webinar_date_from_sheet(participants_sheet)
+        title = get_webinar_topic_from_sheet(participants_sheet)
+        date_str = get_webinar_date_from_sheet(participants_sheet)
+        year = datetime.now().year
+        cert_template = Path("template_without_date.jpeg")
+        if not cert_template.exists():
+            logger.error(f"{cert_template} not found")
+            sys.exit(1)
+        email = GMail.from_environ()
         return cls(
             document=document,
             participants=participants,
-            title=webinar_title,
-            date_str=webinar_date_str,
+            title=title,
+            date_str=date_str,
+            year=year,
+            certs_dir=Path('.') / 'certificates' / f"{date_str}-{year}",
+            cert_template=cert_template,
+            email=email,
         )
 
     def _is_sheet_filled(self, sheet_name: str) -> bool:
         values = self.document.worksheet(sheet_name).get_all_values()
         return len(values) == len(self.participants)
 
-    def certificates_create_sheet(self) -> None:
+    def cert_sheet_create(self) -> None:
         # TODO: headers are subject to change
         headers = ['name', 'given_name', 'just_name', 'email', 'custom_text']
         try:
-            self.certificates_sheet = self.document.worksheet(CERTIFICATES)
+            self.cert_sheet = self.document.worksheet(CERTIFICATES)
         except WorksheetNotFound:
             logger.info("certificates sheet not found. creating...")
-            self.certificates_sheet = self.document.add_worksheet(
+            self.cert_sheet = self.document.add_worksheet(
                 title=CERTIFICATES,
                 rows=len(self.participants),
                 cols=len(headers),
             )
             logger.info("done")
         if self._is_sheet_filled(CERTIFICATES):
-            logger.info("filling certificates")
-            for participant in self.participants:
-                logger.info("{participant.fio} taken")
-                try:
-                    morph = Morph.from_fio(participant.fio)
-                    logger.info("{participant.fio} morphed")
-                except Exception as err:
-                    logger.exception("Unable to morph {participant.fio}", err)
-                    continue
-                row = [
-                    participant.fio,
-                    morph.fio_given,
-                    morph.name,
-                    participant.email,
-                    '',
-                ]
-                # append every row because Morph is unstable and may fail
-                self.certificates_sheet.append_row(row)
-                logger.info("{participant.fio} done")
+            self.cert_sheet_fill()
+
+    def cert_sheet_fill(self) -> None:
+        logger.info("filling certificates")
+        for participant in self.participants:
+            logger.info("{participant.fio} taken")
+            try:
+                morph = Morph.from_fio(participant.fio)
+                logger.info("{participant.fio} morphed")
+            except Exception as err:
+                logger.exception("Unable to morph {participant.fio}", err)
+                continue
+            row = [
+                participant.fio,
+                morph.fio_given,
+                morph.name,
+                participant.email,
+                '',
+            ]
+            # append every row because Morph is unstable and may fail
+            self.cert_sheet.append_row(row)
+            logger.info("{participant.fio} done")
 
     def generate_certificates(self) -> None:
-        pass
+        logger.info("generating certs")
+        for _, given_fio, _, _, _ in self.cert_sheet.get_all_values():
+            logger.debug(f"{given_fio} taken")
+            cert = Certificate.create(
+                template=self.cert_template,
+                certs_dir=self.certs_dir,
+                name=given_fio,
+                date=self.date_str,
+                year=self.year,
+            )
+            cert.create_file()
+            logger.debug(f"{given_fio} cert path: {str(cert.path)}")
+        logger.info("generating certs done")
 
-    def send_certificates(self) -> None:
-        pass
+    def send_emails_with_certificates(self) -> None:
+        # headers = ['name', 'given_name', 'just_name', 'email', 'custom_text']
+        logger.info("sending emails")
+        rows = self.cert_sheet.get_all_values()
+        for fio, given_fio, name, email, custom_text in rows:
+            logger.debug(f"{fio} taken")
+            cert = Certificate.create(
+                template=self.cert_template,
+                certs_dir=self.certs_dir,
+                name=given_fio,
+                date=self.date_str,
+                year=self.year,
+            )
+            if not cert.exists():
+                logger.debug(f"{fio} generating cert")
+                cert.create_file()
+                logger.debug(f"{fio} generating cert done")
+            message = EMAIL_MESSAGE_TEMPLATE.format(
+                name=name,
+                custom_text=custom_text if custom_text else '',
+            )
+            logger.info(f"{fio} sending email to {email}")
+            self.email.send(
+                # to=email,
+                to=f"antondemkin+{fio.replace(' ', '-')}@yandex.ru",
+                bcc=["antondemkin+python@yandex.ru"],
+                subject=self.title,
+                contents=message,
+                attachments=[str(cert.path)],
+            )
+            logger.info(f"{fio} done")
+        logger.info("sending emails done")
