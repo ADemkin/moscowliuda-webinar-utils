@@ -160,7 +160,7 @@ class Webinar:
 
     def certificates_sheet_create(self, fill: bool = False) -> None:
         # TODO: headers are subject to change
-        headers = ['name', 'given_name', 'just_name', 'email', 'custom_text']
+        headers = ['fio', 'given_fio', 'name', 'email', 'custom_text']
         try:
             self.cert_sheet = self.document.worksheet(CERTIFICATES)
         except WorksheetNotFound:
@@ -182,13 +182,16 @@ class Webinar:
             try:
                 morph = Morph.from_fio(participant.fio)
                 logger.info("{participant.fio} morphed")
+                fio_given = morph.fio_given
+                name = morph.name
             except Exception as err:
                 logger.exception("Unable to morph {participant.fio}", err)
-                continue
+                fio_given = ''
+                name = ''
             row = [
                 participant.fio,
-                morph.fio_given,
-                morph.name,
+                fio_given,
+                name,
                 participant.email,
                 '',
             ]
