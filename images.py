@@ -127,7 +127,7 @@ class Certificate:
     ) -> 'Certificate':
         return cls(
             template=template,
-            path=certs_dir / f"{name}.jpeg",
+            path=(certs_dir / name).with_suffix(".jpeg"),
             name=name,
             date=date,
             year=f"{year} г.",
@@ -160,12 +160,12 @@ def main() -> None:
         sys.exit(1)
     OUTDIR.mkdir(exist_ok=True)
     names = ["Пупкину Весилию Андреевичу"]
-    date = "30-31 октября"
-    year = 2021
+    date = "40-41 феврабля"
+    year = 9999
     webinar_dir = OUTDIR / f"{date} - {year}"
     webinar_dir.mkdir(exist_ok=True)
     for name in names:
-        save_to = webinar_dir / f"{name}.jpeg"
+        save_to = (webinar_dir / "name").with_suffix(".jpeg")
         cert = Certificate.create(
             template=TEMPLATE,
             certs_dir=webinar_dir,
