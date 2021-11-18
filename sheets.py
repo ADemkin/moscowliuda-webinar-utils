@@ -42,7 +42,6 @@ class Participant:
 
     @classmethod
     def from_row(cls, row: list[str]) -> 'Participant':
-        # TODO: remove sanitization because google form sanitizes data itself
         row = sanitize_temporary_row_data(row)
         return cls(*row)
 
@@ -124,8 +123,7 @@ class Webinar:
         self._cert_sheet: Worksheet = None
         self.certs_dir = certs_dir
         self.cert_template = cert_template
-        # self.email = email
-        self.email = None
+        self.email = email
 
     @classmethod
     def from_url(cls, url: str = URL) -> 'Webinar':
@@ -240,11 +238,7 @@ class Webinar:
         # headers = ['name', 'given_name', 'just_name', 'email', 'custom_text']
         logger.info("sending emails")
         for row in self.cert_sheet.get_all_values():
-            if len(row) == 4:
-                fio, given_fio, name, email = row
-                custom_text = ''
-            else:
-                fio, given_fio, name, email, custom_text = row
+            fio, given_fio, name, email, message = row
             logger.debug(f"{fio} taken")
             cert = Certificate.create(
                 template=self.cert_template,
@@ -257,29 +251,30 @@ class Webinar:
                 logger.debug(f"{fio} generating cert")
                 cert.create_file()
                 logger.debug(f"{fio} generating cert done")
-            message = EMAIL_MESSAGE_TEMPLATE.format(
-                name=name,
-                custom_text=custom_text if custom_text else '',
-            )
+            message = message.format(name=name)
             logger.info(f"{fio} sending email to {email}")
+            # Hack to send files with latin name
+            new_file = "/tmp/certificate.jpeg"
+            with open(new_file, "wb") as new_fd:
+                with open(cert.path, "rb") as old_fd:
+                    new_fd.write(old_fd.read())
             self.email.send(
-                # to=email,  # TODO
-                to=f"antondemkin+{fio.replace(' ', '-')}@yandex.ru",
-                bcc=["antondemkin+python@yandex.ru"],
+                to=email,
+                bcc=["antondemkin+python@yandex.ru", "moscowliuda@mail.ru"],
                 subject=self.title,
                 contents=message,
-                attachments=[str(cert.path)],
+                attachments=[new_file],
             )
             logger.info(f"{fio} done")
+            # TODO: mark email as sent in google sheet
         logger.info("sending emails done")
 
 
 if __name__ == '__main__':
     print(URL)
-    # NOTE: DO NOT FORGET GMAILACCOUNT and GMAILAPPLICATIONPASSWORD !!!
+    # tonyflexmusic@gmail.com jnrbviavjvpxtogz
+    # GMAILACCOUNT="milabaltyca@gmail.com" GMAILAPPLICATIONPASSWORD="ybullixoirpowibr"
     webinar = Webinar.from_url(URL)
     # webinar.certificates_sheet_fill()
     # webinar.certificates_generate()
-
-    webinar.email = MailStub()
-    webinar.send_emails_with_certificates()
+    # webinar.send_emails_with_certificates()
