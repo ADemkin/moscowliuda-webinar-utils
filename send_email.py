@@ -3,6 +3,7 @@ from os import environ
 from pathlib import PosixPath
 from typing import Union
 
+from loguru import logger
 from yagmail import SMTP
 
 
@@ -13,6 +14,7 @@ PASSWORD = environ.get("GMAILAPPLICATIONPASSWORD")
 class GMail:
     def __init__(self, smtp: SMTP) -> None:
         self.smtp = smtp
+        self.smtp.log = logger
 
     @classmethod
     def from_credentials(cls, user: str, password: str) -> 'GMail':
@@ -104,3 +106,5 @@ def run_tests():
 
 if __name__ == '__main__':
     run_tests()
+    # me = "tonyflexmusic@gmail.com", "jnrbviavjvpxtogz"
+    # she = "milabaltyca@gmail.com", "ybullixoirpowibr"
