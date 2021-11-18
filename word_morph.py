@@ -56,7 +56,7 @@ class Morph:
 
 
 def run_tests() -> None:
-    # import pytest  # pylint: disable=import-outside-toplevel
+    import pytest  # pylint: disable=import-outside-toplevel
 
     # test conversion
     name_form_and_given_form = [
@@ -65,25 +65,18 @@ def run_tests() -> None:
             'Пупкину Василию Александровичу',
             'Василий',
         ),
-        # ('Ермолина Лариса Васильевна', 'Ермолиной Ларисе Васильевне'),
-        # ('Каприян Елизавета', 'Каприян Елизавете'),
-        # ('Кляузер Марина Николаевна', 'Кляузер Марине Николаевне'),
-        # ('Ватненко Ирина Михайловна', 'Ватненко Ирине Михайловне'),
-        # ('Потолока Ксения Вадимовна', 'Потолоке Ксении Вадимовне'),
-        # ('Крюкова Ангелина Генадиевна', 'Крюковой Ангелине Генадиевне'),
-        # ('Пирков Дмитрий Игоревич', 'Пиркову Дмитрию Игоревичу'),
     ]
-    for fio, fio_given, name in name_form_and_given_form:
+    for fio, fio_given, just_name in name_form_and_given_form:
         morph = Morph.from_fio(fio)
         assert morph.fio == fio
         assert morph.fio_given == fio_given
-        assert morph.name == name
+        assert morph.name == just_name
 
-    # test service error
-    # with pytest.raises(WordMorphError) as err:
-    #     Morph.from_fio("not in russian")
-    # err_expected ="Error (496): 'Не найдено русских слов.'"
-    # assert str(err.value) == err_expected, err.value
+    test service error
+    with pytest.raises(WordMorphError) as err:
+        Morph.from_fio("not in russian")
+    err_expected ="Error (496): 'Не найдено русских слов.'"
+    assert str(err.value) == err_expected, err.value
 
     print('tests ok')
 
