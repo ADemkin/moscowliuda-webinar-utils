@@ -3,36 +3,42 @@ from dataclasses import dataclass
 
 @dataclass
 class Participant:
-    fio: str
+    # TODO: check attributes order
+    family_name: str
+    name: str
+    father_name: str
     phone: str
-    email: str
     instagram: str
+    email: str
 
     @classmethod
     def from_row(cls, row: list[str]) -> 'Participant':
-        row = sanitize_temporary_row_data(row)
+        row = normalize_row_data(row)
         return cls(*row)
 
+    @property
+    def fio(self) -> str:
+        return ' '.join((self.family_name, self.name, self.father_name))
 
-def sanitize_temporary_row_data(row_data: list[str]) -> list[str]:
-    """Temporary hack for current webinar"""
-    if len(row_data) == 2:
-        logger.debug(f"no email for {row_data[0]}")
-        row_data.append('')
-    if len(row_data) == 3:
-        logger.debug(f"no instagram account for {row_data[0]}")
-        row_data.append('')
-    if len(row_data) != 4:
-        logger.error(f"Invalid row with values: {row_data=}")
-    # sanitize name
-    row_data[0] = row_data[0].strip()
-    # sanitize phone
-    phones = row_data[1].strip().split(',')
-    if len(phones) > 1:
-        logger.warning(f"{row_data[0]} has multiple phones: {phones}")
-    row_data[1] = phones[0].replace(' ', '')
-    # sanitize email
-    row_data[2] = row_data[2].strip().replace(' ', '')
-    # sanitize instagram
-    row_data[3] = row_data[3].strip().replace(' ', '')
-    return row_data
+
+def normalize_instagram_account(account: str) -> str:
+    return account.lstrip('@')
+
+
+def normalize_phone_number(number: str) -> str:
+    if number.startswith('8'):
+        number = f'7{number[1:]}'
+    return ''.join(c for c in number if c.isdigit())
+
+
+def normalize_row_data(row: list[str]) -> list[str]:
+    normalized_row = []
+    # skip timestamp from row[0]
+    # TODO: check agruments order
+    normalized_row.append(row[1])  # family_name
+    normalized_row.append(row[2])  # name
+    normalized_row.append(row[3])  # father_name
+    normalized_row.append(normalize_phone_number(row[4]))  # phone
+    normalized_row.append(normalize_instagram_account(row[5]))  # instagram
+    normalized_row.append(row[6])  # email
+    return normalized_row
