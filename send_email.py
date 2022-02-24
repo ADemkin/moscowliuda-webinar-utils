@@ -1,9 +1,10 @@
+from abc import ABCMeta
+from abc import abstractmethod
 from io import IOBase
 from os import environ
 from pathlib import PosixPath
 from typing import Union
 
-from loguru import logger
 from yagmail import SMTP
 
 
@@ -11,10 +12,22 @@ ACCOUNT = "milabaltica@gmail.com"
 PASSWORD = environ.get("GMAILAPPLICATIONPASSWORD")
 
 
-class GMail:
+class AbstractMail(metaclass=ABCMeta):
+    @abstractmethod
+    def send(
+            self,
+            to: str,
+            bcc: list[str] = None,
+            subject: str = None,
+            contents: str = None,
+            attachments: list[Union[str, IOBase, PosixPath]] = None,
+    ) -> None:
+        ...
+
+
+class GMail(AbstractMail):
     def __init__(self, smtp: SMTP) -> None:
         self.smtp = smtp
-        self.smtp.log = logger
 
     @classmethod
     def from_credentials(cls, user: str, password: str) -> 'GMail':
@@ -34,8 +47,8 @@ class GMail:
             subject: str = None,
             contents: str = None,
             attachments: list[Union[str, IOBase, PosixPath]] = None,
-    ) -> dict:
-        return self.smtp.send(
+    ) -> None:
+        self.smtp.send(
             to=to,
             bcc=bcc,
             subject=subject,
@@ -44,7 +57,7 @@ class GMail:
         )
 
 
-class MailStub:
+class MailStub(AbstractMail):
     def send(
             self,
             to: str,
