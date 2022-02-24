@@ -8,13 +8,18 @@ from functools import lru_cache
 from typing import Any
 
 from requests import request
+from requests import Response
 
 
 MORPHER_URL = 'https://ws3.morpher.ru/russian/declension'
 
 
-class MorphError(Exception):
-    pass
+class WordMorphError(Exception):
+    @classmethod
+    def from_resp(cls, response: Response) -> 'WordMorphError':
+        status = response.status_code
+        message = response.json()['message']
+        return cls(f"Status {status!r}: {message!r}")
 
 
 @lru_cache
@@ -28,10 +33,9 @@ def get_morph_data(fio: str) -> dict[str, str]:
     * https://morpher.ru/ws3/#fio-split
     """
     resp = request('get', MORPHER_URL, params={'s': fio, 'format': 'json'})
-    json = resp.json()
     if not resp.ok:
-        raise MorphError(f'Error ({resp.status_code}): {json["message"]!r}')
-    return json
+        raise WordMorphError.from_resp(resp)
+    return resp.json()
 
 
 class Morph:
@@ -72,13 +76,13 @@ def run_tests() -> None:
         assert morph.fio_given == fio_given
         assert morph.name == just_name
 
-    test service error
+    # test service error
     with pytest.raises(WordMorphError) as err:
         Morph.from_fio("not in russian")
-    err_expected ="Error (496): 'Не найдено русских слов.'"
+    err_expected = "Status 496: 'Не найдено русских слов.'"
     assert str(err.value) == err_expected, err.value
 
-    print('tests ok')
+    print('tests OK')
 
 
 if __name__ == '__main__':
