@@ -125,6 +125,8 @@ class Certificate:
             date: str,
             year: int,
     ) -> 'Certificate':
+        if not template.exists():
+            raise RuntimeError(f"{str(template)} no exists")
         return cls(
             template=template,
             path=(certs_dir / name).with_suffix(".jpeg"),
