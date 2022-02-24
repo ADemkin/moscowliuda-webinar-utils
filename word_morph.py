@@ -57,33 +57,3 @@ class Morph:
     @property
     def name(self) -> str:
         return self.data['ФИО']['И']
-
-
-def run_tests() -> None:
-    import pytest  # pylint: disable=import-outside-toplevel
-
-    # test conversion
-    name_form_and_given_form = [
-        (
-            'Пупкин Василий Александрович',
-            'Пупкину Василию Александровичу',
-            'Василий',
-        ),
-    ]
-    for fio, fio_given, just_name in name_form_and_given_form:
-        morph = Morph.from_fio(fio)
-        assert morph.fio == fio
-        assert morph.fio_given == fio_given
-        assert morph.name == just_name
-
-    # test service error
-    with pytest.raises(WordMorphError) as err:
-        Morph.from_fio("not in russian")
-    err_expected = "Status 496: 'Не найдено русских слов.'"
-    assert str(err.value) == err_expected, err.value
-
-    print('tests OK')
-
-
-if __name__ == '__main__':
-    run_tests()
