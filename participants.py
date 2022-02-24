@@ -26,6 +26,7 @@ def normalize_instagram_account(account: str) -> str:
 
 
 def normalize_phone_number(number: str) -> str:
+    number = number.lstrip('+')
     if number.startswith('8'):
         number = f'7{number[1:]}'
     return ''.join(c for c in number if c.isdigit())
