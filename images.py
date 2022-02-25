@@ -2,11 +2,9 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from loguru import logger
-from PIL import Image  # type: ignore
+from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-
 
 
 BLACK = (0, 0, 0)
@@ -97,58 +95,60 @@ def create_certificate(
         return image
 
 
-class Certificate:
-    def __init__(
-            self,
-            template: Path,
-            path: Path,
-            name: str,
-            date: str,
-            year: str,
-    ) -> None:
-        self.template: Path = template
-        self.path: Path = path
-        self.name: str = name
-        self.date: str = date
-        self.year: str = year
-        self._image: Image = None
+class BaseCertificateGenerator:
+    _templates_dir: Path = Path("templates")
+    template: str = ''
+
+    def __init__(self, working_dir: Path, date: str, year: str) -> None:
+        self._working_dir = working_dir
+        self._date = date
+        self._year = year
 
     @classmethod
     def create(
             cls,
-            template: Path,
-            certs_dir: Path,
-            name: str,
+            working_dir: Path,
             date: str,
             year: int,
-    ) -> 'Certificate':
-        if not template.exists():
-            raise RuntimeError(f"{str(template.absolute())} not exists")
+    ) -> 'BaseCertificateGenerator':
         return cls(
-            template=template,
-            path=(certs_dir / name).with_suffix(".jpeg"),
-            name=name,
+            working_dir=working_dir,
             date=date,
             year=f"{year} г.",
         )
 
-    def exists(self) -> bool:
-        return self.path.exists() and self.path.is_file()
-
     @property
-    def image(self) -> Image:
-        if self._image is None:
-            self._image = create_certificate(
-                template=self.template,
-                name=self.name,
-                date=self.date,
-                year=self.year,
-            )
-        return self._image
+    def _template_path(self) -> Path:
+        return self._templates_dir / self.template
 
-    def create_file(self) -> None:
-        if self.exists():
-            return
-        logger.info(f"{self.path} taken")
-        self.image.save(str(self.path))
-        logger.info(f"{self.path} done")
+    def generate_cerificate(self, name: str) -> Path:
+        image = create_certificate(
+            template=self._template_path,
+            name=name,
+            date=self._date,
+            year=self._year,
+
+        )
+        file_name = (self._working_dir / name).with_suffix(".jpeg")
+        image.save(file_name)
+        return Path(file_name)
+
+
+class SpeechCertGen(BaseCertificateGenerator):
+    template: str = "template_speech.jpeg"
+
+
+class GrammarCertGen(BaseCertificateGenerator):
+    template: str = "template_grammar.jpeg"
+
+
+TITLE_TO_CLASS = {
+    "формирование базовых грамматических представлений": GrammarCertGen,
+    "практика запуска речи": SpeechCertGen,
+}
+
+
+def get_cert_gen_from_webinar_title(title: str) -> BaseCertificateGenerator:
+    if (class_ := TITLE_TO_CLASS.get(title.lower())):
+        return class_
+    raise ValueError(f"Unknown webinar title: {title!r}")

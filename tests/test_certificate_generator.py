@@ -1,39 +1,80 @@
 from pathlib import Path
-from typing import cast
 
 import pytest
 
-from images import Certificate
+from images import BaseCertificateGenerator
+from images import GrammarCertGen
+from images import SpeechCertGen
+from images import get_cert_gen_from_webinar_title
+from PIL import Image
 
 TEMPLATE = Path("tests/test_template.jpeg")
 
 
-def test_cerificate_generate_certificate(tmp_path: Path) -> None:
-    name = "Имя Фамилия Отчество"
-    date = "40-41 феврабля"
-    year = 2020
-    cert = Certificate.create(
-        template=TEMPLATE,
-        certs_dir=tmp_path,
-        name=name,
-        date=date,
-        year=year,
+@pytest.mark.parametrize("cert_gen_class", [
+    GrammarCertGen,
+    SpeechCertGen,
+])
+def test_certificate_generates_correct_jpeg_file(
+        cert_gen_class: BaseCertificateGenerator,
+        tmp_path: Path,
+) -> None:
+    cert_gen = GrammarCertGen.create(
+        working_dir=tmp_path,
+        date="20-21 сентября",
+        year=2022,
     )
-    cert.create_file()
+    cert = cert_gen.generate_cerificate("Василий Пупкин")
     assert cert.exists()
-    assert cert.path == (tmp_path / name).with_suffix(".jpeg")
+    Image.open(cert, formats=["jpeg"]).verify()
 
 
-def test_certificate_gives_error_if_template_not_exitts() -> None:
-    path = Path("/random/path/that/does/not/exist")
-    assert not path.exists()
-    with pytest.raises(RuntimeError) as err:
-        Certificate.create(
-            template=path,
-            certs_dir=cast(Path, 'does-not-matter'),
-            name='does-not-matter',
-            date='does-not-matter',
-            year='does-not-matter',
-        )
-    err_expected = f"{str(path)} not exists"
-    assert str(err.value) == err_expected
+@pytest.mark.parametrize("cert_gen_class", [
+    GrammarCertGen,
+    SpeechCertGen,
+])
+def test_if_given_different_names_then_files_are_different(
+        cert_gen_class: BaseCertificateGenerator,
+        tmp_path: Path,
+) -> None:
+    cert_gen = GrammarCertGen.create(
+        working_dir=tmp_path,
+        date="20-21 сентября",
+        year=2022,
+    )
+    cert_a = cert_gen.generate_cerificate("Василий Пупкин")
+    cert_b = cert_gen.generate_cerificate("Пётр Курочки")
+    assert str(cert_a) != str(cert_b)
+    assert Image.open(cert_a).tobytes() != Image.open(cert_b).tobytes()
+
+
+@pytest.mark.parametrize("cert_gen_class", [
+    GrammarCertGen,
+    SpeechCertGen,
+])
+def test_cert_file_is_created_inside_given_directory(
+        cert_gen_class: BaseCertificateGenerator,
+        tmp_path: Path,
+) -> None:
+    cert_gen = GrammarCertGen.create(
+        working_dir=tmp_path,
+        date="20-21 сентября",
+        year=2022,
+    )
+    cert_path = cert_gen.generate_cerificate("Пётр Курочки")
+    tmp_dir_contents = [f for f in tmp_path.glob("*")]
+    assert len(tmp_dir_contents) == 1
+    assert cert_path in tmp_dir_contents
+
+
+@pytest.mark.parametrize("title_and_cert_gen_class", [
+    ("Формирование базовых грамматических представлений", GrammarCertGen),
+    ("Формирование Базовых Грамматических Представлений", GrammarCertGen),
+    ("практика запуска речи", SpeechCertGen),
+    ("Практика Запуска Речи", SpeechCertGen),
+])
+def test_if_given_correct_title_then_gives_corresponding_cert_gen(
+    title_and_cert_gen_class: tuple[str, BaseCertificateGenerator],
+) -> None:
+    title, cert_gen_class = title_and_cert_gen_class
+    assert get_cert_gen_from_webinar_title(title) == cert_gen_class

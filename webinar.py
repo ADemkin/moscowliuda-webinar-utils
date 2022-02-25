@@ -1,12 +1,16 @@
 from datetime import datetime
+from os import rename
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from time import sleep
+import atexit
 
 from gspread import Spreadsheet
 from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
 
-from images import Certificate
+from images import BaseCertificateGenerator
+from images import get_cert_gen_from_webinar_title
 from loguru import logger
 from participants import Participant
 from send_email import AbstractMail
@@ -18,10 +22,6 @@ from sheets import open_spreadsheet
 from word_morph import Morph
 
 
-URL = (
-    "https://docs.google.com/spreadsheets/d/"
-    "18k_3stoWisJEzebVbnqcviJgLZsYmy_WFpNSgWc-QSc"
-)
 URL = "https://docs.google.com/spreadsheets/d/1mj6-i4uC5HM_v-WLB3jgo22SvruULnawCNxlkGgWDIU/edit?usp=sharing"
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
@@ -35,9 +35,9 @@ class Webinar:
             title: str,
             date_str: str,
             year: int,
-            certs_dir: Path,
-            cert_template: Path,
             email: AbstractMail,
+            cert_gen: BaseCertificateGenerator,
+            tmp_dir: Path,
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
@@ -45,9 +45,9 @@ class Webinar:
         self.date_str: str = date_str
         self.year: int = year
         self._cert_sheet: Worksheet = None
-        self.certs_dir = certs_dir
-        self.cert_template = cert_template
         self.email = email
+        self.cert_gen = cert_gen
+        self.tmp_dir = tmp_dir
 
     @classmethod
     def from_url(cls, url: str = URL) -> 'Webinar':
@@ -62,24 +62,30 @@ class Webinar:
         date_str, title = get_webinar_date_and_title(document)
         year = datetime.now().year
         # get certificates data
-        # cert_template = Path("template_speech.jpeg")
-        cert_template = Path("template_grammar.jpeg")
-        certs_parent_dir = Path('.') / 'certificates'
+        certs_parent_dir = Path("certificates")
         certs_parent_dir.mkdir(exist_ok=True)
-        certs_dir = certs_parent_dir / f"{date_str}-{year}"
+        certs_dir = certs_parent_dir / f"{date_str} {year}"
         certs_dir.mkdir(exist_ok=True)
+        _title_hack = "формирование базовых грамматических представлений"
+        cert_gen = get_cert_gen_from_webinar_title(_title_hack).create(
+            working_dir=certs_dir,
+            date=date_str,
+            year=year,
+        )
         # create mailer
-        # email = MailStub()
-        email = GMail.from_environ()
+        email = MailStub()
+        # email = GMail.from_environ()
+        working_dir = TemporaryDirectory()
+        atexit.register(working_dir.cleanup)
         return cls(
             document=document,
             participants=participants,
             title=title,
             date_str=date_str,
             year=year,
-            certs_dir=certs_dir,
-            cert_template=cert_template,
             email=email,
+            cert_gen=cert_gen,
+            tmp_dir=Path(working_dir.name),
         )
 
     def _is_sheet_filled(self, sheet_name: str) -> bool:
@@ -150,15 +156,8 @@ class Webinar:
         for row in self.cert_sheet.get_all_values():
             given_fio = row[1]
             logger.debug(f"{given_fio} taken")
-            certificate = Certificate.create(
-                template=self.cert_template,
-                certs_dir=self.certs_dir,
-                name=given_fio,
-                date=self.date_str,
-                year=self.year,
-            )
-            certificate.create_file()
-            logger.debug(f"{given_fio} cert path: {str(certificate.path)}")
+            cert_file = self.cert_gen.generate_cerificate(given_fio)
+            logger.debug(f"{given_fio} cert path: {str(cert_file)}")
         logger.info("generating certs done")
 
     def send_emails_with_certificates(self) -> None:
@@ -167,34 +166,21 @@ class Webinar:
         for row in self.cert_sheet.get_all_values():
             fio, given_fio, _, email, message = row
             logger.debug(f"{fio} taken")
-            cert = Certificate.create(
-                template=self.cert_template,
-                certs_dir=self.certs_dir,
-                name=given_fio,
-                date=self.date_str,
-                year=self.year,
-            )
-            if not cert.exists():
-                logger.debug(f"{fio} generating cert")
-                cert.create_file()
-                logger.debug(f"{fio} generating cert done")
-            # message = message.format(name=name)
+            cert_file = self.cert_gen.generate_cerificate(given_fio)
             logger.info(f"{fio} sending email to {email}")
-            # Hack to send files with latin name
-            new_file = "/tmp/certificate.jpeg"
-            with open(new_file, "wb") as new_fd:
-                with open(cert.path, "rb") as old_fd:
-                    new_fd.write(old_fd.read())
+            ascii_file_name = self.tmp_dir / "certificate.jpeg"
+            rename(cert_file, ascii_file_name)
+            logger.debug(f"cert file: {ascii_file_name}")
             self.email.send(
                 to=email,
                 bcc=["antondemkin+python@yandex.ru", "moscowliuda@mail.ru"],
                 subject=self.title,
                 contents=message,
-                attachments=[new_file],
+                attachments=[str(ascii_file_name)],
             )
             logger.info(f"{fio} done")
             # TODO: mark email as sent in google sheet
-            sleep(3)
+            # sleep(3)
         logger.info("sending emails done")
 
 
@@ -206,6 +192,6 @@ if __name__ == '__main__':
     webinar = Webinar.from_url(URL)
     # webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
-    # webinar.certificates_generate()
+    webinar.certificates_generate()
     # make sure that certificates are correct
-    # webinar.send_emails_with_certificates()
+    webinar.send_emails_with_certificates()
