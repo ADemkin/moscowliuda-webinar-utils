@@ -1,4 +1,5 @@
 from datetime import datetime
+from os import makedirs
 from os import rename
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -62,10 +63,8 @@ class Webinar:
         date_str, title = get_webinar_date_and_title(document)
         year = datetime.now().year
         # get certificates data
-        certs_parent_dir = Path("certificates")
-        certs_parent_dir.mkdir(exist_ok=True)
-        certs_dir = certs_parent_dir / f"{date_str} {year}"
-        certs_dir.mkdir(exist_ok=True)
+        certs_dir = Path("certificates") / f"{date_str} {year}"
+        makedirs(str(certs_dir), mode=0o700, exist_ok=True)
         _title_hack = "формирование базовых грамматических представлений"
         cert_gen = get_cert_gen_from_webinar_title(_title_hack).create(
             working_dir=certs_dir,
@@ -194,4 +193,4 @@ if __name__ == '__main__':
     # make sure that names transformed correctly
     webinar.certificates_generate()
     # make sure that certificates are correct
-    webinar.send_emails_with_certificates()
+    # webinar.send_emails_with_certificates()
