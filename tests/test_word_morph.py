@@ -10,6 +10,11 @@ from word_morph import WordMorphError
         'Пупкину Василию Александровичу',
         'Василий',
     ),
+    (
+        'Качалова Анастасия Валерьевна',
+        'Качаловой Анастасии Валерьевне',
+        'Анастасия',
+    ),
 ])
 def test_name_changes_to_given_form(
         fio: str,
