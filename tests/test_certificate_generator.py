@@ -3,9 +3,11 @@ from pathlib import Path
 import pytest
 
 from images import BaseCertificateGenerator
+from images import get_cert_gen_from_webinar_title
 from images import GrammarCertGen
 from images import SpeechCertGen
-from images import get_cert_gen_from_webinar_title
+from images import TextGrammarCertGen
+from images import TextSpeechCertGen
 from PIL import Image
 
 TEMPLATE = Path("tests/test_template.jpeg")
@@ -78,3 +80,24 @@ def test_if_given_correct_title_then_gives_corresponding_cert_gen(
 ) -> None:
     title, cert_gen_class = title_and_cert_gen_class
     assert get_cert_gen_from_webinar_title(title) == cert_gen_class
+
+
+@pytest.mark.parametrize("cert_gen_class", [
+    TextGrammarCertGen,
+    TextSpeechCertGen,
+])
+def test_certificate_contain_all_given_data(
+        cert_gen_class: BaseCertificateGenerator,
+        tmp_path: Path,
+) -> None:
+    name = "Иванов Иван Иванович"
+    date = "26-27 февраля"
+    year = 2022
+    cert_gen = cert_gen_class.create(tmp_path, date, year)
+    cert_gen.generate_cerificate(name)
+    cert_path = tmp_path / name
+    assert cert_path.exists()
+    content = cert_path.read_text()
+    assert name in content
+    assert f"{year} г." in content
+    assert date in content

@@ -149,3 +149,23 @@ def get_cert_gen_from_webinar_title(title: str) -> BaseCertificateGenerator:
     if (class_ := title_to_class.get(title.lower())):
         return class_
     raise ValueError(f"Unknown webinar title: {title!r}")
+
+
+class TextCertificateGenerator(BaseCertificateGenerator):
+    def generate_cerificate(self, name: str) -> Path:
+        file_name = self._working_dir / name
+        with open(file_name, "wb") as fd:
+            fd.write(f"template: {self.template}\n".encode())
+            fd.write(f"name: {name}\n".encode())
+            fd.write(f"date: {self._date}\n".encode())
+            fd.write(f"year: {self._year}\n".encode())
+            fd.flush()
+        return Path(file_name)
+
+
+class TextSpeechCertGen(SpeechCertGen, TextCertificateGenerator):
+    pass
+
+
+class TextGrammarCertGen(SpeechCertGen, TextCertificateGenerator):
+    pass
