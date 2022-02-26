@@ -127,7 +127,6 @@ class BaseCertificateGenerator:
             name=name,
             date=self._date,
             year=self._year,
-
         )
         file_name = (self._working_dir / name).with_suffix(".jpeg")
         image.save(file_name)
@@ -142,13 +141,11 @@ class GrammarCertGen(BaseCertificateGenerator):
     template: str = "template_grammar.jpeg"
 
 
-TITLE_TO_CLASS = {
-    "формирование базовых грамматических представлений": GrammarCertGen,
-    "практика запуска речи": SpeechCertGen,
-}
-
-
 def get_cert_gen_from_webinar_title(title: str) -> BaseCertificateGenerator:
-    if (class_ := TITLE_TO_CLASS.get(title.lower())):
+    title_to_class = {
+        "формирование базовых грамматических представлений": GrammarCertGen,
+        "практика запуска речи": SpeechCertGen,
+    }
+    if (class_ := title_to_class.get(title.lower())):
         return class_
     raise ValueError(f"Unknown webinar title: {title!r}")
