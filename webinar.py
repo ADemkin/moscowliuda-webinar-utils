@@ -60,7 +60,7 @@ class Webinar:
             first_row=1,
         )
         # get title and date
-        date_str, title = get_webinar_date_and_title(document)
+        date_str, title = get_webinar_date_and_title(document.title)
         year = datetime.now().year
         # get certificates data
         certs_dir = Path("certificates") / f"{date_str} {year}"

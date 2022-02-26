@@ -31,16 +31,17 @@ def get_participants_from_sheet(
     return participants
 
 
-def get_webinar_date_and_title(document: Spreadsheet) -> tuple[str, str]:
-    title = document.title.rstrip(" (Responses)")
-    groups = re.match(r"(\d{1,2}\-\d{1,2} \w+) (.*)", title).groups()
-    if len(groups) != 2:
-        raise RuntimeError(
-            "Spreadsheet title does not contain date and webinar title. "
-            "Use format: "
-            "'19-20 Февраля Формирование базовых графических представлений'"
-        )
-    return groups
+def get_webinar_date_and_title(title: str) -> tuple[str, str]:
+    title = title.rstrip(" (Responses)")
+    if (match := re.match(r"(\d{1,2}\-\d{1,2} \w+) (.*)", title)):
+        if (groups := match.groups()):
+            if len(groups) == 2:
+                return groups
+    raise RuntimeError(
+        "Title does not contain date and webinar title. "
+        "Use format: "
+        "'19-20 Февраля Формирование базовых графических представлений'"
+    )
 
 
 def ensure_permissions(document: Spreadsheet) -> None:
