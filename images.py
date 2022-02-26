@@ -141,17 +141,9 @@ class GrammarCertGen(BaseCertificateGenerator):
     template: str = "template_grammar.jpeg"
 
 
-def get_cert_gen_from_webinar_title(title: str) -> BaseCertificateGenerator:
-    title_to_class = {
-        "формирование базовых грамматических представлений": GrammarCertGen,
-        "практика запуска речи": SpeechCertGen,
-    }
-    if (class_ := title_to_class.get(title.lower())):
-        return class_
-    raise ValueError(f"Unknown webinar title: {title!r}")
-
-
 class TextCertificateGenerator(BaseCertificateGenerator):
+    template = "__no_template__"
+
     def generate_cerificate(self, name: str) -> Path:
         file_name = self._working_dir / name
         with open(file_name, "wb") as fd:
@@ -163,9 +155,12 @@ class TextCertificateGenerator(BaseCertificateGenerator):
         return Path(file_name)
 
 
-class TextSpeechCertGen(SpeechCertGen, TextCertificateGenerator):
-    pass
-
-
-class TextGrammarCertGen(SpeechCertGen, TextCertificateGenerator):
-    pass
+def get_cert_gen_from_webinar_title(title: str) -> BaseCertificateGenerator:
+    title_to_class = {
+        "формирование базовых грамматических представлений": GrammarCertGen,
+        "практика запуска речи": SpeechCertGen,
+        "test webinar": TextCertificateGenerator,
+    }
+    if (class_ := title_to_class.get(title.lower())):
+        return class_
+    raise ValueError(f"Unknown webinar title: {title!r}")
