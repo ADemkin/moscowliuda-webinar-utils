@@ -50,4 +50,6 @@ def create_test_sheet(rows: list[list[str]] = None) -> Worksheet:
         sheet.clear()
         sheet.append_row(TITLE_CELL_NAMES)
         sheet.append_rows(rows)
+    assert 'Формирование базовых графических представлений' in document.title
+    assert '00-99 Месяц' in document.title
     return document
