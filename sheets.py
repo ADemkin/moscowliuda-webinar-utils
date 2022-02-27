@@ -36,7 +36,7 @@ def get_webinar_date_and_title(title: str) -> tuple[str, str]:
     if (match := re.match(r"(\d{1,2}\-\d{1,2} \w+) (.*)", title)):
         if (groups := match.groups()):
             if len(groups) == 2:
-                return groups
+                return str(groups[0]), str(groups[1])
     raise RuntimeError(
         "Title does not contain date and webinar title. "
         "Use format: "

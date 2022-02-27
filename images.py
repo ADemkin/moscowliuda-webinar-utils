@@ -155,7 +155,9 @@ class TextCertificateGenerator(BaseCertificateGenerator):
         return Path(file_name)
 
 
-def get_cert_gen_from_webinar_title(title: str) -> BaseCertificateGenerator:
+def get_cert_gen_from_webinar_title(
+        title: str,
+) -> type[BaseCertificateGenerator]:
     title_to_class = {
         "формирование базовых грамматических представлений": GrammarCertGen,
         "практика запуска речи": SpeechCertGen,

@@ -3,7 +3,6 @@ from os import makedirs
 from os import rename
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from time import sleep
 import atexit
 
 from gspread import Spreadsheet
@@ -23,7 +22,10 @@ from sheets import open_spreadsheet
 from word_morph import Morph
 
 
-URL = "https://docs.google.com/spreadsheets/d/1mj6-i4uC5HM_v-WLB3jgo22SvruULnawCNxlkGgWDIU/edit?usp=sharing"
+URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    "1mj6-i4uC5HM_v-WLB3jgo22SvruULnawCNxlkGgWDIU/edit?usp=sharing"
+)
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 

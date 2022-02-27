@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 
+from protocols import RowT
+
 
 @dataclass
 class Participant:
-    # TODO: check attributes order
+    timestamp: str
     family_name: str
     name: str
     father_name: str
@@ -12,9 +14,8 @@ class Participant:
     email: str
 
     @classmethod
-    def from_row(cls, row: list[str]) -> 'Participant':
-        row = normalize_row_data(row)
-        return cls(*row)
+    def from_row(cls, row: RowT) -> 'Participant':
+        return cls(*normalize_row(row))
 
     @property
     def fio(self) -> str:
@@ -32,14 +33,24 @@ def normalize_phone_number(number: str) -> str:
     return ''.join(c for c in number if c.isdigit())
 
 
-def normalize_row_data(row: list[str]) -> list[str]:
+def strip(string: str) -> str:
+    return string.strip()
+
+
+def normalize_row(row: RowT) -> list[str]:
     normalized_row = []
-    # skip timestamp from row[0]
-    # TODO: check agruments order
-    normalized_row.append(row[1].strip())  # family_name
-    normalized_row.append(row[2].strip())  # name
-    normalized_row.append(row[3].strip())  # father_name
-    normalized_row.append(normalize_phone_number(row[4]))  # phone
-    normalized_row.append(normalize_instagram_account(row[5]))  # instagram
-    normalized_row.append(row[6])  # email
+    # timetamp
+    normalized_row.append(strip(row[0]))  # type: ignore
+    # family name
+    normalized_row.append(strip(row[1]))  # type: ignore
+    # name
+    normalized_row.append(strip(row[2]))  # type: ignore
+    # father name
+    normalized_row.append(strip(row[3]))  # type: ignore
+    # phone
+    normalized_row.append(normalize_phone_number(row[4]))  # type: ignore
+    # instagram
+    normalized_row.append(normalize_instagram_account(row[5]))  # type: ignore
+    # email
+    normalized_row.append(strip(row[6]))  # type: ignore
     return normalized_row

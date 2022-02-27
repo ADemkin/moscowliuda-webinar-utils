@@ -1,20 +1,14 @@
+from typing import Callable
+
 from models import Participant
 from participants import normalize_instagram_account
 from participants import normalize_phone_number
 from tests.common import create_row
 
-# 'timestamp',
-# 'family',
-# 'name',
-# 'father',
-# 'phone',
-# 'instagram',
-# 'email',
-# 'fio_given',
-# 'message',
 
-
-def test_participant_fields_gives_data_from_sheet(create_sheet: any) -> None:
+def test_participant_fields_gives_data_from_sheet(
+        create_sheet: Callable,
+) -> None:
     sheet = create_sheet([
         create_row(
             timestamp="now",
@@ -23,7 +17,7 @@ def test_participant_fields_gives_data_from_sheet(create_sheet: any) -> None:
             father="Андреевич",
             email="a@ya.ru",
         ),
-    ]).sheet1
+    ])
     participant = Participant(sheet, 2)
     assert participant.timestamp == "now"
     assert participant.name == "Антон"
@@ -32,7 +26,7 @@ def test_participant_fields_gives_data_from_sheet(create_sheet: any) -> None:
     assert participant.email == "a@ya.ru"
 
 
-def test_participant_gives_normalized_fields(create_sheet: any) -> None:
+def test_participant_gives_normalized_fields(create_sheet: Callable) -> None:
     phone = "89161234567"
     instagram = "@_anton_"
     sheet = create_sheet([
@@ -43,32 +37,32 @@ def test_participant_gives_normalized_fields(create_sheet: any) -> None:
             phone=phone,
             instagram=instagram,
         ),
-    ]).sheet1
+    ])
     participant = Participant(sheet, 2)
     assert participant.phone == normalize_phone_number(phone)
     assert participant.instagram == normalize_instagram_account(instagram)
 
 
-def test_participant_gives_correct_given_fio(create_sheet: any) -> None:
+def test_participant_gives_correct_given_fio(create_sheet: Callable) -> None:
     sheet = create_sheet([
         create_row(
             family="Мазаев",
             name="Антон",
             father="Андреевич",
         ),
-    ]).sheet1
+    ])
     participant = Participant(sheet, 2)
     assert participant.fio_given == "Мазаеву Антону Андреевичу"
 
 
-def test_participant_updates_empty_fields(create_sheet: any) -> None:
+def test_participant_updates_empty_fields(create_sheet: Callable) -> None:
     sheet = create_sheet([
         create_row(
             family="Мазаев",
             name="Антон",
             father="Андреевич",
         ),
-    ]).sheet1
+    ])
     participant = Participant(sheet, 2)
     assert participant.message == ''
     message = "Hello, {username}!"
