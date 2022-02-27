@@ -58,6 +58,9 @@ class GMail(AbstractMail):
 
 
 class MailStub(AbstractMail):
+    def __init__(self) -> None:
+        self._call_args: list[dict] = []
+
     def send(
             self,
             to: str,
@@ -66,6 +69,13 @@ class MailStub(AbstractMail):
             contents: str = None,
             attachments: list[Union[str, IOBase, PosixPath]] = None,
     ) -> None:
+        self._call_args.append(dict(
+            to=to,
+            bcc=bcc,
+            subject=subject,
+            contents=contents,
+            attachments=attachments,
+        ))
         print(f"""--- sending email ---
     {to=}
     {bcc=}
@@ -73,6 +83,12 @@ class MailStub(AbstractMail):
     {contents=}
     {attachments=}
 --- done ---""")
+
+    def assert_email_sent_to(self, to: str) -> bool:
+        for call in self._call_args:
+            if call['to'] == to:
+                return True
+        return False
 
 
 def run_tests():

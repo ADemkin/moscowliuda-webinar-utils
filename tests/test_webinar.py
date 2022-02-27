@@ -1,13 +1,11 @@
 from pathlib import Path
 from os import listdir
 
-import pytest
-
 from images import TextCertificateGenerator
+from participants import Participant
 from send_email import MailStub
 from tests.common import create_row
 from webinar import Webinar
-from participants import Participant
 
 
 def test_webinar_generate_certificates_for_given_participants(
@@ -50,4 +48,6 @@ def test_webinar_generate_certificates_for_given_participants(
         assert date_str in content
         assert str(year) in content
     webinar.send_emails_with_certificates()
+    for participant in participants:
+        mail_stub.assert_email_sent_to(participant.email)
     assert listdir(tmp_path) == ["certificate.jpeg"]
