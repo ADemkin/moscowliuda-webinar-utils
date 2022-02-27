@@ -10,7 +10,7 @@ from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
 
 from images import BaseCertificateGenerator
-from images import get_cert_gen_from_webinar_title
+from factory import get_cert_gen_from_webinar_title
 from loguru import logger
 from participants import Participant
 from send_email import AbstractMail

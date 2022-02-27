@@ -3,13 +3,10 @@ from pathlib import Path
 import pytest
 
 from images import BaseCertificateGenerator
-from images import get_cert_gen_from_webinar_title
 from images import GrammarCertGen
 from images import SpeechCertGen
 from images import TextCertificateGenerator
 from PIL import Image
-
-TEMPLATE = Path("tests/test_template.jpeg")
 
 
 @pytest.mark.parametrize("cert_gen_class", [
@@ -66,21 +63,6 @@ def test_cert_file_is_created_inside_given_directory(
     tmp_dir_contents = [f for f in tmp_path.glob("*")]
     assert len(tmp_dir_contents) == 1
     assert cert_path in tmp_dir_contents
-
-
-@pytest.mark.parametrize("title,cert_gen_class", [
-    ("Формирование базовых грамматических представлений", GrammarCertGen),
-    ("Формирование Базовых Грамматических Представлений", GrammarCertGen),
-    ("практика запуска речи", SpeechCertGen),
-    ("Практика Запуска Речи", SpeechCertGen),
-    ("Test Webinar", TextCertificateGenerator),
-    ("test webinar", TextCertificateGenerator),
-])
-def test_if_given_correct_title_then_gives_corresponding_cert_gen(
-    title: str,
-    cert_gen_class: BaseCertificateGenerator,
-) -> None:
-    assert get_cert_gen_from_webinar_title(title) == cert_gen_class
 
 
 def test_certificate_contain_all_given_data(tmp_path: Path) -> None:

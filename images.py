@@ -153,16 +153,3 @@ class TextCertificateGenerator(BaseCertificateGenerator):
             fd.write(f"year: {self._year}\n".encode())
             fd.flush()
         return Path(file_name)
-
-
-def get_cert_gen_from_webinar_title(
-        title: str,
-) -> type[BaseCertificateGenerator]:
-    title_to_class = {
-        "формирование базовых грамматических представлений": GrammarCertGen,
-        "практика запуска речи": SpeechCertGen,
-        "test webinar": TextCertificateGenerator,
-    }
-    if (class_ := title_to_class.get(title.lower())):
-        return class_
-    raise ValueError(f"Unknown webinar title: {title!r}")
