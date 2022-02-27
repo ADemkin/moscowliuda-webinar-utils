@@ -20,9 +20,9 @@ TITLE_CELL_NAMES = [
 
 
 def create_row(
-        family_name: str,
+        family: str,
         name: str,
-        father_name: str,
+        father: str,
         timestamp: str = None,
         phone: str = '+79161234567',
         instagram: str = '@instagram',
@@ -31,9 +31,9 @@ def create_row(
     timestamp = timestamp or str(datetime.now())
     return [
         timestamp,
-        family_name,
+        family,
         name,
-        father_name,
+        father,
         phone,
         instagram,
         email,
