@@ -7,6 +7,7 @@ from send_email import MailStub
 from tests.common import create_row
 from tests.common import CreateDocumentT
 from webinar import Webinar
+from word_morph import offline_morph
 
 
 def test_webinar_generate_certificates_for_given_participants(
@@ -36,6 +37,7 @@ def test_webinar_generate_certificates_for_given_participants(
             year=str(year),
         ),
         tmp_dir=tmp_path,
+        morphological=offline_morph,
     )
     webinar.certificates_sheet_fill()
     webinar.certificates_generate()

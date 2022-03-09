@@ -4,6 +4,7 @@ from os import rename
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import atexit
+from typing import Callable
 
 from gspread import Spreadsheet
 from gspread import Worksheet
@@ -19,7 +20,7 @@ from send_email import MailStub
 from sheets import get_participants_from_sheet
 from sheets import get_webinar_date_and_title
 from sheets import open_spreadsheet
-from word_morph import Morph
+from word_morph import online_morph
 
 
 URL = (
@@ -41,6 +42,7 @@ class Webinar:
             email: AbstractMail,
             cert_gen: BaseCertificateGenerator,
             tmp_dir: Path,
+            morphological: Callable[[str], str],
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
@@ -51,6 +53,7 @@ class Webinar:
         self.email = email
         self.cert_gen = cert_gen
         self.tmp_dir = tmp_dir
+        self.morphological = morphological
 
     @classmethod
     def from_url(cls, url: str = URL) -> 'Webinar':
@@ -87,6 +90,7 @@ class Webinar:
             email=email,
             cert_gen=cert_gen,
             tmp_dir=Path(working_dir.name),
+            morphological=online_morph,
         )
 
     def _is_sheet_filled(self, sheet_name: str) -> bool:
@@ -128,22 +132,13 @@ class Webinar:
         if self.certificates_sheet_is_filled():
             return
         for participant in self.participants:
-            # TODO: check if participant already in table
             logger.info(f"{participant.fio} taken")
-            try:
-                morph = Morph.from_fio(participant.fio)
-                logger.info(f"{participant.fio} morphed")
-                fio_given = morph.fio_given
-                name = morph.name
-            except Exception as err:
-                logger.exception(f"Unable to morph {participant.fio}", err)
-                fio_given = ''
-                name = ''
-            message = f'Здравствуйте, {name}! Благодарю вас за участие.'
+            fio_given = self.morphological(participant.fio)
+            message = f'Здравствуйте, {participant.name}! Благодарю вас за участие.'
             row = [
                 participant.fio,
                 fio_given,
-                name,
+                participant.name,
                 participant.email,
                 message,
             ]

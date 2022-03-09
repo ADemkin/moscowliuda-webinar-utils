@@ -91,13 +91,11 @@ class Participant:
     def fio_given(self) -> str | None:
         if (fio := self._get_value_by_name("fio_given")):
             return fio
-        try:
+        if (fio := self.fio):
             fio = get_morph_data(self.fio)["Д"]
-        except WordMorphError as err:
-            logger.exception(err)
-            return None
-        self._update_value_by_name("fio_given", fio)
-        return fio
+            self._update_value_by_name("fio_given", fio)
+            return fio
+        return None
 
     @property
     def message(self) -> str | None:

@@ -1,12 +1,7 @@
-"""
-Трансформировать имя из именительного в дательный падеж.
+from functools import partial
 
-alternative solution: https://github.com/petrovich/pytrovich
-"""
-
-from functools import lru_cache
-from typing import Any
-
+from pymorphy2 import MorphAnalyzer  # type: ignore
+from pyphrasy.inflect import PhraseInflector  # type: ignore
 from requests import request
 from requests import Response
 
@@ -22,7 +17,6 @@ class WordMorphError(Exception):
         return cls(f"Status {status!r}: {message!r}")
 
 
-@lru_cache
 def get_morph_data(fio: str) -> dict[str, str]:
     """Get response from morpher.ru
 
@@ -38,22 +32,10 @@ def get_morph_data(fio: str) -> dict[str, str]:
     return resp.json()
 
 
-class Morph:
-    def __init__(self, data: dict[str, Any], fio: str) -> None:
-        self.data: dict[str, Any] = data
-        self.fio = fio
+def online_morph(fio: str) -> str:
+    return get_morph_data(fio)["Д"]
 
-    def __repr__(self) -> str:
-        return '<NameMorph data={self.data}>'
 
-    @classmethod
-    def from_fio(cls, fio: str) -> 'Morph':
-        return cls(data=get_morph_data(fio), fio=fio)
-
-    @property
-    def fio_given(self) -> str:
-        return self.data['Д']
-
-    @property
-    def name(self) -> str:
-        return self.data['ФИО']['И']
+def offline_morph(fio: str) -> str:
+    inflect = partial(PhraseInflector(MorphAnalyzer()).inflect, form="datv")
+    return ' '.join([inflect(part) for part in fio.split()]).title()

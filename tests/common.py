@@ -13,8 +13,10 @@ from sheets import open_spreadsheet
 
 
 cell = namedtuple("cell", ["value"])
+
 CreateDocumentT = Callable[[RowsT], ProtoDocument]
 CreateSheetT = Callable[[RowsT], ProtoSheet]
+MorpherT = Callable[[str], str]
 
 TEST_SHEET_URL = (
     "https://docs.google.com/spreadsheets/d/"
