@@ -33,14 +33,17 @@ def get_participants_from_sheet(
 
 def get_webinar_date_and_title(title: str) -> tuple[str, str]:
     title = title.rstrip(" (Responses)")
-    if (match := re.match(r"(\d{1,2}\-\d{1,2} \w+) (.*)", title)):
+    match = re.match(r"(\d{1,2}\-\d{1,2} \w+) (.*)", title)
+    match = match or re.match(r"(\d{1,2} \w+-\d{1,2} \w+) (.*)", title)
+    if match:
         if (groups := match.groups()):
             if len(groups) == 2:
                 return str(groups[0]), str(groups[1])
     raise RuntimeError(
-        "Title does not contain date and webinar title. "
-        "Use format: "
-        "'19-20 Февраля Формирование базовых графических представлений'"
+        f"Title does not contain date and webinar title: {title!r}\n"
+        "Use format:\n"
+        "'19-20 Февраля Формирование базовых грамматических представлений'\n"
+        "'31 Мая-2 Июня Формирование базовых грамматических представлений'\n"
     )
 
 
