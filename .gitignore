@@ -2,3 +2,4 @@ certificates/
 key.json
 .vim*
 venv/
+.env

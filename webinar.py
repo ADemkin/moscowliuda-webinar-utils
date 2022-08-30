@@ -3,16 +3,17 @@ from os import makedirs
 from os import rename
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import atexit
 from typing import Callable
+import atexit
 
+from dotenv import load_dotenv
 from gspread import Spreadsheet
 from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
-
-from images import BaseCertificateGenerator
-from factory import get_cert_gen_from_webinar_title
 from loguru import logger
+
+from factory import get_cert_gen_from_webinar_title
+from images import BaseCertificateGenerator
 from participants import Participant
 from send_email import AbstractMail
 from send_email import GMail
@@ -20,13 +21,10 @@ from send_email import MailStub
 from sheets import get_participants_from_sheet
 from sheets import get_webinar_date_and_title
 from sheets import open_spreadsheet
-from word_morph import online_morph
+from word_morph import offline_morph
 
 
-URL = (
-    "https://docs.google.com/spreadsheets/d/"
-    "1mj6-i4uC5HM_v-WLB3jgo22SvruULnawCNxlkGgWDIU/edit?usp=sharing"
-)
+URL = "https://docs.google.com/spreadsheets/d/11fPeU5u-nKzsJ1p5ORcQDe1kiUgW-vbV5zQIHeg5QDY/edit?resourcekey&usp=forms_web_b#gid=1559238270"
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 
@@ -70,15 +68,14 @@ class Webinar:
         # get certificates data
         certs_dir = Path("certificates") / f"{date_str} {year}"
         makedirs(str(certs_dir), mode=0o700, exist_ok=True)
-        _title_hack = "формирование базовых грамматических представлений"
-        cert_gen = get_cert_gen_from_webinar_title(_title_hack).create(
+        cert_gen = get_cert_gen_from_webinar_title(title).create(
             working_dir=certs_dir,
             date=date_str,
             year=year,
         )
         # create mailer
-        email = MailStub()
-        # email = GMail.from_environ()
+        # email = MailStub()
+        email = GMail.from_environ()
         working_dir = TemporaryDirectory()
         atexit.register(working_dir.cleanup)
         return cls(
@@ -90,7 +87,7 @@ class Webinar:
             email=email,
             cert_gen=cert_gen,
             tmp_dir=Path(working_dir.name),
-            morphological=online_morph,
+            morphological=offline_morph,
         )
 
     def _is_sheet_filled(self, sheet_name: str) -> bool:
@@ -181,13 +178,10 @@ class Webinar:
 
 
 if __name__ == '__main__':
-    print(URL)
-    # tonyflexmusic@gmail.com jnrbviavjvpxtogz
-    # GMAILACCOUNT="milabaltyca@gmail.com"
-    # GMAILAPPLICATIONPASSWORD="ybullixoirpowibr"
+    load_dotenv()
     webinar = Webinar.from_url(URL)
     # webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
-    webinar.certificates_generate()
+    # webinar.certificates_generate()
     # make sure that certificates are correct
-    # webinar.send_emails_with_certificates()
+    webinar.send_emails_with_certificates()

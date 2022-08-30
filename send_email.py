@@ -135,5 +135,3 @@ def run_tests():
 
 if __name__ == '__main__':
     run_tests()
-    # me = "tonyflexmusic@gmail.com", "jnrbviavjvpxtogz"
-    # she = "milabaltyca@gmail.com", "ybullixoirpowibr"
