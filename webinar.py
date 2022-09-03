@@ -180,8 +180,10 @@ class Webinar:
 if __name__ == '__main__':
     load_dotenv()
     webinar = Webinar.from_url(URL)
-    # webinar.certificates_sheet_fill()
+    webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
     # webinar.certificates_generate()
     # make sure that certificates are correct
+    import pdb ; pdb.set_trace();
+    pass
     webinar.send_emails_with_certificates()

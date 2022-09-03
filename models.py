@@ -1,10 +1,7 @@
-from loguru import logger
-
 from participants import normalize_instagram_account
 from participants import normalize_phone_number
 from protocols import ProtoSheet
-from word_morph import get_morph_data
-from word_morph import WordMorphError
+from word_morph import offline_morph
 
 
 class Participant:
@@ -92,7 +89,7 @@ class Participant:
         if (fio := self._get_value_by_name("fio_given")):
             return fio
         if (fio := self.fio):
-            fio = get_morph_data(self.fio)["Д"]
+            fio = offline_morph(self.fio)
             self._update_value_by_name("fio_given", fio)
             return fio
         return None

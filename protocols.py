@@ -1,6 +1,6 @@
 # pylint: disable=no-self-use,unused-argument,too-few-public-methods
 
-from typing_extensions import Protocol
+from typing import Protocol
 
 
 RowT = list[str | None]
