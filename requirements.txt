@@ -1,7 +1,0 @@
-gspread~=4.0
-loguru~=0.5
-Pillow~=8.3
-python-dotenv~=0.20
-requests~=2.26
-types-requests~=2.25
-yagmail~=0.14
