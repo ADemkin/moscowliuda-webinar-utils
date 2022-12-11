@@ -1,4 +1,5 @@
-RUN="poetry"
+RUN:=poetry
+
 
 test:
 	$(RUN) run pytest
