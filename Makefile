@@ -14,3 +14,5 @@ pylint:
 
 lint: mypy flake8 pylint
 
+run:
+	$(RUN) run python webinar.py

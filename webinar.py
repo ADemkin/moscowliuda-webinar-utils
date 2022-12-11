@@ -3,6 +3,7 @@ from os import makedirs
 from os import rename
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from time import sleep
 from typing import Callable
 import atexit
 
@@ -24,7 +25,7 @@ from sheets import open_spreadsheet
 from word_morph import offline_morph
 
 
-URL = "https://docs.google.com/spreadsheets/d/11fPeU5u-nKzsJ1p5ORcQDe1kiUgW-vbV5zQIHeg5QDY/edit?resourcekey&usp=forms_web_b#gid=1559238270"
+URL = "https://docs.google.com/spreadsheets/d/18opjgDC1dQn7An3rJ5IYyfgzErFXQG0mMspPsNkajAk/edit?resourcekey#gid=1484958473"
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 
@@ -141,6 +142,7 @@ class Webinar:
             ]
             self.cert_sheet.append_row(row)
             logger.info(f"{participant.fio} done")
+            sleep(1)  # Quota limit is 60 rps
         logger.info("filling certificates done")
 
     def certificates_generate(self) -> None:
@@ -173,17 +175,15 @@ class Webinar:
             )
             logger.info(f"{fio} done")
             # TODO: mark email as sent in google sheet
-            # sleep(3)
+            sleep(3)
         logger.info("sending emails done")
 
 
 if __name__ == '__main__':
     load_dotenv()
     webinar = Webinar.from_url(URL)
-    webinar.certificates_sheet_fill()
+    # webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
     # webinar.certificates_generate()
     # make sure that certificates are correct
-    import pdb ; pdb.set_trace();
-    pass
-    webinar.send_emails_with_certificates()
+    # webinar.send_emails_with_certificates()
