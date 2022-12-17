@@ -2,7 +2,7 @@ RUN:=poetry
 
 
 test:
-	$(RUN) run pytest
+	$(RUN) run pytest --ff --lf
 
 mypy:
 	$(RUN) run mypy .
