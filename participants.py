@@ -50,6 +50,7 @@ def normalize_row(row: RowT) -> list[str]:
     # phone
     normalized_row.append(normalize_phone_number(row[4]))  # type: ignore
     # instagram
+    # normalized_row.append(None)  # type: ignore
     normalized_row.append(normalize_instagram_account(row[5]))  # type: ignore
     # email
     normalized_row.append(strip(row[6]))  # type: ignore
