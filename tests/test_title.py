@@ -6,6 +6,7 @@ from sheets import get_webinar_date_and_title
 @pytest.mark.parametrize("date,name", [
     ("10-20 Января", "Название вебинара"),
     ("1-2 Февраля", "Название"),
+    ("2 - 5 Февраля", "Практика Запуска Речи"),
     ("20 - 25 Февраля", "Название"),
     ("1-99 Марта", "Длинное Название из нескольких слов"),
     ("1-99 Марта", "Длинное Название из нескольких слов"),
@@ -16,7 +17,8 @@ def test_gives_date_and_title_if_given_correct_title(
         date: str,
         name: str
 ) -> None:
-    assert get_webinar_date_and_title(f"{date} {name}") == (date, name)
+    title = f" {date} {name} (Responses) "
+    assert get_webinar_date_and_title(title) == (date, name)
 
 
 @pytest.mark.parametrize("title", [

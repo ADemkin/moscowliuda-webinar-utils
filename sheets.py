@@ -32,7 +32,7 @@ def get_participants_from_sheet(
 
 
 def get_webinar_date_and_title(title: str) -> tuple[str, str]:
-    title = title.rstrip(" (Responses)")
+    title = title.strip().rstrip(" (Responses)")
     match = re.match(r"(\d{1,2}\s?\-\s?\d{1,2} \w+) (.*)", title)
     match = match or re.match(r"(\d{1,2} \w+\s-\s\d{1,2} \w+) (.*)", title)
     if match:

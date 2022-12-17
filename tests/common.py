@@ -19,8 +19,7 @@ CreateSheetT = Callable[[RowsT], ProtoSheet]
 MorpherT = Callable[[str], str]
 
 TEST_SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/"
-    "1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"
+    "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"
 )
 TITLE_CELL_NAMES: RowT = [
     "Timestamp",
@@ -28,8 +27,7 @@ TITLE_CELL_NAMES: RowT = [
     "Имя:",
     "Отчество",
     "Введите ваш телефон:",
-    "Введите ваш аккаунт Instagram:",
-    "Введите ваш email:",
+    "Email address",
 ]
 
 
@@ -39,7 +37,6 @@ def create_row(
         father: str,
         timestamp: str = None,
         phone: str = "+79161234567",
-        instagram: str = "@instagram",
         email: str = "email@yandex.ru",
 ) -> RowT:
     timestamp = timestamp or str(datetime.now())
@@ -49,7 +46,7 @@ def create_row(
         name,
         father,
         phone,
-        instagram,
+        None,
         email,
     ]
 
