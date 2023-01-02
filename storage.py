@@ -66,7 +66,7 @@ class Storage:
     def get_name_morph(self, name: str) -> str | None:
         return self._store["morph"]["name"].get(name)
 
-    def add_webinar(self, webinar_info: dict) -> int:
+    def add_webinar(self, webinar_info: dict[str, str | int]) -> int:
         for webinar_id, webinar in self._store["webinars"].items():
             if webinar_info == webinar:
                 return webinar_id
@@ -74,3 +74,6 @@ class Storage:
         self._store["webinars"][webinar_id] = webinar_info
         self.store()
         return webinar_id
+
+    def get_webinar(self, webinar_id: int) -> dict[str, str | int] | None:
+        return self._store["webinars"].get(webinar_id)
