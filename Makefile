@@ -1,8 +1,9 @@
 RUN:=poetry
+ARGS:=--ff --lf
 
 
 test:
-	$(RUN) run pytest --ff --lf
+	$(RUN) run pytest --disable-warnings $(ARGS)
 
 mypy:
 	$(RUN) run mypy .
