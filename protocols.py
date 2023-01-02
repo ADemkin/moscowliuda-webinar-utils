@@ -2,7 +2,6 @@
 
 from typing import Protocol
 
-
 RowT = list[str | None]
 RowsT = list[RowT]
 
@@ -51,10 +50,10 @@ class ProtoDocument(Protocol):
         ...
 
     def add_worksheet(
-            self,
-            title: str,
-            rows: int = 100,
-            cols: int = 100,
+        self,
+        title: str,
+        rows: int = 100,
+        cols: int = 100,
     ) -> ProtoSheet:
         ...
 

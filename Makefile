@@ -1,20 +1,29 @@
-RUN:=poetry
-ARGS:=--ff --lf
+POETRY:=poetry
+RUN:=${POETRY} run
+ARGS:=''
 
 
 test:
-	$(RUN) run pytest --disable-warnings $(ARGS)
+	$(RUN) pytest --disable-warnings $(ARGS)
 
 mypy:
-	$(RUN) run mypy .
+	$(RUN) mypy .
 
 flake8:
-	$(RUN) run flake8 --ignore=E501
+	$(RUN) flake8 *.py
 
 pylint:
-	$(RUN) run mypy *.py
+	$(RUN) pylint *.py
 
 lint: mypy flake8 pylint
 
 run:
-	$(RUN) run python webinar.py
+	$(RUN) python webinar.py
+
+black:
+	$(RUN) black *.py
+
+isort:
+	$(RUN) isort *.py
+
+fmt: isort black

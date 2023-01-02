@@ -2,10 +2,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
-
+from PIL import Image, ImageDraw, ImageFont
 
 BLACK = (0, 0, 0)
 
@@ -62,10 +59,10 @@ def calculate_largest_font_size_for_text(image: Image, text: str) -> ImageFont:
 
 
 def create_certificate(
-        template: Path,
-        name: str,
-        date: str,
-        year: str,
+    template: Path,
+    name: str,
+    date: str,
+    year: str,
 ) -> Image:
     with Image.open(template) as image:
         # fill name
@@ -97,7 +94,7 @@ def create_certificate(
 
 class BaseCertificateGenerator:
     _templates_dir: Path = Path("templates")
-    template: str = ''
+    template: str = ""
 
     def __init__(self, working_dir: Path, date: str, year: str) -> None:
         self._working_dir = working_dir
@@ -106,11 +103,11 @@ class BaseCertificateGenerator:
 
     @classmethod
     def create(
-            cls,
-            working_dir: Path,
-            date: str,
-            year: int,
-    ) -> 'BaseCertificateGenerator':
+        cls,
+        working_dir: Path,
+        date: str,
+        year: int,
+    ) -> "BaseCertificateGenerator":
         return cls(
             working_dir=working_dir,
             date=date,
@@ -146,10 +143,10 @@ class TextCertificateGenerator(BaseCertificateGenerator):
 
     def generate_cerificate(self, name: str) -> Path:
         file_name = self._working_dir / name
-        with open(file_name, "wb") as fd:
-            fd.write(f"template: {self.template}\n".encode())
-            fd.write(f"name: {name}\n".encode())
-            fd.write(f"date: {self._date}\n".encode())
-            fd.write(f"year: {self._year}\n".encode())
-            fd.flush()
+        with open(file_name, "wb") as file:
+            file.write(f"template: {self.template}\n".encode())
+            file.write(f"name: {name}\n".encode())
+            file.write(f"date: {self._date}\n".encode())
+            file.write(f"year: {self._year}\n".encode())
+            file.flush()
         return Path(file_name)

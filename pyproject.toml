@@ -30,6 +30,9 @@ disable = [
     'missing-function-docstring',
     'missing-class-docstring',
     'missing-module-docstring',
+    'line-too-long',
+    'broad-except',
+    'invalid-name',
 ]
 
 [tool.flake8]

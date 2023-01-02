@@ -15,29 +15,29 @@ class Participant:
     email: str
 
     @classmethod
-    def from_row(cls, row: RowT) -> 'Participant':
+    def from_row(cls, row: RowT) -> "Participant":
         return cls(*normalize_row(row))
 
     @property
     def fio(self) -> str:
-        return ' '.join((self.family_name, self.name, self.father_name))
+        return " ".join((self.family_name, self.name, self.father_name))
 
 
 def normalize_instagram_account(account: str) -> str:
-    return account.lstrip('@')
+    return account.lstrip("@")
 
 
 def normalize_phone_number(number: str) -> str:
-    number = number.lstrip('+')
-    if number.startswith('8'):
-        number = f'7{number[1:]}'
-    return ''.join(c for c in number if c.isdigit())
+    number = number.lstrip("+")
+    if number.startswith("8"):
+        number = f"7{number[1:]}"
+    return "".join(c for c in number if c.isdigit())
 
 
 def normalize_email(email: str) -> str:
     email = email.lower()
-    if not re.match(r'[a-zA-Z0-9.-]+@\w+\.\w+', email):
-        print(f'{email!r} is not a valid email')
+    if not re.match(r"[a-zA-Z0-9.-]+@\w+\.\w+", email):
+        print(f"{email!r} is not a valid email")
     return email
 
 

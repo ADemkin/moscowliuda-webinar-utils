@@ -11,13 +11,13 @@ from images import TextCertificateGenerator
 @pytest.mark.parametrize("title,cert_gen_class", [
     ("Формирование базовых грамматических представлений", GrammarCertGen),
     ("Формирование Базовых Грамматических Представлений", GrammarCertGen),
-    (WebinarTitles.grammar, GrammarCertGen),
+    (WebinarTitles.GRAMMAR, GrammarCertGen),
     ("практика запуска речи", SpeechCertGen),
     ("Практика Запуска Речи", SpeechCertGen),
-    (WebinarTitles.speech, SpeechCertGen),
+    (WebinarTitles.SPEECH, SpeechCertGen),
     ("Test Webinar", TextCertificateGenerator),
     ("test webinar", TextCertificateGenerator),
-    (WebinarTitles.test, TextCertificateGenerator),
+    (WebinarTitles.TEST, TextCertificateGenerator),
 ])
 def test_if_given_correct_title_then_gives_corresponding_cert_gen(
     title: str,

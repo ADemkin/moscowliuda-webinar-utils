@@ -1,8 +1,6 @@
-from typing import Any
-from tempfile import NamedTemporaryFile
-from pathlib import Path
-import atexit
 import json
+from pathlib import Path
+from typing import Any, Sequence
 
 
 class StorageError(Exception):
@@ -24,21 +22,12 @@ class Storage:
         self._file = file
 
     @classmethod
-    def temporary(cls) -> "Storage":
-        file = NamedTemporaryFile()
-        atexit.register(file.close)
-        return cls(
-            store=DEFAULT_STORE,
-            file=Path(file.name),
-        )
-
-    @classmethod
-    def create(cls) -> "Storage":
-        file = Path(DEFAULT_FILE_NAME)
-        if not file.exists():
-            file.write_bytes(cls.dumps(DEFAULT_STORE))
-        store = cls.loads(file.read_bytes())
-        return Storage(store, DEFAULT_FILE_NAME)
+    def from_path(cls, file_path: Path) -> "Storage":
+        content = file_path.read_bytes()
+        if not content:
+            file_path.write_bytes(cls.dumps(DEFAULT_STORE))
+            content = file_path.read_bytes()
+        return Storage(cls.loads(content), file_path)
 
     @staticmethod
     def dumps(data: dict[str, Any]) -> bytes:
@@ -77,3 +66,6 @@ class Storage:
 
     def get_webinar(self, webinar_id: int) -> dict[str, str | int] | None:
         return self._store["webinars"].get(webinar_id)
+
+    def list_webinars(self) -> Sequence[dict[str, str | int]]:
+        return list(self._store["webinars"].values())

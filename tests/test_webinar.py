@@ -10,7 +10,7 @@ from webinar import Webinar
 from word_morph import offline_morph
 
 
-def test_webinar_generate_certificates_for_given_participants(
+def test_webinar_integration(
         create_document: CreateDocumentT,
         tmp_path: Path,
 ) -> None:
@@ -30,6 +30,7 @@ def test_webinar_generate_certificates_for_given_participants(
         title=title,
         date_str=date_str,
         year=year,
+        test_email=mail_stub,
         email=mail_stub,
         cert_gen=TextCertificateGenerator(
             working_dir=tmp_path,

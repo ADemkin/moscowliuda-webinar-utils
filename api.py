@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
+from loguru import logger
+
 from storage import Storage
 from webinar import Webinar
-
-from loguru import logger
 
 
 @dataclass
@@ -17,7 +17,7 @@ class WebinarInfo:
         return self.__dict__
 
     @classmethod
-    def from_dict(cls, webinar_dict: dict) -> 'WebinarInfo':
+    def from_dict(cls, webinar_dict: dict) -> "WebinarInfo":
         return WebinarInfo(**webinar_dict)
 
 
@@ -28,8 +28,9 @@ class WebinarApi:
     def import_webinar_from_url(self, url: str) -> int:
         try:
             webinar = Webinar.from_url(url)
-        except Exception as err:
-            logger.exception('Could not create webinar', err)
+        except Exception as err:  # pylint: disable=broad-except
+            logger.exception("Could not create webinar", err)
+            raise
         info = WebinarInfo(
             url=url,
             title=webinar.title,
@@ -37,7 +38,7 @@ class WebinarApi:
             year=webinar.year,
         )
         webinar_id = self.storage.add_webinar(info.to_dict())
-        logger.info('Webinar added: %d', webinar_id)
+        logger.info("Webinar added: %d", webinar_id)
         return webinar_id
 
     def get_name_morph(self, name: str) -> str | None:
