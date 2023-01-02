@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 
 from protocols import RowT
@@ -33,6 +34,13 @@ def normalize_phone_number(number: str) -> str:
     return ''.join(c for c in number if c.isdigit())
 
 
+def normalize_email(email: str) -> str:
+    email = email.lower()
+    if not re.match(r'[a-zA-Z0-9.-]+@\w+\.\w+', email):
+        print(f'{email!r} is not a valid email')
+    return email
+
+
 def strip(string: str) -> str:
     return string.strip()
 
@@ -53,5 +61,5 @@ def normalize_row(row: RowT) -> list[str]:
     # normalized_row.append(None)  # type: ignore
     normalized_row.append(normalize_instagram_account(row[5]))  # type: ignore
     # email
-    normalized_row.append(strip(row[6]))  # type: ignore
+    normalized_row.append(normalize_email(strip(row[6])))  # type: ignore
     return normalized_row

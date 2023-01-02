@@ -46,7 +46,7 @@ def create_row(
         name,
         father,
         phone,
-        None,
+        '',
         email,
     ]
 
