@@ -13,6 +13,7 @@ DEFAULT_STORE = {
     "morph": {
         "name": {},
     },
+    "webinars": {},
 }
 DEFAULT_FILE_NAME = "storage.json"
 
@@ -64,3 +65,12 @@ class Storage:
 
     def get_name_morph(self, name: str) -> str | None:
         return self._store["morph"]["name"].get(name)
+
+    def add_webinar(self, webinar_info: dict) -> int:
+        for webinar_id, webinar in self._store["webinars"].items():
+            if webinar_info == webinar:
+                return webinar_id
+        webinar_id = len(self._store["webinars"])
+        self._store["webinars"][webinar_id] = webinar_info
+        self.store()
+        return webinar_id
