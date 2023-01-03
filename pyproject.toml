@@ -34,6 +34,10 @@ disable = [
     'broad-except',
     'invalid-name',
 ]
+load-plugins = 'pylint.extensions.no_self_use'
 
 [tool.flake8]
 max-line-length = 100
+
+[tool.isort]
+profile = 'black'

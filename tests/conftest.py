@@ -13,7 +13,7 @@ from word_morph import offline_morph
 
 
 @pytest.fixture(params=[
-    # create_google_document,
+    create_google_document,
     create_stub_document,
 ])
 def create_document(request: Any) -> CreateDocumentT:
@@ -21,7 +21,7 @@ def create_document(request: Any) -> CreateDocumentT:
 
 
 @pytest.fixture(params=[
-    # create_google_sheet,
+    create_google_sheet,
     create_stub_sheet
 ])
 def create_sheet(request: Any) -> CreateSheetT:

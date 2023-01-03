@@ -1,8 +1,11 @@
 from collections import namedtuple
 from datetime import datetime
-from typing import Callable
+from typing import Callable, Any
+from functools import wraps
 
 from gspread.exceptions import WorksheetNotFound
+from google.auth.exceptions import TransportError
+import pytest
 
 from protocols import ProtoCell
 from protocols import ProtoDocument
@@ -18,9 +21,7 @@ CreateDocumentT = Callable[[RowsT], ProtoDocument]
 CreateSheetT = Callable[[RowsT], ProtoSheet]
 MorpherT = Callable[[str], str]
 
-TEST_SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"
-)
+TEST_SHEET_URL = "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"
 TITLE_CELL_NAMES: RowT = [
     "Timestamp",
     "Фамилия:",
@@ -32,12 +33,12 @@ TITLE_CELL_NAMES: RowT = [
 
 
 def create_row(
-        family: str,
-        name: str,
-        father: str,
-        timestamp: str = None,
-        phone: str = "+79161234567",
-        email: str = "email@yandex.ru",
+    family: str,
+    name: str,
+    father: str,
+    timestamp: str = None,
+    phone: str = "+79161234567",
+    email: str = "email@yandex.ru",
 ) -> RowT:
     timestamp = timestamp or str(datetime.now())
     return [
@@ -46,7 +47,7 @@ def create_row(
         name,
         father,
         phone,
-        '',
+        "",
         email,
     ]
 
@@ -108,7 +109,7 @@ class SpreadsheetStub:
         col_index = col - 1
         row_values = self._rows[row - 1]
         while len(row_values) <= col_index:
-            row_values.append(None)
+            row_values.append("")
         self.row_values(row)[col - 1] = value
         return {}  # mimic gspread
 
@@ -136,10 +137,10 @@ class WorksheetStub:
         return self._title
 
     def add_worksheet(
-            self,
-            title: str,
-            rows: int = 100,
-            cols: int = 100,
+        self,
+        title: str,
+        rows: int = 100,
+        cols: int = 100,
     ) -> ProtoSheet:
         sheet = SpreadsheetStub(title)
         self._worksheets.append(sheet)
@@ -156,3 +157,25 @@ class WorksheetStub:
 
 def create_stub_sheet(rows: RowsT) -> ProtoSheet:
     return prepare_sheet(SpreadsheetStub(), rows)
+
+
+def skipif(exception: BaseException, reason: str) -> Any:
+    """Helper to skip some tests if certain exception is raised.
+
+    Main goal is to skip online integration tests if network is down.
+    """
+
+    def decorator(func: Callable) -> Any:
+        @wraps(func)
+        def wrapper(*args, **kwargs) -> Any:
+            try:
+                return func(*args, **kwargs)
+            except exception:  # type: ignore
+                pytest.skip(reason)
+
+        return wrapper
+
+    return decorator
+
+
+skip_if_no_network = skipif(TransportError, "Network is down")

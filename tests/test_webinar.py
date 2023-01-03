@@ -1,6 +1,8 @@
 from pathlib import Path
 from os import listdir
 
+from tests.common import skip_if_no_network
+
 from images import TextCertificateGenerator
 from participants import Participant
 from send_email import MailStub
@@ -10,6 +12,7 @@ from webinar import Webinar
 from word_morph import offline_morph
 
 
+@skip_if_no_network
 def test_webinar_integration(
         create_document: CreateDocumentT,
         tmp_path: Path,
