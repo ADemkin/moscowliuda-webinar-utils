@@ -68,4 +68,5 @@ class Storage:
         return self._store["webinars"].get(webinar_id)
 
     def list_webinars(self) -> Sequence[dict[str, str | int]]:
-        return list(self._store["webinars"].values())
+        items = self._store["webinars"].items()
+        return list(i[1] for i in sorted(items, key=lambda w: w[0]))

@@ -41,3 +41,6 @@ max-line-length = 100
 
 [tool.isort]
 profile = 'black'
+
+[tool.black]
+line-length = 80
