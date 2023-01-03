@@ -59,12 +59,12 @@ class Storage:
         for webinar_id, webinar in self._store["webinars"].items():
             if webinar_info == webinar:
                 return webinar_id
-        webinar_id = len(self._store["webinars"])
+        webinar_id = str(len(self._store["webinars"]))
         self._store["webinars"][webinar_id] = webinar_info
         self.store()
         return webinar_id
 
-    def get_webinar(self, webinar_id: int) -> dict[str, str | int] | None:
+    def get_webinar(self, webinar_id: str) -> dict[str, str | int] | None:
         return self._store["webinars"].get(webinar_id)
 
     def list_webinars(self) -> Sequence[dict[str, str | int]]:

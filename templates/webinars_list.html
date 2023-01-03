@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body %}
+<div>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="text" name="url" />
+    <button type="submit">импортировать вебинар</button>
+  </form>
+  {% if error %}
+  <div>{{ error }}</div>
+  {% endif %}
+  {% for webinar in webinars %}
+  <div>
+    <a
+        href="{{ url('webinar', id=loop.index0) }}"
+        >
+        {{ webinar.title }} {{ webinar.dates }} {{ webinar.year }}
+    </a>
+  </div>
+  {% else %}
+  <p>no webinars</p>
+  {% endfor %}
+</div>
+{% endblock body %}

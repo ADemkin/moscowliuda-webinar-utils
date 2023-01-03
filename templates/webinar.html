@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body %}
+<div>
+  <a href="{{ url('webinars-list') }}">назад</a>
+  {% if error %}
+    <div>{{ error }}</div>
+  {% endif %}
+  {% if webinar %}
+    <div>{{ webinar.title }}</div>
+    <div>{{ webinar.dates }} {{ webinar.year }}</div>
+    <div>{{ webinar.yrl }}</div>
+  {% endif %}
+</div>
+{% endblock body %}

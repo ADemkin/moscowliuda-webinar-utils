@@ -41,6 +41,12 @@ class WebinarApi:
         logger.info("Webinar added: %d", webinar_id)
         return webinar_id
 
+    def list_webinars(self) -> list[dict]:
+        return self.storage.list_webinars()
+
+    def get_webinar(self, webinar_id: int) -> dict | None:
+        return self.storage.get_webinar(webinar_id)
+
     def get_name_morph(self, name: str) -> str | None:
         """Suggest name in datv form"""
         return self.storage.get_name_morph(name)
