@@ -20,6 +20,10 @@ lint: mypy flake8 pylint
 run:
 	$(RUN) python webinar.py
 
+dev:
+	$(RUN) gunicorn server:acreate_app --bind localhost:8080 --reload  --worker-class aiohttp.GunicornWebWorker
+
+
 black:
 	$(RUN) black *.py
 

@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import asyncio
 
 import aiohttp_jinja2
 import jinja2
@@ -27,6 +28,11 @@ def create_app() -> Application:
     api = WebinarApi(storage)
     app["api"] = api
     return app
+
+
+async def acreate_app() -> Application:
+    """Async version for app factory for gunicorn"""
+    return create_app()
 
 
 def main() -> None:
