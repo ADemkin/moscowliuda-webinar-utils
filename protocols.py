@@ -2,7 +2,7 @@
 
 from typing import Protocol
 
-RowT = list[str | None]
+RowT = list[str]
 RowsT = list[RowT]
 
 

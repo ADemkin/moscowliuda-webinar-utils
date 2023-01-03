@@ -1,10 +1,11 @@
 import re
 from dataclasses import dataclass
+from typing import Sequence
 
 from protocols import RowT
 
 
-@dataclass
+@dataclass(frozen=True)
 class Participant:
     timestamp: str
     family_name: str
@@ -16,7 +17,16 @@ class Participant:
 
     @classmethod
     def from_row(cls, row: RowT) -> "Participant":
-        return cls(*normalize_row(row))
+        stripped_row: Sequence[str] = [str(i).strip() for i in row]
+        return cls(
+            timestamp=stripped_row[0],
+            family_name=stripped_row[1],
+            name=stripped_row[2],
+            father_name=stripped_row[3],
+            phone=normalize_phone_number(stripped_row[4]),
+            instagram=normalize_instagram_account(stripped_row[5]),
+            email=normalize_email(stripped_row[6]),
+        )
 
     @property
     def fio(self) -> str:
@@ -39,27 +49,3 @@ def normalize_email(email: str) -> str:
     if not re.match(r"[a-zA-Z0-9.-]+@\w+\.\w+", email):
         print(f"{email!r} is not a valid email")
     return email
-
-
-def strip(string: str) -> str:
-    return string.strip()
-
-
-def normalize_row(row: RowT) -> list[str]:
-    normalized_row = []
-    # timetamp
-    normalized_row.append(strip(row[0]))  # type: ignore
-    # family name
-    normalized_row.append(strip(row[1]))  # type: ignore
-    # name
-    normalized_row.append(strip(row[2]))  # type: ignore
-    # father name
-    normalized_row.append(strip(row[3]))  # type: ignore
-    # phone
-    normalized_row.append(normalize_phone_number(row[4]))  # type: ignore
-    # instagram
-    # normalized_row.append(None)  # type: ignore
-    normalized_row.append(normalize_instagram_account(row[5]))  # type: ignore
-    # email
-    normalized_row.append(normalize_email(strip(row[6])))  # type: ignore
-    return normalized_row
