@@ -16,7 +16,7 @@ def create_app() -> Application:
     app = Application()
     # setup routes
     app.router.add_view("/", WebinarsList, name="webinars-list")
-    app.router.add_view("/{id}", Webinar, name="webinar")
+    app.router.add_view(r"/{id:\w+}", Webinar, name="webinar")
     # setup templates
     aiohttp_jinja2.setup(
         app=app,
