@@ -33,7 +33,7 @@ class Storage:
     def dumps(data: dict[str, Any]) -> bytes:
         return json.dumps(
             data,
-            ensure_ascii=True,
+            ensure_ascii=False,
             sort_keys=True,
             indent=2,
         ).encode("utf-8")
@@ -55,7 +55,7 @@ class Storage:
     def get_name_morph(self, name: str) -> str | None:
         return self._store["morph"]["name"].get(name)
 
-    def add_webinar(self, webinar_info: dict[str, str | int]) -> int:
+    def add_webinar(self, webinar_info: dict[str, str | int]) -> str:
         for webinar_id, webinar in self._store["webinars"].items():
             if webinar_info == webinar:
                 return webinar_id

@@ -41,7 +41,7 @@ def test_storage_raises_if_duplicate_name_set(storage: Storage) -> None:
 def test_storage_gives_new_id_for_new_webinar(storage: Storage) -> None:
     webinar = create_webinar_info()
     webinar_id = storage.add_webinar(webinar)
-    assert webinar_id == 0
+    assert webinar_id == '0'
 
 
 def test_storage_gives_existing_id_for_existing_webinar(
@@ -59,7 +59,7 @@ def test_storage_gives_webinar_by_existing_id(storage: Storage) -> None:
 
 
 def test_storage_gives_none_for_unknown_id(storage: Storage) -> None:
-    assert storage.get_webinar(99) is None
+    assert storage.get_webinar('99') is None
 
 
 def test_storage_gives_existing_webinars(storage: Storage) -> None:
