@@ -5,6 +5,9 @@
   <title>Webinar</title>
 </head>
 <body>
+  {% if error %}
+    <div>{{ error }}</div>
+  {% endif %}
   {% block body %}
   {% endblock body %}
 </body>

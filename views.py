@@ -44,7 +44,8 @@ class WebinarsList(BaseView):
         return self.render()
 
     async def post(self) -> Response:
-        url = (await self.post())["url"]
+        form = await self.form()
+        url = form["url"]
         self.api.import_webinar_from_url(url)
         return await self.get()
 
@@ -53,7 +54,7 @@ class Webinar(BaseView):
     template = "webinar.html"
 
     async def get(self) -> Response:
-        webinar_id = self.query.get("id", "not-existing-webinar-id")
+        webinar_id: str = self.query.get("id", "unknown")
         if webinar := self.api.get_webinar(webinar_id):
             self.ctx["webinar"] = webinar
         else:
