@@ -2,7 +2,6 @@ from datetime import datetime
 from functools import cached_property
 from os import makedirs, rename
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from time import sleep
 from typing import Callable
 
@@ -11,6 +10,7 @@ from gspread import Spreadsheet, Worksheet
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
+from contacts import create_vcard
 from factory import get_cert_gen_from_webinar_title
 from images import BaseCertificateGenerator
 from participants import Participant
@@ -73,7 +73,7 @@ class Webinar:
             year=year,
         )
         tmp_dir_path = Path("/tmp/webinar/")
-        tmp_dir_path.mkdir(exists_ok=True)
+        tmp_dir_path.mkdir(exist_ok=True)
         return cls(
             document=document,
             participants=participants,
@@ -169,6 +169,28 @@ class Webinar:
             sleep(3)
         logger.info("sending emails done")
 
+    def get_participant_vcards(self) -> list[str]:
+        return [
+            create_vcard(
+                first_name=p.name,
+                last_name=p.family_name,
+                email=p.email,
+                phone=p.phone,
+                organisation=self.title,
+            )
+            for p in self.participants
+        ]
+
+    def import_contacts(self) -> None:
+        vcards = self.get_participant_vcards()
+        logger.info(f"imported {len(vcards)} contacts")
+        webinar_contacts_file = f"{self.title} {self.date_str} {self.year}.vcf"
+        contacts_file = Path("contacts") / webinar_contacts_file
+        with open(contacts_file, "wb") as fd:
+            fd.write("\n".join(vcards).encode("utf-8"))
+            fd.flush()
+        logger.info(f"contacts saved to {contacts_file}")
+
 
 if __name__ == "__main__":
     load_dotenv()
@@ -178,3 +200,5 @@ if __name__ == "__main__":
     # webinar.certificates_generate()
     # make sure that certificates are correct
     # webinar.send_emails_with_certificates(test=False)
+    # webinar.email_contacts()
+    webinar.import_contacts()
