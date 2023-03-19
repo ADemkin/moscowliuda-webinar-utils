@@ -22,7 +22,7 @@ from sheets import (
 )
 from word_morph import offline_morph
 
-URL = "https://docs.google.com/spreadsheets/d/1RqHlYYZdWvegkP5Yml3Eav-CA9TJOh8CzYV-stpyxEw/edit?resourcekey#gid=1274809481"  # noqa
+URL = "https://docs.google.com/spreadsheets/d/1QyMNKQtRSKUdXP2fP-g_gmnw1j_ybQgps-TQV2xQ8jI/edit#gid=1283117476"  # noqa
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 
@@ -72,20 +72,20 @@ class Webinar:
             date=date_str,
             year=year,
         )
-        # create mailer
-        with TemporaryDirectory() as working_dir:
-            return cls(
-                document=document,
-                participants=participants,
-                title=title,
-                date_str=date_str,
-                year=year,
-                email=GMail.from_environ(),
-                test_email=MailStub(),
-                cert_gen=cert_gen,
-                tmp_dir=Path(working_dir),
-                morphological=offline_morph,
-            )
+        tmp_dir_path = Path("/tmp/webinar/")
+        tmp_dir_path.mkdir(exists_ok=True)
+        return cls(
+            document=document,
+            participants=participants,
+            title=title,
+            date_str=date_str,
+            year=year,
+            email=GMail.from_environ(),
+            test_email=MailStub(),
+            cert_gen=cert_gen,
+            tmp_dir=tmp_dir_path,
+            morphological=offline_morph,
+        )
 
     def _is_sheet_filled(self, sheet_name: str) -> bool:
         values = self.document.worksheet(sheet_name).get_all_values()
@@ -177,4 +177,4 @@ if __name__ == "__main__":
     # make sure that names transformed correctly
     # webinar.certificates_generate()
     # make sure that certificates are correct
-    webinar.send_emails_with_certificates()
+    # webinar.send_emails_with_certificates(test=False)
