@@ -4,3 +4,4 @@ certificates/
 venv/
 .venv/
 .env
+*.vcf
