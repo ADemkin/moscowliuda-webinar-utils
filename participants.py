@@ -2,6 +2,8 @@ import re
 from dataclasses import dataclass
 from typing import Sequence
 
+from loguru import logger
+
 from protocols import RowT
 
 
@@ -46,6 +48,6 @@ def normalize_phone_number(number: str) -> str:
 
 def normalize_email(email: str) -> str:
     email = email.lower()
-    if not re.match(r"[a-zA-Z0-9.-]+@\w+\.\w+", email):
-        print(f"{email!r} is not a valid email")
+    if not re.match(r"[a-zA-Z0-9._-]+@\w+\.\w+", email):
+        logger.warning(f"{email!r} is not a valid email")
     return email
