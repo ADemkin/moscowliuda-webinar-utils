@@ -19,15 +19,15 @@ class Participant:
 
     @classmethod
     def from_row(cls, row: RowT) -> "Participant":
-        stripped_row: Sequence[str] = [str(i).strip() for i in row]
+        row_strip: Sequence[str] = [str(i).strip() for i in row]
         return cls(
-            timestamp=stripped_row[0],
-            family_name=stripped_row[1],
-            name=stripped_row[2],
-            father_name=stripped_row[3],
-            phone=normalize_phone_number(stripped_row[4]),
-            instagram=normalize_instagram_account(stripped_row[5]),
-            email=normalize_email(stripped_row[6]),
+            timestamp=row_strip[0],
+            family_name=row_strip[1],
+            name=row_strip[2],
+            father_name=row_strip[3],
+            phone=normalize_phone_number(row_strip[4]),
+            instagram=normalize_instagram_account(row_strip[5]),
+            email=normalize_email(row_strip[6]),
         )
 
     @property
@@ -41,9 +41,11 @@ def normalize_instagram_account(account: str) -> str:
 
 def normalize_phone_number(number: str) -> str:
     number = number.lstrip("+")
+    number = "".join(c for c in number if c.isdigit())
     if number.startswith("8"):
         number = f"7{number[1:]}"
-    return "".join(c for c in number if c.isdigit())
+    number = f"+{number}" if number else ''
+    return number
 
 
 def normalize_email(email: str) -> str:
@@ -51,3 +53,4 @@ def normalize_email(email: str) -> str:
     if not re.match(r"[a-zA-Z0-9._-]+@\w+\.\w+", email):
         logger.warning(f"{email!r} is not a valid email")
     return email
+
