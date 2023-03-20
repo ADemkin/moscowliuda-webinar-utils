@@ -10,8 +10,8 @@ from gspread import Spreadsheet, Worksheet
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
-from contacts import create_vcard
-from factory import get_cert_gen_from_webinar_title
+from contacts import create_vcard, save_vcards_to_file
+from factory import get_cert_gen_from_webinar_title, WebinarTitles
 from images import BaseCertificateGenerator
 from participants import Participant
 from send_email import AbstractMail, GMail, MailStub
@@ -169,27 +169,40 @@ class Webinar:
             sleep(3)
         logger.info("sending emails done")
 
-    def get_participant_vcards(self) -> list[str]:
+    def get_group_name(self) -> str:
+        short_title = {
+            WebinarTitles.SPEECH: "П",
+            WebinarTitles.GRAMMAR: "Г",
+        }[WebinarTitles(self.title.lower())]
+        return f"{short_title} {self.date_str} {self.year}"
+
+    def get_participant_vcards(self, group: str) -> list[str]:
         return [
             create_vcard(
-                first_name=p.name,
-                last_name=p.family_name,
+                last_name=f"{p.name} {p.family_name}",
+                first_name=group,
                 email=p.email,
                 phone=p.phone,
-                organisation=self.title,
+                organisation=group,
             )
             for p in self.participants
         ]
 
     def import_contacts(self) -> None:
-        vcards = self.get_participant_vcards()
+        group = self.get_group_name()
+        vcards = self.get_participant_vcards(group)
         logger.info(f"imported {len(vcards)} contacts")
-        webinar_contacts_file = f"{self.title} {self.date_str} {self.year}.vcf"
+        webinar_contacts_file = f"{group}.vcf"
         contacts_file = Path("contacts") / webinar_contacts_file
-        with open(contacts_file, "wb") as fd:
-            fd.write("\n".join(vcards).encode("utf-8"))
-            fd.flush()
+        save_vcards_to_file(contacts_file, vcards)
         logger.info(f"contacts saved to {contacts_file}")
+        # self.email.send(
+        #     to="antondemkin+python@yandex.ru",
+        #     bcc=["moscowliuda@mail.ru"],
+        #     subject="contacts",
+        #     contents="here they are",
+        #     attachments=[contacts_file],
+        # )
 
 
 if __name__ == "__main__":
