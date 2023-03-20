@@ -22,7 +22,7 @@ from sheets import (
 )
 from word_morph import offline_morph
 
-URL = "https://docs.google.com/spreadsheets/d/1QyMNKQtRSKUdXP2fP-g_gmnw1j_ybQgps-TQV2xQ8jI/edit#gid=1283117476"  # noqa
+URL = "https://docs.google.com/spreadsheets/d/1b0Syrr0yNYN6HXfY7IMS7tSQTPSLDTEFs0zyc9a0QH4/edit?resourcekey#gid=1151721040"  # noqa
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 

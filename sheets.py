@@ -21,7 +21,7 @@ def get_participants_from_sheet(
     participants: list[Participant] = []
     for row in sheet.get_all_values()[first_row:]:
         try:
-            participants.append(Participant.from_row(row))
+            participants.append(Participant.from_row_v2(row))
         except Exception as err:
             logger.error(err)
             continue

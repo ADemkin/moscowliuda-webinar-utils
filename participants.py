@@ -14,8 +14,8 @@ class Participant:
     name: str
     father_name: str
     phone: str
-    instagram: str
     email: str
+    instagram: str = ''
 
     @classmethod
     def from_row(cls, row: RowT) -> "Participant":
@@ -28,6 +28,18 @@ class Participant:
             phone=normalize_phone_number(row_strip[4]),
             instagram=normalize_instagram_account(row_strip[5]),
             email=normalize_email(row_strip[6]),
+        )
+
+    @classmethod
+    def from_row_v2(cls, row: RowT) -> "Participant":
+        row_strip: Sequence[str] = [str(i).strip() for i in row]
+        return cls(
+            timestamp=row_strip[0],
+            email=normalize_email(row_strip[1]),
+            family_name=row_strip[2],
+            name=row_strip[3],
+            father_name=row_strip[4],
+            phone=normalize_phone_number(row_strip[5]),
         )
 
     @property
@@ -53,4 +65,3 @@ def normalize_email(email: str) -> str:
     if not re.match(r"[a-zA-Z0-9._-]+@\w+\.\w+", email):
         logger.warning(f"{email!r} is not a valid email")
     return email
-
