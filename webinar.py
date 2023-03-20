@@ -174,7 +174,7 @@ class Webinar:
             WebinarTitles.SPEECH: "П",
             WebinarTitles.GRAMMAR: "Г",
         }[WebinarTitles(self.title.lower())]
-        return f"{short_title} {self.date_str} {self.year}"
+        return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
 
     def get_participant_vcards(self, group: str) -> list[str]:
         return [
