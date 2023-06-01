@@ -5,7 +5,7 @@ description = "Automation for @moscowliuda webinar"
 authors = ["Anton Demkin <antondemkin@yandex.ru>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 Pillow = "^9.2.0"
 loguru = "^0.6.0"
 python-dotenv = "^0.20.0"
