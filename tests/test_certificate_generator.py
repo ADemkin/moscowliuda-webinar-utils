@@ -20,7 +20,7 @@ def test_certificate_generates_correct_jpeg_file(
     cert_gen_class: BaseCertificateGenerator,
     tmp_path: Path,
 ) -> None:
-    cert_gen = GrammarCertGen.create(
+    cert_gen = cert_gen_class.create(
         working_dir=tmp_path,
         date="20-21 сентября",
         year=2022,
@@ -41,7 +41,7 @@ def test_if_given_different_names_then_files_are_different(
     cert_gen_class: BaseCertificateGenerator,
     tmp_path: Path,
 ) -> None:
-    cert_gen = GrammarCertGen.create(
+    cert_gen = cert_gen_class.create(
         working_dir=tmp_path,
         date="20-21 сентября",
         year=2022,
@@ -63,13 +63,13 @@ def test_cert_file_is_created_inside_given_directory(
     cert_gen_class: BaseCertificateGenerator,
     tmp_path: Path,
 ) -> None:
-    cert_gen = GrammarCertGen.create(
+    cert_gen = cert_gen_class.create(
         working_dir=tmp_path,
         date="20-21 сентября",
         year=2022,
     )
     cert_path = cert_gen.generate_cerificate("Пётр Курочки")
-    tmp_dir_contents = [f for f in tmp_path.glob("*")]
+    tmp_dir_contents = list(tmp_path.glob("*"))
     assert len(tmp_dir_contents) == 1
     assert cert_path in tmp_dir_contents
 
