@@ -13,8 +13,8 @@ from tests.common import skip_if_no_network
 
 @skip_if_no_network
 def test_webinar_integration(
-        create_document: CreateDocumentT,
-        tmp_path: Path,
+    create_document: CreateDocumentT,
+    tmp_path: Path,
 ) -> None:
     rows = [
         create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
@@ -45,7 +45,7 @@ def test_webinar_integration(
     webinar.certificates_sheet_fill()
     webinar.certificates_generate()
     assert len(listdir(tmp_path)) == len(rows)
-    for name in ('Мазаеву Антону Андреевичу', 'Мельниковой Людмиле Андреевне'):
+    for name in ("Мазаеву Антону Андреевичу", "Мельниковой Людмиле Андреевне"):
         path = tmp_path / name
         assert path.exists()
         content = path.read_text()

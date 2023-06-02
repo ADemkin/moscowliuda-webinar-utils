@@ -12,24 +12,25 @@ from tests.common import CreateSheetT
 from tests.common import MorpherT
 
 
-@pytest.fixture(params=[
-    create_google_document,
-    create_stub_document,
-])
+@pytest.fixture(
+    params=[
+        create_google_document,
+        create_stub_document,
+    ]
+)
 def create_document(request: Any) -> CreateDocumentT:
     return request.param
 
 
-@pytest.fixture(params=[
-    create_google_sheet,
-    create_stub_sheet
-])
+@pytest.fixture(params=[create_google_sheet, create_stub_sheet])
 def create_sheet(request: Any) -> CreateSheetT:
     return request.param
 
 
-@pytest.fixture(params=[
-    offline_morph,
-])
+@pytest.fixture(
+    params=[
+        offline_morph,
+    ]
+)
 def morpher(request: Any) -> MorpherT:
     return request.param

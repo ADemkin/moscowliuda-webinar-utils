@@ -15,7 +15,7 @@ class Participant:
     father_name: str
     phone: str
     email: str
-    instagram: str = ''
+    instagram: str = ""
 
     @classmethod
     def from_row(cls, row: RowT) -> "Participant":
@@ -56,7 +56,7 @@ def normalize_phone_number(number: str) -> str:
     number = "".join(c for c in number if c.isdigit())
     if number.startswith("8"):
         number = f"7{number[1:]}"
-    number = f"+{number}" if number else ''
+    number = f"+{number}" if number else ""
     return number
 
 

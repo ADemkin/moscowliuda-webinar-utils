@@ -2,11 +2,11 @@ from lib.contacts import create_vcard
 
 
 def test_vcard_contains_all_fields():
-    first_name = 'Anton'
-    last_name = 'Demkin'
-    email = 'myemail@mail.com'
-    phone = '+7 916 803-58-95'
-    organisation = 'Family'
+    first_name = "Anton"
+    last_name = "Demkin"
+    email = "myemail@mail.com"
+    phone = "+7 916 803-58-95"
+    organisation = "Family"
     vcard = create_vcard(
         first_name=first_name,
         last_name=last_name,

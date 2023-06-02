@@ -9,13 +9,16 @@ from lib.images import SpeechCertGen
 from lib.images import TextCertificateGenerator
 
 
-@pytest.mark.parametrize("cert_gen_class", [
-    GrammarCertGen,
-    SpeechCertGen,
-])
+@pytest.mark.parametrize(
+    "cert_gen_class",
+    [
+        GrammarCertGen,
+        SpeechCertGen,
+    ],
+)
 def test_certificate_generates_correct_jpeg_file(
-        cert_gen_class: BaseCertificateGenerator,
-        tmp_path: Path,
+    cert_gen_class: BaseCertificateGenerator,
+    tmp_path: Path,
 ) -> None:
     cert_gen = GrammarCertGen.create(
         working_dir=tmp_path,
@@ -27,13 +30,16 @@ def test_certificate_generates_correct_jpeg_file(
     Image.open(cert, formats=["jpeg"]).verify()
 
 
-@pytest.mark.parametrize("cert_gen_class", [
-    GrammarCertGen,
-    SpeechCertGen,
-])
+@pytest.mark.parametrize(
+    "cert_gen_class",
+    [
+        GrammarCertGen,
+        SpeechCertGen,
+    ],
+)
 def test_if_given_different_names_then_files_are_different(
-        cert_gen_class: BaseCertificateGenerator,
-        tmp_path: Path,
+    cert_gen_class: BaseCertificateGenerator,
+    tmp_path: Path,
 ) -> None:
     cert_gen = GrammarCertGen.create(
         working_dir=tmp_path,
@@ -46,13 +52,16 @@ def test_if_given_different_names_then_files_are_different(
     assert Image.open(cert_a).tobytes() != Image.open(cert_b).tobytes()
 
 
-@pytest.mark.parametrize("cert_gen_class", [
-    GrammarCertGen,
-    SpeechCertGen,
-])
+@pytest.mark.parametrize(
+    "cert_gen_class",
+    [
+        GrammarCertGen,
+        SpeechCertGen,
+    ],
+)
 def test_cert_file_is_created_inside_given_directory(
-        cert_gen_class: BaseCertificateGenerator,
-        tmp_path: Path,
+    cert_gen_class: BaseCertificateGenerator,
+    tmp_path: Path,
 ) -> None:
     cert_gen = GrammarCertGen.create(
         working_dir=tmp_path,
