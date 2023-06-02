@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 TEMPLATE = """BEGIN:VCARD
 VERSION:3.0
 PRODID:-//Apple Inc.//macOS 13.2.1//EN

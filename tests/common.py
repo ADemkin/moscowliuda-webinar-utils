@@ -1,19 +1,14 @@
 from collections import namedtuple
 from datetime import datetime
-from typing import Callable, Any
 from functools import wraps
+from typing import Any, Callable
 
-from gspread.exceptions import WorksheetNotFound
-from google.auth.exceptions import TransportError
 import pytest
+from google.auth.exceptions import TransportError
+from gspread.exceptions import WorksheetNotFound
 
-from protocols import ProtoCell
-from protocols import ProtoDocument
-from protocols import ProtoSheet
-from protocols import RowsT
-from protocols import RowT
-from sheets import open_spreadsheet
-
+from lib.protocols import ProtoCell, ProtoDocument, ProtoSheet, RowsT, RowT
+from lib.sheets import open_spreadsheet
 
 cell = namedtuple("cell", ["value"])
 
@@ -21,7 +16,10 @@ CreateDocumentT = Callable[[RowsT], ProtoDocument]
 CreateSheetT = Callable[[RowsT], ProtoSheet]
 MorpherT = Callable[[str], str]
 
-TEST_SHEET_URL = "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"
+TEST_SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K06"
+    "85oIfkMnAEvQyeJjkOMzLCo/edit"
+)
 TITLE_CELL_NAMES: RowT = [
     "Timestamp",
     "Фамилия:",

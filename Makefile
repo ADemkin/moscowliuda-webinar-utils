@@ -2,7 +2,6 @@ POETRY:=poetry
 RUN:=${POETRY} run
 ARGS:=''
 
-
 test:
 	$(RUN) pytest --disable-warnings $(ARGS)
 
@@ -10,10 +9,10 @@ mypy:
 	$(RUN) mypy .
 
 flake8:
-	$(RUN) flake8 *.py
+	$(RUN) flake8 lib/*.py tests/*.py
 
 pylint:
-	$(RUN) pylint *.py
+	$(RUN) pylint lib/*.py tests/*.py
 
 lint: mypy flake8 pylint
 
@@ -25,9 +24,9 @@ dev:
 
 
 black:
-	$(RUN) black *.py
+	$(RUN) black lib/*.py tests/*.py
 
 isort:
-	$(RUN) isort *.py
+	$(RUN) isort lib/*.py tests/*.py
 
 fmt: isort black

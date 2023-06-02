@@ -46,7 +46,7 @@ load-plugins = 'pylint.extensions.no_self_use'
 max-line-length = 100
 
 [tool.isort]
-profile = 'black'
+profile = 'google'
 
 [tool.black]
 line-length = 80

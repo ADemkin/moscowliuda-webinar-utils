@@ -1,12 +1,12 @@
 from pathlib import Path
 
 import pytest
-
-from images import BaseCertificateGenerator
-from images import GrammarCertGen
-from images import SpeechCertGen
-from images import TextCertificateGenerator
 from PIL import Image
+
+from lib.images import BaseCertificateGenerator
+from lib.images import GrammarCertGen
+from lib.images import SpeechCertGen
+from lib.images import TextCertificateGenerator
 
 
 @pytest.mark.parametrize("cert_gen_class", [

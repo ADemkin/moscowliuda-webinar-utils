@@ -1,13 +1,13 @@
 from unittest.mock import patch
 from unittest.mock import MagicMock
 
-from send_email import GMail, MailStub
+from lib.send_email import GMail, MailStub
 
 
 def test_mail_creates_from_credentials() -> None:
     user = "username"
     password = "random-password"
-    with patch("send_email.SMTP") as smtp_mock:
+    with patch("lib.send_email.SMTP") as smtp_mock:
         GMail.from_credentials(user=user, password=password)
     smtp_mock.assert_called_once_with(user=user, password=password)
 

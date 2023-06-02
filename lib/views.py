@@ -1,11 +1,13 @@
 from abc import abstractmethod
-from functools import cached_property, partial
+from functools import cached_property
+from functools import partial
 from typing import Any, Mapping
 
-from aiohttp.web import Response, View
+from aiohttp.web import Response
+from aiohttp.web import View
 from aiohttp_jinja2 import render_template
 
-from api import WebinarApi
+from lib.api import WebinarApi
 
 
 class BaseView(View):

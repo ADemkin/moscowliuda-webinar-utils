@@ -1,7 +1,7 @@
 import pytest
 
-from participants import normalize_instagram_account
-from participants import normalize_phone_number
+from lib.participants import normalize_instagram_account
+from lib.participants import normalize_phone_number
 
 
 @pytest.mark.parametrize('account,expected', [

@@ -1,28 +1,32 @@
 from datetime import datetime
 from functools import cached_property
-from os import makedirs, rename
+from os import makedirs
+from os import rename
 from pathlib import Path
 from time import sleep
 from typing import Callable
 
 from dotenv import load_dotenv
-from gspread import Spreadsheet, Worksheet
+from gspread import Spreadsheet
+from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
-from contacts import create_vcard, save_vcards_to_file
-from factory import get_cert_gen_from_webinar_title, WebinarTitles
-from images import BaseCertificateGenerator
-from participants import Participant
-from send_email import AbstractMail, GMail, MailStub
-from sheets import (
-    get_participants_from_sheet,
-    get_webinar_date_and_title,
-    open_spreadsheet,
-)
-from word_morph import offline_morph
+from lib.contacts import create_vcard
+from lib.contacts import save_vcards_to_file
+from lib.factory import get_cert_gen_from_webinar_title
+from lib.factory import WebinarTitles
+from lib.images import BaseCertificateGenerator
+from lib.participants import Participant
+from lib.send_email import AbstractMail
+from lib.send_email import GMail
+from lib.send_email import MailStub
+from lib.sheets import get_participants_from_sheet
+from lib.sheets import get_webinar_date_and_title
+from lib.sheets import open_spreadsheet
+from lib.word_morph import offline_morph
 
-URL = "https://docs.google.com/spreadsheets/d/1b0Syrr0yNYN6HXfY7IMS7tSQTPSLDTEFs0zyc9a0QH4/edit?resourcekey#gid=1151721040"  # noqa
+URL = "https://docs.google.com/spreadsheets/d/14RAaB-w1nyqwd5CViRllzYUdSfdZtAhcuRkZPSY6480/edit?resourcekey#gid=1981150616"  # noqa
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 
@@ -196,22 +200,15 @@ class Webinar:
         contacts_file = Path("contacts") / webinar_contacts_file
         save_vcards_to_file(contacts_file, vcards)
         logger.info(f"contacts saved to {contacts_file}")
-        # self.email.send(
-        #     to="antondemkin+python@yandex.ru",
-        #     bcc=["moscowliuda@mail.ru"],
-        #     subject="contacts",
-        #     contents="here they are",
-        #     attachments=[contacts_file],
-        # )
+        logger.info("import this file using icloud.com")
 
 
 if __name__ == "__main__":
     load_dotenv()
     webinar = Webinar.from_url(URL)
+    webinar.import_contacts()
     # webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
     # webinar.certificates_generate()
     # make sure that certificates are correct
     # webinar.send_emails_with_certificates(test=False)
-    # webinar.email_contacts()
-    webinar.import_contacts()

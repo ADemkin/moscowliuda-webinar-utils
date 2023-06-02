@@ -1,10 +1,10 @@
-import re
 from dataclasses import dataclass
+import re
 from typing import Sequence
 
 from loguru import logger
 
-from protocols import RowT
+from lib.protocols import RowT
 
 
 @dataclass(frozen=True)

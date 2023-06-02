@@ -1,11 +1,10 @@
-from enum import Enum, unique
+from enum import Enum
+from enum import unique
 
-from images import (
-    BaseCertificateGenerator,
-    GrammarCertGen,
-    SpeechCertGen,
-    TextCertificateGenerator,
-)
+from lib.images import BaseCertificateGenerator
+from lib.images import GrammarCertGen
+from lib.images import SpeechCertGen
+from lib.images import TextCertificateGenerator
 
 
 @unique

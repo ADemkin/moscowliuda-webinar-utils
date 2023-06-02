@@ -9,7 +9,7 @@ from tests.common import create_stub_sheet
 from tests.common import CreateDocumentT
 from tests.common import CreateSheetT
 from tests.common import MorpherT
-from word_morph import offline_morph
+from lib.word_morph import offline_morph
 
 
 @pytest.fixture(params=[

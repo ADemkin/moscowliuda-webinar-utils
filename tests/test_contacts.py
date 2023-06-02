@@ -1,4 +1,4 @@
-from contacts import create_vcard
+from lib.contacts import create_vcard
 
 
 def test_vcard_contains_all_fields():

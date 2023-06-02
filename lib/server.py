@@ -1,15 +1,18 @@
 import os
 from pathlib import Path
 
+from aiohttp.web import Application
+from aiohttp.web import run_app
 import aiohttp_jinja2
-import jinja2
-from aiohttp.web import Application, run_app
 from dotenv import load_dotenv
+import jinja2
 from loguru import logger
 
-from api import WebinarApi
-from storage import DEFAULT_FILE_NAME, Storage
-from views import Webinar, WebinarsList
+from lib.api import WebinarApi
+from lib.storage import DEFAULT_FILE_NAME
+from lib.storage import Storage
+from lib.views import Webinar
+from lib.views import WebinarsList
 
 
 def create_app() -> Application:

@@ -1,6 +1,6 @@
 import pytest
 
-from sheets import get_webinar_date_and_title
+from lib.sheets import get_webinar_date_and_title
 
 
 @pytest.mark.parametrize("date,name", [

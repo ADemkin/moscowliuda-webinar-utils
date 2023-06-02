@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 
 BLACK = (0, 0, 0)
 

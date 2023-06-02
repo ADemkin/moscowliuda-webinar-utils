@@ -3,13 +3,13 @@ from os import listdir
 
 from tests.common import skip_if_no_network
 
-from images import TextCertificateGenerator
-from participants import Participant
-from send_email import MailStub
+from lib.images import TextCertificateGenerator
+from lib.participants import Participant
+from lib.send_email import MailStub
 from tests.common import create_row
 from tests.common import CreateDocumentT
-from webinar import Webinar
-from word_morph import offline_morph
+from lib.webinar import Webinar
+from lib.word_morph import offline_morph
 
 
 @skip_if_no_network

@@ -3,8 +3,8 @@ from typing import Sequence
 
 from loguru import logger
 
-from storage import Storage
-from webinar import Webinar
+from lib.webinar import Webinar
+from lib.storage import Storage
 
 
 @dataclass
