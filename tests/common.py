@@ -38,11 +38,10 @@ def create_row(
     family: str,
     name: str,
     father: str,
-    timestamp: str = None,
     phone: str = "+79161234567",
     email: str = "email@yandex.ru",
 ) -> RowT:
-    timestamp = timestamp or str(datetime.now())
+    timestamp = str(datetime.now())
     return [
         timestamp,
         family,
@@ -141,8 +140,8 @@ class WorksheetStub:
     def add_worksheet(
         self,
         title: str,
-        rows: int = 100,
-        cols: int = 100,
+        rows: int = 100,  # pylint: disable=unused-argument
+        cols: int = 100,  # pylint: disable=unused-argument
     ) -> ProtoSheet:
         sheet = SpreadsheetStub(title)
         self._worksheets.append(sheet)
@@ -169,7 +168,10 @@ def skipif(exception: BaseException, reason: str) -> Any:
 
     def decorator(func: Callable) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs) -> Any:
+        def wrapper(  # pylint: disable=inconsistent-return-statements
+                *args,
+                **kwargs
+        ) -> Callable:
             try:
                 return func(*args, **kwargs)
             except exception:  # type: ignore

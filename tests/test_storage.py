@@ -18,8 +18,8 @@ def create_webinar_info(**kwargs) -> dict[str, str | int]:
     return default  # type: ignore
 
 
-@pytest.fixture(scope="function")
-def storage() -> Storage:
+@pytest.fixture(scope="function", name="storage")
+def fuxture_storage() -> Storage:
     with NamedTemporaryFile() as file:
         return Storage.from_path(Path(file.name))
 
