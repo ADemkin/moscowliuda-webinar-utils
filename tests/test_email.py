@@ -1,7 +1,8 @@
-from unittest.mock import patch
 from unittest.mock import MagicMock
+from unittest.mock import patch
 
-from lib.send_email import GMail, MailStub
+from lib.send_email import GMail
+from lib.send_email import MailStub
 
 
 def test_mail_creates_from_credentials() -> None:

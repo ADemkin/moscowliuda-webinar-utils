@@ -1,15 +1,14 @@
-from pathlib import Path
 from os import listdir
-
-from tests.common import skip_if_no_network
+from pathlib import Path
 
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.send_email import MailStub
-from tests.common import create_row
-from tests.common import CreateDocumentT
 from lib.webinar import Webinar
 from lib.word_morph import offline_morph
+from tests.common import create_row
+from tests.common import CreateDocumentT
+from tests.common import skip_if_no_network
 
 
 @skip_if_no_network

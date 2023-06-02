@@ -3,7 +3,8 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
-from lib.storage import Storage, StorageError
+from lib.storage import Storage
+from lib.storage import StorageError
 
 
 def create_webinar_info(**kwargs) -> dict[str, str | int]:

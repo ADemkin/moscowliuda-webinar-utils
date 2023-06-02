@@ -3,11 +3,15 @@ from datetime import datetime
 from functools import wraps
 from typing import Any, Callable
 
-import pytest
 from google.auth.exceptions import TransportError
 from gspread.exceptions import WorksheetNotFound
+import pytest
 
-from lib.protocols import ProtoCell, ProtoDocument, ProtoSheet, RowsT, RowT
+from lib.protocols import ProtoCell
+from lib.protocols import ProtoDocument
+from lib.protocols import ProtoSheet
+from lib.protocols import RowsT
+from lib.protocols import RowT
 from lib.sheets import open_spreadsheet
 
 cell = namedtuple("cell", ["value"])
