@@ -33,13 +33,3 @@ def save_vcards_to_file(path: Path | str, vcards: list[str]) -> None:
         vcards_join = "\n".join(vcards)
         fd.write(vcards_join)
         fd.flush()
-
-
-if __name__ == "__main__":
-    group = "TestGroup"
-    vcards = [
-        create_vcard("Мама", "Семья", "a@e.s", "12341234", group),
-        create_vcard("Папа", "Семья", "a@e.s", "12341235", group),
-        create_vcard("Я", "Семья", "a@e.s", "12341236", group),
-    ]
-    save_vcards_to_file("test-family.vcf", vcards)
