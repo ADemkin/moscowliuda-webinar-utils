@@ -1,32 +1,25 @@
 from datetime import datetime
 from functools import cached_property
-from os import makedirs
-from os import rename
+from os import makedirs, rename
 from pathlib import Path
 from time import sleep
 from typing import Callable
 
 from dotenv import load_dotenv
-from gspread import Spreadsheet
-from gspread import Worksheet
+from gspread import Spreadsheet, Worksheet
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
-from lib.contacts import create_vcard
-from lib.contacts import save_vcards_to_file
-from lib.factory import get_cert_gen_from_webinar_title
-from lib.factory import WebinarTitles
+from lib.contacts import create_vcard, save_vcards_to_file
+from lib.factory import WebinarTitles, get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.participants import Participant
-from lib.send_email import AbstractMail
-from lib.send_email import GMail
-from lib.send_email import MailStub
-from lib.sheets import get_participants_from_sheet
-from lib.sheets import get_webinar_date_and_title
-from lib.sheets import open_spreadsheet
+from lib.send_email import AbstractMail, GMail, MailStub
+from lib.sheets import get_participants_from_sheet, get_webinar_date_and_title, open_spreadsheet
 from lib.word_morph import offline_morph
 
-URL = "https://docs.google.com/spreadsheets/d/14RAaB-w1nyqwd5CViRllzYUdSfdZtAhcuRkZPSY6480/edit?resourcekey#gid=1981150616"  # noqa
+
+URL = "https://docs.google.com/spreadsheets/d/17wFBB0pc1rLmiBloBWDD72gOVGY2nNeqzE5iEHxbfls/edit?usp=sharing"  # noqa
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 
@@ -47,7 +40,7 @@ class Webinar:
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
-        self.title: str = title
+        self.title: str = title  # TODO: make enum
         self.date_str: str = date_str
         self.year: int = year
         self.email = email
