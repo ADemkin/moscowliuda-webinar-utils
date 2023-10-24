@@ -3,13 +3,13 @@ from typing import Any
 import pytest
 
 from lib.word_morph import offline_morph
+from tests.common import CreateDocumentT
+from tests.common import CreateSheetT
+from tests.common import MorpherT
 from tests.common import create_google_document
 from tests.common import create_google_sheet
 from tests.common import create_stub_document
 from tests.common import create_stub_sheet
-from tests.common import CreateDocumentT
-from tests.common import CreateSheetT
-from tests.common import MorpherT
 
 
 @pytest.fixture(

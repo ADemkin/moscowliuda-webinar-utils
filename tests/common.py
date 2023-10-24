@@ -1,11 +1,12 @@
 from collections import namedtuple
 from datetime import datetime
 from functools import wraps
-from typing import Any, Callable
+from typing import Any
+from typing import Callable
 
+import pytest
 from google.auth.exceptions import TransportError
 from gspread.exceptions import WorksheetNotFound
-import pytest
 
 from lib.protocols import ProtoCell
 from lib.protocols import ProtoDocument
@@ -169,8 +170,7 @@ def skipif(exception: BaseException, reason: str) -> Any:
     def decorator(func: Callable) -> Any:
         @wraps(func)
         def wrapper(  # pylint: disable=inconsistent-return-statements
-                *args,
-                **kwargs
+            *args, **kwargs
         ) -> Callable:
             try:
                 return func(*args, **kwargs)

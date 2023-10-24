@@ -6,8 +6,8 @@ from lib.participants import Participant
 from lib.send_email import MailStub
 from lib.webinar import Webinar
 from lib.word_morph import offline_morph
-from tests.common import create_row
 from tests.common import CreateDocumentT
+from tests.common import create_row
 from tests.common import skip_if_no_network
 
 

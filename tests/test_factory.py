@@ -1,7 +1,7 @@
 import pytest
 
-from lib.factory import get_cert_gen_from_webinar_title
 from lib.factory import WebinarTitles
+from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.images import GrammarCertGen
 from lib.images import SpeechCertGen

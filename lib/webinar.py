@@ -1,25 +1,32 @@
 from datetime import datetime
 from functools import cached_property
-from os import makedirs, rename
+from os import makedirs
+from os import rename
 from pathlib import Path
 from time import sleep
 from typing import Callable
 
 from dotenv import load_dotenv
-from gspread import Spreadsheet, Worksheet
+from gspread import Spreadsheet
+from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
-from lib.contacts import create_vcard, save_vcards_to_file
-from lib.factory import WebinarTitles, get_cert_gen_from_webinar_title
+from lib.contacts import create_vcard
+from lib.contacts import save_vcards_to_file
+from lib.factory import WebinarTitles
+from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.participants import Participant
-from lib.send_email import AbstractMail, GMail, MailStub
-from lib.sheets import get_participants_from_sheet, get_webinar_date_and_title, open_spreadsheet
+from lib.send_email import AbstractMail
+from lib.send_email import GMail
+from lib.send_email import MailStub
+from lib.sheets import get_participants_from_sheet
+from lib.sheets import get_webinar_date_and_title
+from lib.sheets import open_spreadsheet
 from lib.word_morph import offline_morph
 
-
-URL = "https://docs.google.com/spreadsheets/d/17wFBB0pc1rLmiBloBWDD72gOVGY2nNeqzE5iEHxbfls/edit?usp=sharing"  # noqa
+URL = "https://docs.google.com/spreadsheets/d/1ilwLmFAQ-FUiRkjVPsLHa4RS9NAxX8chm11siZLYyQU/edit?resourcekey#gid=992781999"  # noqa
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
 
@@ -101,22 +108,8 @@ class Webinar:
                 cols=len(headers),
             )
 
-    def certificates_sheet_is_filled(self) -> bool:
-        cert_sheet_rows = self.cert_sheet.get_all_values()
-        if len(cert_sheet_rows) == len(self.participants):
-            logger.debug("already filled")
-            return True
-        if len(cert_sheet_rows) > len(self.participants):
-            logger.warning("already filled but rows > participants")
-            return True
-        if 0 < len(cert_sheet_rows) < len(self.participants):
-            logger.error("looks like table is filled up partially")
-        return False
-
     def certificates_sheet_fill(self) -> None:
         logger.info("filling certificates")
-        if self.certificates_sheet_is_filled():
-            return
         for participant in self.participants:
             logger.info(f"{participant.fio} taken")
             fio_given = self.morphological(participant.fio)
@@ -199,8 +192,8 @@ class Webinar:
 if __name__ == "__main__":
     load_dotenv()
     webinar = Webinar.from_url(URL)
-    webinar.import_contacts()
-    # webinar.certificates_sheet_fill()
+    # webinar.import_contacts()
+    webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
     # webinar.certificates_generate()
     # make sure that certificates are correct

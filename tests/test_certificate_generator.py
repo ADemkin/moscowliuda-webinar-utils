@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from PIL import Image
 import pytest
+from PIL import Image
 
 from lib.images import BaseCertificateGenerator
 from lib.images import GrammarCertGen

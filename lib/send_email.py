@@ -3,7 +3,8 @@ from abc import abstractmethod
 from io import IOBase
 from os import environ
 from pathlib import PosixPath
-from typing import Sequence, Union
+from typing import Sequence
+from typing import Union
 
 from yagmail import SMTP
 

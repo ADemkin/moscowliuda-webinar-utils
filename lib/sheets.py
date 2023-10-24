@@ -1,8 +1,8 @@
 import re
 
-from gspread import service_account
 from gspread import Spreadsheet
 from gspread import Worksheet
+from gspread import service_account
 from gspread.exceptions import APIError
 from loguru import logger
 
@@ -50,7 +50,8 @@ def ensure_permissions(document: Spreadsheet) -> None:
     try:
         document.worksheets()
     except APIError as err:
-        if err._extract_text(err.response)["code"] == 403:
+        code = err._extract_text(err.response)["code"]  # pylint: disable=protected-access
+        if code == 403:
             raise RuntimeError(FIX_API_ERROR_MESSAGE) from err
 
 
