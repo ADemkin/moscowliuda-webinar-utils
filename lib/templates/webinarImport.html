@@ -1,0 +1,12 @@
+<form method="POST" action="{{ url('webinarImport') }}" >
+    <div>
+        <label for="url">Ссылка на таблицу с вебинаром</label>
+        <input
+            type="text"
+            id="url"
+            name="url"
+            placeholder="https://docs.google.com/spreadsheets/d/..."
+        />
+    </div>
+    <button type="submit">Импортировать</button>
+</form>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block body %}
+<a href="{{ url('webinarList') }}">назад</a>
+<div>
+    <div>
+        <b>{{ webinar.title }}</b>
+    </div>
+    {% if message %}
+        <div><b>{{ message }}</b></div>
+    {% endif %}
+    <div>
+        <a href="{{ webinar.url }}">{{ webinar.url }}</a>
+    </div>
+    <form method="POST" action="{{ url('importCertificates', webinar_id=webinar.id) }}">
+        <button type="submit">
+            Подготовить рассылку
+        </button>
+    </form>
+    <form method="POST" action="{{ url('sendEmails', webinar_id=webinar.id) }}">
+        <button type="submit">
+            Разослать спам
+        </button>
+    </form>
+</div>
+{% endblock body %}
