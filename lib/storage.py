@@ -1,9 +1,9 @@
+import json
 from dataclasses import dataclass
 from dataclasses import field
 from functools import partial
 from pathlib import Path
 from typing import TypedDict
-import json
 
 from lib.factory import WebinarTitles
 
@@ -21,31 +21,31 @@ class WebinarModel:
     url: str
 
     @classmethod
-    def from_dict(cls, webinar_dict: WebinarDict) -> 'WebinarModel':
+    def from_dict(cls, webinar_dict: WebinarDict) -> "WebinarModel":
         return cls(
-            id=webinar_dict['id'],
-            title=WebinarTitles(webinar_dict['title'].lower()),
-            url=webinar_dict['url'],
+            id=webinar_dict["id"],
+            title=WebinarTitles(webinar_dict["title"].lower()),
+            url=webinar_dict["url"],
         )
 
     def to_dict(self) -> WebinarDict:
         return {
-            'id': self.id,
-            'title': self.title.value,
-            'url': self.url,
+            "id": self.id,
+            "title": self.title.value,
+            "url": self.url,
         }
 
 
 @dataclass(slots=True)
 class WebinarStorage:
-    file: Path = field(default_factory=partial(Path, 'storage.json'))
+    file: Path = field(default_factory=partial(Path, "storage.json"))
 
     def load(self) -> list[WebinarModel]:
-        with open(self.file, 'r', encoding='utf-8') as fd:
+        with open(self.file, "r", encoding="utf-8") as fd:
             return [WebinarModel.from_dict(e) for e in json.loads(fd.read())]
 
     def save(self, webinars: list[WebinarModel]) -> None:
-        with open(self.file, 'w', encoding='utf-8') as fd:
+        with open(self.file, "w", encoding="utf-8") as fd:
             fd.write(json.dumps([webinar.to_dict() for webinar in webinars]))
 
     def add_webinar(self, url: str, title: WebinarTitles) -> int:

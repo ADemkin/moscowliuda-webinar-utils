@@ -1,16 +1,16 @@
-from pathlib import Path
 import json
+from pathlib import Path
 
 import pytest
 
-from lib.storage import WebinarStorage
 from lib.factory import WebinarTitles
+from lib.storage import WebinarStorage
 
 
-@pytest.fixture(name='storage')
+@pytest.fixture(name="storage")
 def storage_fixture(tmp_path: Path) -> WebinarStorage:
-    file_path = tmp_path / 'storage.json'
-    with open(file_path, 'w', encoding='utf-8') as fd:
+    file_path = tmp_path / "storage.json"
+    with open(file_path, "w", encoding="utf-8") as fd:
         fd.write(json.dumps([]))
     storage = WebinarStorage(file_path)
     return storage
@@ -25,7 +25,7 @@ def test_if_webinar_not_found_then_gives_none(storage: WebinarStorage) -> None:
 
 
 def test_if_webinar_exists_then_gives_webinar(storage: WebinarStorage) -> None:
-    url = 'some-url'
+    url = "some-url"
     title = WebinarTitles.TEST
     webinar_id = storage.add_webinar(url, title)
     webinar = storage.get_webinar_by_id(webinar_id)
@@ -34,8 +34,10 @@ def test_if_webinar_exists_then_gives_webinar(storage: WebinarStorage) -> None:
     assert webinar.title == title
 
 
-def test_if_webinar_exists_then_it_appears_in_all(storage: WebinarStorage) -> None:
-    url = 'some-url'
+def test_if_webinar_exists_then_it_appears_in_all(
+    storage: WebinarStorage,
+) -> None:
+    url = "some-url"
     title = WebinarTitles.TEST
     webinar = storage.get_webinar_by_id(storage.add_webinar(url, title))
     all_webinars = storage.get_all_webinars()
