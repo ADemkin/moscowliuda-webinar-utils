@@ -118,7 +118,7 @@ class Webinar:
             row = [
                 participant.fio,
                 fio_given,
-                name,
+                "no",
                 participant.email,
                 message,
             ]
@@ -138,11 +138,13 @@ class Webinar:
 
     def send_emails_with_certificates(self, test: bool = True) -> None:
         email_sender = self.email if not test else self.test_email
-        # headers = ['name', 'given_name', 'just_name', 'email', 'custom_text']
         logger.info("sending emails")
-        for row in self.cert_sheet.get_all_values():
-            fio, given_fio, _, email, message = row
+        for i, row in enumerate(self.cert_sheet.get_all_values()):
+            fio, given_fio, is_email_sent, email, message = row
             logger.debug(f"{fio} taken")
+            if is_email_sent == "yes":
+                logger.debug(f"{fio} do not need to send email")
+                continue
             cert_file = self.cert_gen.generate_cerificate(given_fio)
             logger.info(f"{fio} sending email to {email}")
             ascii_file_name = self.tmp_dir / "certificate.jpeg"
@@ -156,6 +158,9 @@ class Webinar:
                 attachments=[str(ascii_file_name)],
             )
             logger.info(f"{fio} done")
+            row_number = i + 1
+            # set email_sent = True
+            self.cert_sheet.update_cell(row_number, 4, "yes")
             sleep(3)
         logger.info("sending emails done")
 
@@ -193,8 +198,8 @@ if __name__ == "__main__":
     load_dotenv()
     webinar = Webinar.from_url(URL)
     # webinar.import_contacts()
-    webinar.certificates_sheet_fill()
+    # webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
-    # webinar.certificates_generate()
+    webinar.certificates_generate()
     # make sure that certificates are correct
     # webinar.send_emails_with_certificates(test=False)

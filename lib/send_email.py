@@ -98,3 +98,10 @@ class MailStub(AbstractMail):
             if call["to"] == to:
                 return True
         return False
+
+    def email_sent_count(self, to: str) -> int:
+        count = 0
+        for call in self._call_args:
+            if call["to"] == to:
+                count += 1
+        return count

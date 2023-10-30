@@ -53,7 +53,12 @@ def test_webinar_integration(
         # assert title in content
         assert date_str in content
         assert str(year) in content
+    # send emails
     webinar.send_emails_with_certificates()
     for participant in participants:
         mail_stub.assert_email_sent_to(participant.email)
+    # trigger email send again will not send them
+    webinar.send_emails_with_certificates()
+    for participant in participants:
+        mail_stub.email_sent_count(participant.email) == 1
     assert listdir(tmp_path) == ["certificate.jpeg"]
