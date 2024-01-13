@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 
 from gspread import Spreadsheet
 from gspread import Worksheet
@@ -14,6 +15,30 @@ Fix APIError:
 Share > Get Link > Change > Anyone with link > Editor
 
 """
+PARTICIPANTS = "Form Responses 1"
+
+
+@dataclass(frozen=True, slots=True)
+class Sheet:
+    title: str
+    date_str: str
+    participants: list[Participant]
+    document: Spreadsheet
+
+    @classmethod
+    def from_url(cls, url: str) -> "Sheet":
+        document = open_spreadsheet(url)
+        participants = get_participants_from_sheet(
+            document.worksheet(PARTICIPANTS),
+            first_row=1,
+        )
+        date_str, title = get_webinar_date_and_title(document.title)
+        return cls(
+            title=title,
+            date_str=date_str,
+            participants=participants,
+            document=document,
+        )
 
 
 def get_participants_from_sheet(
@@ -55,6 +80,7 @@ def ensure_permissions(document: Spreadsheet) -> None:
         )  # pylint: disable=protected-access
         if resp["code"] == 403:
             raise RuntimeError(FIX_API_ERROR_MESSAGE) from err
+        raise err
 
 
 def open_spreadsheet(url: str) -> Spreadsheet:

@@ -7,7 +7,7 @@ from loguru import logger
 from lib.protocols import RowT
 
 
-@dataclass(frozen=True)
+@dataclass(slots=True, frozen=True)
 class Participant:
     timestamp: str
     family_name: str

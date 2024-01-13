@@ -21,9 +21,7 @@ from lib.participants import Participant
 from lib.send_email import AbstractMail
 from lib.send_email import GMail
 from lib.send_email import MailStub
-from lib.sheets import get_participants_from_sheet
-from lib.sheets import get_webinar_date_and_title
-from lib.sheets import open_spreadsheet
+from lib.sheets import Sheet
 from lib.word_morph import offline_morph
 
 URL = "https://docs.google.com/spreadsheets/d/1ilwLmFAQ-FUiRkjVPsLHa4RS9NAxX8chm11siZLYyQU/edit?resourcekey#gid=992781999"  # noqa
@@ -58,31 +56,24 @@ class Webinar:
 
     @classmethod
     def from_url(cls, url: str = URL) -> "Webinar":
-        document = open_spreadsheet(url)
         logger.debug("creating webinar")
-        # get participants
-        participants = get_participants_from_sheet(
-            document.worksheet(PARTICIPANTS),
-            first_row=1,
-        )
-        # get title and date
-        date_str, title = get_webinar_date_and_title(document.title)
+        sheet = Sheet.from_url(url)
         year = datetime.now().year
         # get certificates data
-        certs_dir = Path("certificates") / f"{date_str} {year}"
+        certs_dir = Path("certificates") / f"{sheet.date_str} {year}"
         makedirs(str(certs_dir), mode=0o700, exist_ok=True)
-        cert_gen = get_cert_gen_from_webinar_title(title).create(
+        cert_gen = get_cert_gen_from_webinar_title(sheet.title).create(
             working_dir=certs_dir,
-            date=date_str,
+            date=sheet.date_str,
             year=year,
         )
         tmp_dir_path = Path("/tmp/webinar/")
         tmp_dir_path.mkdir(exist_ok=True)
         return cls(
-            document=document,
-            participants=participants,
-            title=title,
-            date_str=date_str,
+            document=sheet.document,
+            participants=sheet.participants,
+            title=sheet.title,
+            date_str=sheet.date_str,
             year=year,
             email=GMail.from_environ(),
             test_email=MailStub(),
@@ -200,6 +191,6 @@ if __name__ == "__main__":
     # webinar.import_contacts()
     # webinar.certificates_sheet_fill()
     # make sure that names transformed correctly
-    webinar.certificates_generate()
+    # webinar.certificates_generate()
     # make sure that certificates are correct
     # webinar.send_emails_with_certificates(test=False)
