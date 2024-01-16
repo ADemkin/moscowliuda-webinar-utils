@@ -6,3 +6,4 @@ venv/
 .env
 *.vcf
 .coverage
+db.sqlite3
