@@ -1,7 +1,7 @@
 import sqlite3
 from dataclasses import dataclass
 from dataclasses import field
-from lib.db import DB
+from lib.clients.db import DB
 from lib.domain.webinar.models import Account
 from lib.domain.webinar.models import Webinar
 from lib.domain.webinar.errors import AccountAlreadyExistsError

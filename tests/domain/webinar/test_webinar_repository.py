@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from lib.db import DB
+from lib.clients.db import DB
 from lib.domain.webinar.repository import WebinarRepo
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError

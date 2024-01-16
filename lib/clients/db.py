@@ -5,17 +5,15 @@ from dataclasses import field
 from functools import partial
 from pathlib import Path
 from typing import Generator
+from functools import cached_property
 
 from lib.environment import env_str_field
 
 
-@dataclass(slots=True)
+@dataclass
 class DB:
     path: str = env_str_field("DBPATH", "db.sqlite3")
     migrations: Path = field(default_factory=partial(Path, "migrations"))
-    _connection: sqlite3.Connection | None = field(
-        init=False, repr=False, default=None
-    )
 
     def _migrate(self) -> None:
         migrations = [
@@ -33,11 +31,9 @@ class DB:
     def create_in_memory(cls) -> "DB":
         return cls(path=":memory:")
 
-    @property
+    @cached_property
     def connection(self) -> sqlite3.Connection:
-        if self._connection is None:
-            self._connection = sqlite3.connect(self.path)
-        return self._connection
+        return sqlite3.connect(self.path)
 
     @property
     def cursor(self) -> sqlite3.Cursor:
