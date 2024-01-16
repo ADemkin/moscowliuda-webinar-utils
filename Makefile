@@ -3,7 +3,8 @@ RUN:=${POETRY} run
 ARGS:=''
 
 test:
-	$(RUN) pytest --disable-warnings $(ARGS)
+	$(RUN) pytest --cov=lib --cov-report=term-missing --cov-report=html --disable-warnings $(ARGS)
+	$(RUN) coverage report -m
 
 mypy:
 	$(RUN) mypy .
