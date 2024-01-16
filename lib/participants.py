@@ -1,15 +1,25 @@
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Sequence
 
 from loguru import logger
 
 from lib.protocols import RowT
 
+GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"
+
+
+def get_datetime_from_sheet_timestamp(sheet_timestamp: str) -> datetime | None:
+    try:
+        return datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)
+    except ValueError:
+        return None
+
 
 @dataclass(slots=True, frozen=True)
 class Participant:
-    timestamp: str
+    timestamp: datetime | None
     family_name: str
     name: str
     father_name: str
@@ -34,7 +44,7 @@ class Participant:
     def from_row_v2(cls, row: RowT) -> "Participant":
         row_strip: Sequence[str] = [str(i).strip() for i in row]
         return cls(
-            timestamp=row_strip[0],
+            timestamp=get_datetime_from_sheet_timestamp(row_strip[0]),
             email=normalize_email(row_strip[1]),
             family_name=row_strip[2],
             name=row_strip[3],

@@ -8,6 +8,7 @@ from gspread.exceptions import APIError
 from loguru import logger
 
 from lib.participants import Participant
+from lib.participants import get_datetime_from_sheet_timestamp
 
 FIX_API_ERROR_MESSAGE = """You have to add permissions to spreadsheet.
 Fix APIError:
@@ -24,6 +25,7 @@ class Sheet:
     date_str: str
     participants: list[Participant]
     document: Spreadsheet
+    year: int
 
     @classmethod
     def from_url(cls, url: str) -> "Sheet":
@@ -33,12 +35,21 @@ class Sheet:
             first_row=1,
         )
         date_str, title = get_webinar_date_and_title(document.title)
+        year = get_year_from_participants(participants)
         return cls(
             title=title,
             date_str=date_str,
             participants=participants,
             document=document,
+            year=year,
         )
+
+
+def get_year_from_participants(participants: list[Participant]) -> int:
+    for participant in participants:
+        if date := get_datetime_from_sheet_timestamp(participant.timestamp):
+            return date.year
+    return 2024
 
 
 def get_participants_from_sheet(

@@ -8,6 +8,7 @@ import pytest
 from google.auth.exceptions import TransportError
 from gspread.exceptions import WorksheetNotFound
 
+from lib.participants import GOOGLE_TIMESTAMP_FORMAT
 from lib.protocols import ProtoCell
 from lib.protocols import ProtoDocument
 from lib.protocols import ProtoSheet
@@ -42,7 +43,7 @@ def create_row(
     phone: str = "+79161234567",
     email: str = "email@yandex.ru",
 ) -> RowT:
-    timestamp = str(datetime.now())
+    timestamp = datetime.strftime(datetime.now(), GOOGLE_TIMESTAMP_FORMAT)
     return [
         timestamp,
         family,
