@@ -1,3 +1,4 @@
+from typing import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 
@@ -15,7 +16,7 @@ from lib.sheets import Sheet
 class WebinarService:
     webinar_repo: WebinarRepo = field(default_factory=WebinarRepo)
 
-    def import_webinar_and_accounts_by_url(self, url: str) -> list[Account]:
+    def import_webinar_and_accounts_by_url(self, url: str) -> Sequence[Account]:
         logger.debug(f"Importing webinar and accounts by url: {url}")
         sheet = Sheet.from_url(url)
         webinar: Webinar
@@ -48,7 +49,7 @@ class WebinarService:
         logger.debug(f"Imported {len(accounts)} accounts for webinar {webinar}")
         return accounts
 
-    def import_webinars_and_accounts_by_urls(self, urls: list[str]) -> list[Account]:
+    def import_webinars_and_accounts_by_urls(self, urls: Sequence[str]) -> Sequence[Account]:
         accounts: list[Account] = []
         for url in urls:
             accounts.extend(self.import_webinar_and_accounts_by_url(url))

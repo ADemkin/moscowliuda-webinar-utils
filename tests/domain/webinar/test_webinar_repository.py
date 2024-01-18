@@ -59,17 +59,23 @@ def test_webinar_repo_gives_existing_webinar_by_url(webinar_repo: WebinarRepo) -
     assert webinar_got == webinar
 
 
-def test_webinar_repo_raises_error_when_webinar_id_not_found(webinar_repo: WebinarRepo) -> None:
+def test_webinar_repo_raises_error_when_webinar_id_not_found(
+        webinar_repo: WebinarRepo,
+) -> None:
     with pytest.raises(WebinarNotFoundError):
         webinar_repo.get_webinar_by_id(webinar_id=9999)
 
 
-def test_webinar_repo_raises_error_when_webinar_url_not_found(webinar_repo: WebinarRepo) -> None:
+def test_webinar_repo_raises_error_when_webinar_url_not_found(
+        webinar_repo: WebinarRepo,
+) -> None:
     with pytest.raises(WebinarNotFoundError):
         webinar_repo.get_webinar_by_url(url="someurl")
 
 
-def test_webinar_repo_raises_error_when_webinar_already_exists(webinar_repo: WebinarRepo) -> None:
+def test_webinar_repo_raises_error_when_webinar_already_exists(
+        webinar_repo: WebinarRepo,
+) -> None:
     webinar_url = "https://webinar-url.some/2/#"
     title = "random webinar title"
     date_str = "2020-01-01"
@@ -89,7 +95,9 @@ def test_webinar_repo_raises_error_when_webinar_already_exists(webinar_repo: Web
         )
 
 
-def test_webinar_repo_add_account_gives_account_model(webinar_repo: WebinarRepo) -> None:
+def test_webinar_repo_add_account_gives_account_model(
+        webinar_repo: WebinarRepo,
+) -> None:
     webinar = add_random_webinar(webinar_repo=webinar_repo)
     account = webinar_repo.add_account(
         webinar_id=webinar.id,
@@ -109,12 +117,16 @@ def test_webinar_repo_add_account_gives_account_model(webinar_repo: WebinarRepo)
     assert account_got == account
 
 
-def test_webinar_repo_raises_error_when_account_not_found(webinar_repo: WebinarRepo) -> None:
+def test_webinar_repo_raises_error_when_account_not_found(
+        webinar_repo: WebinarRepo,
+) -> None:
     with pytest.raises(AccountNotFoundError):
         webinar_repo.get_account_by_id(account_id=9999)
 
 
-def test_webinar_repo_raises_error_when_account_email_already_exists(webinar_repo: WebinarRepo) -> None:
+def test_webinar_repo_raises_error_when_account_email_already_exists(
+        webinar_repo: WebinarRepo,
+) -> None:
     webinar = add_random_webinar(webinar_repo=webinar_repo)
     email = "someemail@somedomain.com"
     webinar_repo.add_account(
@@ -136,7 +148,9 @@ def test_webinar_repo_raises_error_when_account_email_already_exists(webinar_rep
         )
 
 
-def test_webinar_repo_raises_error_when_account_phone_already_exists(webinar_repo: WebinarRepo) -> None:
+def test_webinar_repo_raises_error_when_account_phone_already_exists(
+        webinar_repo: WebinarRepo,
+) -> None:
     webinar = add_random_webinar(webinar_repo=webinar_repo)
     phone = "+7 (916) 321-54-76"
     webinar_repo.add_account(
@@ -156,3 +170,42 @@ def test_webinar_repo_raises_error_when_account_phone_already_exists(webinar_rep
             phone=phone,
             email="someotheremail",
         )
+
+
+def test_webinar_repo_gives_all_webinars(webinar_repo: WebinarRepo) -> None:
+    webinars_before = webinar_repo.get_all_webinars()
+    webinar1 = add_random_webinar(webinar_repo=webinar_repo)
+    webinar2 = add_random_webinar(webinar_repo=webinar_repo)
+    assert webinar1 not in webinars_before
+    assert webinar2 not in webinars_before
+    webinars = webinar_repo.get_all_webinars()
+    assert len(webinars) == len(webinars_before) + 2
+    assert webinar1 in webinars
+    assert webinar2 in webinars
+
+
+def test_webinar_repo_gives_all_webinar_accounts_by_webinar_id(
+        webinar_repo: WebinarRepo,
+) -> None:
+    webinar = add_random_webinar(webinar_repo=webinar_repo)
+    assert webinar_repo.get_all_accounts_by_webinar_id(webinar_id=webinar.id) == []
+    account1 = webinar_repo.add_account(
+        webinar_id=webinar.id,
+        family_name="Петров",
+        name="Пётр",
+        father_name="Петрович",
+        phone="+7 (916) 123-45-67",
+        email="someemail",
+    )
+    account2 = webinar_repo.add_account(
+        webinar_id=webinar.id,
+        family_name="Петров",
+        name="Пётр",
+        father_name="Петрович",
+        phone="+7 (916) 321-54-76",
+        email="someotheremail",
+    )
+    accounts = webinar_repo.get_all_accounts_by_webinar_id(webinar_id=webinar.id)
+    assert len(accounts) == 2
+    assert account1 in accounts
+    assert account2 in accounts

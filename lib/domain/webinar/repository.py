@@ -1,6 +1,8 @@
 import sqlite3
+from typing import Sequence
 from dataclasses import dataclass
 from dataclasses import field
+
 from lib.clients.db import DB
 from lib.domain.webinar.models import Account
 from lib.domain.webinar.models import Webinar
@@ -137,3 +139,29 @@ class WebinarRepo:
         if row := resp.fetchone():
             return Account.from_row(row)
         raise AccountNotFoundError(f"Account with id={account_id!r} not found")
+
+    def get_all_webinars(self) -> Sequence[Webinar]:
+        query = """
+            SELECT id, imported_at, url, title, date_str, year
+            FROM webinar
+        """
+        resp = self.db.connection.execute(query)
+        return [Webinar.from_row(row) for row in resp.fetchall()]
+
+    def get_all_accounts_by_webinar_id(self, webinar_id: int) -> Sequence[Account]:
+        query = """
+            SELECT
+                id,
+                timestamp,
+                family_name,
+                name,
+                father_name,
+                phone,
+                email,
+                webinar_id
+            FROM account
+            WHERE webinar_id = :webinar_id
+        """
+        params = {"webinar_id": webinar_id}
+        resp = self.db.connection.execute(query, params)
+        return [Account.from_row(row) for row in resp.fetchall()]
