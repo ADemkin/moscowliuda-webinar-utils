@@ -13,6 +13,7 @@ import jinja2
 from lib.storage import WebinarStorage
 from lib.webui.routes import setup_routes
 
+
 CWD = Path(".")
 
 
