@@ -6,6 +6,8 @@ from dataclasses import field
 from lib.clients.db import DB
 from lib.domain.webinar.models import Account
 from lib.domain.webinar.models import Webinar
+from lib.domain.webinar.models import AccountId
+from lib.domain.webinar.models import WebinarId
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
 from lib.domain.webinar.errors import AccountNotFoundError
@@ -120,7 +122,7 @@ class WebinarRepo:
         row = resp.fetchone()
         return Account.from_row(row)
 
-    def get_account_by_id(self, account_id: int) -> Account:
+    def get_account_by_id(self, account_id: AccountId) -> Account:
         query = """
             SELECT
                 id,
@@ -148,7 +150,7 @@ class WebinarRepo:
         resp = self.db.connection.execute(query)
         return [Webinar.from_row(row) for row in resp.fetchall()]
 
-    def get_all_accounts_by_webinar_id(self, webinar_id: int) -> Sequence[Account]:
+    def get_all_accounts_by_webinar_id(self, webinar_id: WebinarId) -> Sequence[Account]:
         query = """
             SELECT
                 id,

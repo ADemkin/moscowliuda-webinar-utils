@@ -1,10 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import NewType
+
+
+WebinarId = NewType("WebinarId", int)
+AccountId = NewType("AccountId", int)
 
 
 @dataclass(frozen=True, slots=True)
 class Webinar:
-    id: int
+    id: WebinarId
     imported_at: datetime
     url: str
     title: str
@@ -25,7 +30,7 @@ class Webinar:
 
 @dataclass(frozen=True, slots=True)
 class Account:
-    id: int
+    id: AccountId
     timestamp: datetime
     family_name: str
     name: str

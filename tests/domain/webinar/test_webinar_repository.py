@@ -9,6 +9,8 @@ from lib.domain.webinar.errors import WebinarAlreadyExistsError
 from lib.domain.webinar.errors import AccountNotFoundError
 from lib.domain.webinar.errors import WebinarNotFoundError
 from lib.domain.webinar.models import Webinar
+from lib.domain.webinar.models import WebinarId
+from lib.domain.webinar.models import AccountId
 
 
 @pytest.fixture(scope="session")
@@ -63,7 +65,7 @@ def test_webinar_repo_raises_error_when_webinar_id_not_found(
         webinar_repo: WebinarRepo,
 ) -> None:
     with pytest.raises(WebinarNotFoundError):
-        webinar_repo.get_webinar_by_id(webinar_id=9999)
+        webinar_repo.get_webinar_by_id(webinar_id=WebinarId(9999))
 
 
 def test_webinar_repo_raises_error_when_webinar_url_not_found(
@@ -121,7 +123,7 @@ def test_webinar_repo_raises_error_when_account_not_found(
         webinar_repo: WebinarRepo,
 ) -> None:
     with pytest.raises(AccountNotFoundError):
-        webinar_repo.get_account_by_id(account_id=9999)
+        webinar_repo.get_account_by_id(account_id=AccountId(9999))
 
 
 def test_webinar_repo_raises_error_when_account_email_already_exists(
