@@ -6,6 +6,9 @@ authors = ["Anton Demkin <antondemkin@yandex.ru>"]
 packages = [
     { include = "lib" },
 ]
+classifiers = [
+    "Private :: Do Not Upload"
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
