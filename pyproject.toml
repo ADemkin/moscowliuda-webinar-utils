@@ -3,6 +3,9 @@ name = "moscowliuda-webinar"
 version = "0.1.0"
 description = "Automation for @moscowliuda webinar"
 authors = ["Anton Demkin <antondemkin@yandex.ru>"]
+packages = [
+    { include = "lib" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -18,6 +21,7 @@ aiohttp = "^3.8.3"
 aiohttp-jinja2 = "^1.5"
 gunicorn = "^20.1.0"
 pytest-coverage = "^0.0"
+click = "^8.1.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"
