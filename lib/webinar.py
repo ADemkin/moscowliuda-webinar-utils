@@ -127,7 +127,7 @@ class Webinar:
             logger.debug(f"{given_fio} cert path: {str(cert_file)}")
         logger.info("generating certs done")
 
-    def send_emails_with_certificates(self, test: bool = True) -> None:
+    def send_emails_with_certificates(self) -> None:
         logger.info("sending emails")
         for i, row in enumerate(self.cert_sheet.get_all_values()):
             fio, given_fio, is_email_sent, email, message = row
@@ -157,6 +157,7 @@ class Webinar:
         short_title = {
             WebinarTitles.SPEECH: "П",
             WebinarTitles.GRAMMAR: "Г",
+            WebinarTitles.TEST: "Т",
         }[WebinarTitles(self.title.lower())]
         return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
 

@@ -51,6 +51,8 @@ def test_webinar_integration(
         tmp_dir=tmp_path,
         morphological=offline_morph,
     )
+
+    # generate certificates
     webinar.certificates_sheet_fill()
     webinar.certificates_generate()
     assert len(listdir(tmp_path)) == len(rows)
@@ -62,13 +64,28 @@ def test_webinar_integration(
         # assert title in content
         assert date_str in content
         assert str(year) in content
+
     # send emails
     webinar.send_emails_with_certificates()
     for participant in participants:
         assert mail_stub.is_sent_to(participant.email)
+
     # trigger email send again will not send them
     webinar.send_emails_with_certificates()
     for participant in participants:
         assert mail_stub.sent_count(participant.email) == 1
     assert mail_stub.total_send_count == 2
     assert listdir(tmp_path) == ["certificate.jpeg"]
+
+    # create vcards
+    webinar.import_contacts()
+    group_expected = f"Т{date_str.replace(' ', '')} {year}"
+    path_expected = Path("contacts") / f"{group_expected}.vcf"
+    assert path_expected.exists()
+    content = path_expected.read_text()
+    assert group_expected in content
+    for participant in participants:
+        assert participant.family_name in content
+        assert participant.name in content
+        assert participant.email in content
+        assert participant.phone in content
