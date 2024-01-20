@@ -1,9 +1,12 @@
 from os import listdir
 from pathlib import Path
+from unittest.mock import patch
 
+import pytest
+
+from lib.clients.email import MailStub
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
-from lib.send_email import MailStub
 from lib.webinar import Webinar
 from lib.word_morph import offline_morph
 from tests.common import CreateDocumentT
@@ -11,10 +14,17 @@ from tests.common import create_row
 from tests.common import skip_if_no_network
 
 
+@pytest.fixture
+def _no_sleep():
+    with patch("lib.webinar.sleep"):
+        yield
+
+
 @skip_if_no_network
 def test_webinar_integration(
     create_document: CreateDocumentT,
     tmp_path: Path,
+    _no_sleep: None,
 ) -> None:
     rows = [
         create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
@@ -22,17 +32,16 @@ def test_webinar_integration(
     ]
     participants = [Participant.from_row(row) for row in rows]
     document = create_document(rows)
-    mail_stub = MailStub()
     title = "Test Webinar"
     date_str = "00-99 Month"
     year = 2022
+    mail_stub = MailStub()
     webinar = Webinar(
         document=document,
         participants=participants,
         title=title,
         date_str=date_str,
         year=year,
-        test_email=mail_stub,
         email=mail_stub,
         cert_gen=TextCertificateGenerator(
             working_dir=tmp_path,
@@ -56,9 +65,10 @@ def test_webinar_integration(
     # send emails
     webinar.send_emails_with_certificates()
     for participant in participants:
-        mail_stub.assert_email_sent_to(participant.email)
+        assert mail_stub.is_sent_to(participant.email)
     # trigger email send again will not send them
     webinar.send_emails_with_certificates()
     for participant in participants:
-        mail_stub.email_sent_count(participant.email) == 1
+        assert mail_stub.sent_count(participant.email) == 1
+    assert mail_stub.total_send_count == 2
     assert listdir(tmp_path) == ["certificate.jpeg"]

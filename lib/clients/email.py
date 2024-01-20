@@ -43,6 +43,7 @@ class GMail(AbstractMail):
         contents: str | None = None,
         attachments: Sequence[str | IOBase | PosixPath] | None = None,
     ) -> None:
+        logger.debug(f"Sending mail to {to}")
         self.smtp.send(
             to=to,
             bcc=bcc,
@@ -50,6 +51,7 @@ class GMail(AbstractMail):
             contents=contents,
             attachments=attachments,
         )
+        logger.debug(f"Sending mail to {to} done")
 
 
 class MailStub(AbstractMail):
@@ -74,8 +76,12 @@ class MailStub(AbstractMail):
         self._call_args.append(args)
         logger.debug("MailStub.send: {args}", args=args)
 
-    def assert_email_sent_to(self, to: str) -> bool:
+    def is_sent_to(self, to: str) -> bool:
         return to in {call["to"] for call in self._call_args}
 
-    def email_sent_count(self, to: str) -> int:
+    def sent_count(self, to: str) -> int:
         return len([call for call in self._call_args if call["to"] == to])
+
+    @property
+    def total_send_count(self) -> int:
+        return len(self._call_args)

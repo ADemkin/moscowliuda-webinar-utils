@@ -12,21 +12,23 @@ from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
+from lib.clients.email import AbstractMail
+from lib.clients.email import GMail
+from lib.clients.email import MailStub
 from lib.contacts import create_vcard
 from lib.contacts import save_vcards_to_file
 from lib.factory import WebinarTitles
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.participants import Participant
-from lib.send_email import AbstractMail
-from lib.send_email import GMail
-from lib.send_email import MailStub
 from lib.sheets import Sheet
 from lib.word_morph import offline_morph
 
 URL = "https://docs.google.com/spreadsheets/d/1ilwLmFAQ-FUiRkjVPsLHa4RS9NAxX8chm11siZLYyQU/edit?resourcekey#gid=992781999"  # noqa
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
+
+TEST = False
 
 
 class Webinar:
@@ -38,7 +40,6 @@ class Webinar:
         date_str: str,
         year: int,
         email: AbstractMail,
-        test_email: MailStub,
         cert_gen: BaseCertificateGenerator,
         tmp_dir: Path,
         morphological: Callable[[str], str],
@@ -49,7 +50,6 @@ class Webinar:
         self.date_str: str = date_str
         self.year: int = year
         self.email = email
-        self.test_email = test_email
         self.cert_gen = cert_gen
         self.tmp_dir = tmp_dir
         self.morphological = morphological
@@ -69,14 +69,14 @@ class Webinar:
         )
         tmp_dir_path = Path("/tmp/webinar/")
         tmp_dir_path.mkdir(exist_ok=True)
+        email = MailStub() if TEST else GMail()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
             title=sheet.title,
             date_str=sheet.date_str,
             year=year,
-            email=GMail.from_environ(),
-            test_email=MailStub(),
+            email=email,
             cert_gen=cert_gen,
             tmp_dir=tmp_dir_path,
             morphological=offline_morph,
@@ -128,7 +128,6 @@ class Webinar:
         logger.info("generating certs done")
 
     def send_emails_with_certificates(self, test: bool = True) -> None:
-        email_sender = self.email if not test else self.test_email
         logger.info("sending emails")
         for i, row in enumerate(self.cert_sheet.get_all_values()):
             fio, given_fio, is_email_sent, email, message = row
@@ -141,17 +140,16 @@ class Webinar:
             ascii_file_name = self.tmp_dir / "certificate.jpeg"
             rename(cert_file, ascii_file_name)
             logger.debug(f"cert file: {ascii_file_name}")
-            email_sender.send(
+            self.email.send(
                 to=email,
                 bcc=["antondemkin+python@yandex.ru", "moscowliuda@mail.ru"],
                 subject=self.title,
                 contents=message,
                 attachments=[str(ascii_file_name)],
             )
-            logger.info(f"{fio} done")
             row_number = i + 1
-            # set email_sent = True
-            self.cert_sheet.update_cell(row_number, 4, "yes")
+            self.cert_sheet.update_cell(row_number, 3, "yes")
+            logger.info(f"{fio} done")
             sleep(3)
         logger.info("sending emails done")
 
