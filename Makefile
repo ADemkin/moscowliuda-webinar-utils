@@ -4,8 +4,7 @@ ARGS:=''
 
 
 test:
-	$(RUN) pytest --cov=lib --disable-warnings $(ARGS)
-	$(RUN) coverage report -m
+	$(RUN) pytest --cov=lib --cov-report=term-missing --disable-warnings $(ARGS)
 
 mypy:
 	$(RUN) mypy .
