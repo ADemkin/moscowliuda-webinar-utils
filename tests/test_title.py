@@ -16,9 +16,7 @@ from lib.sheets import get_webinar_date_and_title
         ("28 Апреля - 1 Мая", "Длинное Название из нескольких слов"),
     ],
 )
-def test_gives_date_and_title_if_given_correct_title(
-    date: str, name: str
-) -> None:
+def test_gives_date_and_title_if_given_correct_title(date: str, name: str) -> None:
     title = f" {date} {name} (Responses) "
     assert get_webinar_date_and_title(title) == (date, name)
 

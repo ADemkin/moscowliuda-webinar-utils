@@ -1,6 +1,6 @@
+import atexit
 from datetime import datetime
 from functools import cached_property
-from os import makedirs
 from os import rename
 from pathlib import Path
 from time import sleep
@@ -20,6 +20,7 @@ from lib.factory import WebinarTitles
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.participants import Participant
+from lib.paths import ETC_PATH
 from lib.sheets import Sheet
 from lib.word_morph import offline_morph
 
@@ -61,15 +62,16 @@ class Webinar:
         sheet = Sheet.from_url(url)
         year = datetime.now().year
         # get certificates data
-        certs_dir = Path("certificates") / f"{sheet.date_str} {year}"
-        makedirs(str(certs_dir), mode=0o700, exist_ok=True)
+        certs_path = ETC_PATH / "certificates" / f"{sheet.date_str} {year}"
+        certs_path.mkdir(mode=0o700, exist_ok=True)
         cert_gen = get_cert_gen_from_webinar_title(sheet.title).create(
-            working_dir=certs_dir,
+            working_dir=certs_path,
             date=sheet.date_str,
             year=year,
         )
-        tmp_dir_path = Path("/tmp/webinar/")
-        tmp_dir_path.mkdir(exist_ok=True)
+        tmp_dir_path = ETC_PATH / "tmp"
+        tmp_dir_path.mkdir(mode=0o700, exist_ok=True)
+        atexit.register(tmp_dir_path.rmdir, ignore_errors=True)  # type: ignore
         email = MailStub() if TEST else GMail()
         return cls(
             document=sheet.document,

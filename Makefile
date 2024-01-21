@@ -10,10 +10,10 @@ mypy:
 	$(RUN) mypy .
 
 flake8:
-	$(RUN) flake8 lib/*.py tests/*.py
+	$(RUN) flake8 lib/ tests/ bin/
 
 pylint:
-	$(RUN) pylint lib/*.py tests/*.py
+	$(RUN) pylint lib/ tests/ bin/
 
 lint: mypy flake8 pylint
 
@@ -25,9 +25,9 @@ dev:
 
 
 black:
-	$(RUN) black lib/*.py tests/*.py
+	$(RUN) black lib/ tests/ bin/
 
 isort:
-	$(RUN) isort lib/*.py tests/*.py
+	$(RUN) isort lib/ tests/ bin/
 
 fmt: isort black

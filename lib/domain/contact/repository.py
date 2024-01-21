@@ -1,14 +1,15 @@
-from typing import Sequence
-from functools import partial
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
-from dataclasses import dataclass, field
+from typing import Sequence
 
 from lib.domain.contact.models import VCard
+from lib.paths import ETC_PATH
 
 
 @dataclass(frozen=True, slots=True)
 class VCardRepository:
-    path: Path = field(default_factory=partial(Path, "contacts"))
+    path: Path = field(default=ETC_PATH / "contacts")
 
     def save_vcards_to_file(self, vcards: Sequence[VCard], group: str) -> Path:
         path = self.path / f"{group}.vcf"

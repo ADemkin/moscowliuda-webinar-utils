@@ -58,10 +58,10 @@ load-plugins = 'pylint.extensions.no_self_use'
 [tool.isort]
 force_single_line = true
 line_length = 100
-py_version = 311
+py_version = 310
 
 [tool.black]
-line-length = 80
+line-length = 100
 
 [tool.mypy]
 implicit_optional = true

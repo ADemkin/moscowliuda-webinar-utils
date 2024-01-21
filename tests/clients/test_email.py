@@ -1,5 +1,5 @@
-from os import urandom
 from os import environ
+from os import urandom
 from unittest.mock import patch
 
 import pytest
@@ -64,7 +64,7 @@ def test_gmail_calls_smtp_send_with_corect_arguments(smtp_mock):
     )
 
 
-@pytest.mark.parametrize('size', [1, 2, 3])
+@pytest.mark.parametrize("size", [1, 2, 3])
 def test_mailstub_keeps_all_calls(size: int):
     emails = {randstr() for _ in range(size)}
     assert len(emails) == size

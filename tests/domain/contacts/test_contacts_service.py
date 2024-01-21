@@ -1,13 +1,13 @@
-from os import urandom
 from datetime import datetime
+from os import urandom
 from pathlib import Path
 
 import pytest
 
-from lib.domain.webinar.models import Account
-from lib.domain.webinar.models import AccountId
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
+from lib.domain.webinar.models import Account
+from lib.domain.webinar.models import AccountId
 
 
 def randstr() -> str:
@@ -15,7 +15,7 @@ def randstr() -> str:
 
 
 def randint() -> int:
-    return int.from_bytes(urandom(4), 'big')
+    return int.from_bytes(urandom(4), "big")
 
 
 @pytest.fixture

@@ -1,10 +1,10 @@
 from os import listdir
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from lib.clients.email import MailStub
+from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
@@ -24,9 +24,16 @@ def _no_sleep():
 @skip_if_no_network
 def test_webinar_integration(
     create_document: CreateDocumentT,
-    tmp_path: Path,
-    _no_sleep: None,
+    tmp_path_factory,
+    _no_sleep,
 ) -> None:
+    webinar_tmp_path = tmp_path_factory.mktemp("webinar")
+    contact_tmp_path = tmp_path_factory.mktemp("contacts")
+    contact_service = ContactService(
+        vcard_repo=VCardRepository(
+            path=contact_tmp_path,
+        ),
+    )
     rows = [
         create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
         create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
@@ -45,21 +52,21 @@ def test_webinar_integration(
         year=year,
         email=mail_stub,
         cert_gen=TextCertificateGenerator(
-            working_dir=tmp_path,
+            working_dir=webinar_tmp_path,
             date=date_str,
             year=str(year),
         ),
-        tmp_dir=tmp_path,
+        tmp_dir=webinar_tmp_path,
         morphological=offline_morph,
-        contact_service=ContactService(),
+        contact_service=contact_service,
     )
 
     # generate certificates
     webinar.certificates_sheet_fill()
     webinar.certificates_generate()
-    assert len(listdir(tmp_path)) == len(rows)
+    assert len(listdir(webinar_tmp_path)) == len(rows)
     for name in ("Мазаеву Антону Андреевичу", "Мельниковой Людмиле Андреевне"):
-        path = tmp_path / name
+        path = webinar_tmp_path / name
         assert path.exists()
         content = path.read_text()
         assert name in content
@@ -77,12 +84,12 @@ def test_webinar_integration(
     for participant in participants:
         assert mail_stub.sent_count(participant.email) == 1
     assert mail_stub.total_send_count == 2
-    assert listdir(tmp_path) == ["certificate.jpeg"]
+    assert listdir(webinar_tmp_path) == ["certificate.jpeg"]
 
     # create vcards
     webinar.import_contacts()
     group_expected = f"Т{date_str.replace(' ', '')} {year}"
-    path_expected = Path("contacts") / f"{group_expected}.vcf"
+    path_expected = contact_tmp_path / f"{group_expected}.vcf"
     assert path_expected.exists()
     content = path_expected.read_text()
     assert group_expected in content

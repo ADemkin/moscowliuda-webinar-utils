@@ -23,8 +23,7 @@ CreateSheetT = Callable[[RowsT], ProtoSheet]
 MorpherT = Callable[[str], str]
 
 TEST_SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K06"
-    "85oIfkMnAEvQyeJjkOMzLCo/edit"
+    "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K06" "85oIfkMnAEvQyeJjkOMzLCo/edit"
 )
 TITLE_CELL_NAMES: RowT = [
     "Timestamp",
@@ -170,9 +169,7 @@ def skipif(exception: BaseException, reason: str) -> Any:
 
     def decorator(func: Callable) -> Any:
         @wraps(func)
-        def wrapper(  # pylint: disable=inconsistent-return-statements
-            *args, **kwargs
-        ) -> Callable:
+        def wrapper(*args, **kwargs) -> Callable:  # pylint: disable=inconsistent-return-statements
             try:
                 return func(*args, **kwargs)
             except exception:  # type: ignore

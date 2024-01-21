@@ -18,9 +18,7 @@ def get_env_variable(
 ) -> T:
     if (value := environ.get(var_name, default)) is not None:
         return factory(value)
-    raise EnvironmentVariableNotSetError(
-        f"Environment variable {var_name!r} is not set"
-    )
+    raise EnvironmentVariableNotSetError(f"Environment variable {var_name!r} is not set")
 
 
 get_env_str_var = partial(get_env_variable, factory=str)

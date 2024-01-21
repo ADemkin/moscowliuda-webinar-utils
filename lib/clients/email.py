@@ -1,11 +1,11 @@
 from abc import ABCMeta
 from abc import abstractmethod
-from io import IOBase
-from pathlib import PosixPath
-from typing import Sequence
-from typing import Mapping
 from dataclasses import dataclass
 from functools import cached_property
+from io import IOBase
+from pathlib import PosixPath
+from typing import Mapping
+from typing import Sequence
 
 from loguru import logger
 from yagmail import SMTP
@@ -23,7 +23,7 @@ class AbstractMail(metaclass=ABCMeta):
         contents: str | None = None,
         attachments: Sequence[str | IOBase | PosixPath] | None = None,
     ) -> None:
-        ...
+        ...  # pragma: no cover
 
 
 @dataclass

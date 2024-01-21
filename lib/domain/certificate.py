@@ -1,3 +1,6 @@
+import os
+import sys
+from abc import ABC
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -5,11 +8,6 @@ from pathlib import Path
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-
-import os
-import sys
-from abc import ABC
-
 
 BLACK = (0, 0, 0)
 
@@ -166,5 +164,6 @@ def stuff():
     randint(1, 100)
     choice(["a", "b"])
     cached_property(lambda: 1)
+
     class New(ABC):
         pass

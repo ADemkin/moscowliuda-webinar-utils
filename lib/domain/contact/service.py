@@ -1,12 +1,13 @@
-from typing import Sequence
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
-from dataclasses import dataclass, field
+from typing import Sequence
 
 from loguru import logger
 
-from lib.domain.webinar.models import Account
 from lib.domain.contact.models import VCard
 from lib.domain.contact.repository import VCardRepository
+from lib.domain.webinar.models import Account
 from lib.participants import Participant
 
 
@@ -24,9 +25,9 @@ class ContactService:
         )
 
     def save_accounts_to_file(
-            self,
-            accounts: Sequence[Account | Participant],
-            group: str,
+        self,
+        accounts: Sequence[Account | Participant],
+        group: str,
     ) -> Path:
         logger.debug(f"Saving {len(accounts)} accounts to file")
         vcards = [self.create_vcard(account, group) for account in accounts]

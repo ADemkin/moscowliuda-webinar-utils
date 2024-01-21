@@ -6,6 +6,8 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
+from lib.paths import ETC_PATH
+
 BLACK = (0, 0, 0)
 
 
@@ -95,7 +97,7 @@ def create_certificate(
 
 
 class BaseCertificateGenerator:
-    _templates_dir: Path = Path("templates")
+    _templates_dir: Path = ETC_PATH / "templates"
     template: str = ""
 
     def __init__(self, working_dir: Path, date: str, year: str) -> None:

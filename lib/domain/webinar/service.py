@@ -1,14 +1,14 @@
-from typing import Sequence
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Sequence
 
 from loguru import logger
 
-from lib.domain.webinar.repository import WebinarRepo
-from lib.domain.webinar.models import Account
-from lib.domain.webinar.models import Webinar
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
+from lib.domain.webinar.models import Account
+from lib.domain.webinar.models import Webinar
+from lib.domain.webinar.repository import WebinarRepo
 from lib.sheets import Sheet
 
 

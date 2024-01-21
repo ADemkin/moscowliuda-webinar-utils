@@ -1,17 +1,17 @@
 import sqlite3
-from typing import Sequence
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Sequence
 
 from lib.clients.db import DB
-from lib.domain.webinar.models import Account
-from lib.domain.webinar.models import Webinar
-from lib.domain.webinar.models import AccountId
-from lib.domain.webinar.models import WebinarId
 from lib.domain.webinar.errors import AccountAlreadyExistsError
-from lib.domain.webinar.errors import WebinarAlreadyExistsError
 from lib.domain.webinar.errors import AccountNotFoundError
+from lib.domain.webinar.errors import WebinarAlreadyExistsError
 from lib.domain.webinar.errors import WebinarNotFoundError
+from lib.domain.webinar.models import Account
+from lib.domain.webinar.models import AccountId
+from lib.domain.webinar.models import Webinar
+from lib.domain.webinar.models import WebinarId
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,7 +40,12 @@ class WebinarRepo:
                 date_str,
                 year
         """
-        params = {"url": url, "date_str": date_str, "title": title, "year": year}
+        params = {
+            "url": url,
+            "date_str": date_str,
+            "title": title,
+            "year": year,
+        }
         try:
             row = self.db.connection.execute(query, params).fetchone()
         except sqlite3.IntegrityError as err:
@@ -71,13 +76,13 @@ class WebinarRepo:
         raise WebinarNotFoundError(f"Webinar with {url=!r} not found")
 
     def add_account(
-            self,
-            webinar_id: int,
-            family_name: str,
-            name: str,
-            father_name: str,
-            phone: str,
-            email: str,
+        self,
+        webinar_id: int,
+        family_name: str,
+        name: str,
+        father_name: str,
+        phone: str,
+        email: str,
     ) -> Account:
         query = """
             INSERT INTO account (
