@@ -56,8 +56,8 @@ class InflectService:
         )
         return " ".join(
             [
-                name_inflection.datv,
                 family_name_inflection.datv,
+                name_inflection.datv,
                 father_name_inflection.datv,
             ],
         )

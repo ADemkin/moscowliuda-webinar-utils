@@ -20,7 +20,6 @@ cell = namedtuple("cell", ["value"])
 
 CreateDocumentT = Callable[[RowsT], ProtoDocument]
 CreateSheetT = Callable[[RowsT], ProtoSheet]
-MorpherT = Callable[[str], str]
 
 # fmt: off
 TEST_SHEET_URL = "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"  # noqa: E501

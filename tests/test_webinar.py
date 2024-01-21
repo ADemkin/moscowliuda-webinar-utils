@@ -6,10 +6,10 @@ import pytest
 from lib.clients.email import MailStub
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
+from lib.domain.inflect.service import InflectService
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.webinar import Webinar
-from lib.word_morph import offline_morph
 from tests.common import CreateDocumentT
 from tests.common import create_row
 from tests.common import skip_if_no_network
@@ -58,8 +58,8 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
             year=str(year),
         ),
         tmp_dir=webinar_tmp_path,
-        morphological=offline_morph,
         contact_service=contact_service,
+        inflect_service=InflectService(),
     )
 
     # generate certificates

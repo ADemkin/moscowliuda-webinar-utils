@@ -148,7 +148,7 @@ def test_inflect_service_inflect_account_fio_gives_inflected_fio(
         father_name="Иванович",
     )
     inflected_fio = inflect_service.inflect_account_fio(account)
-    assert inflected_fio == "Беки Мороз Ивановичу"
+    assert inflected_fio == "Мороз Беки Ивановичу"
 
 
 def test_inflect_unknown_account_gives_registered_unknown_part(

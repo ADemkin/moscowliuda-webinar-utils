@@ -5,7 +5,6 @@ from os import rename
 from pathlib import Path
 from shutil import rmtree
 from time import sleep
-from typing import Callable
 
 from gspread import Spreadsheet
 from gspread import Worksheet
@@ -16,13 +15,13 @@ from lib.clients.email import AbstractMail
 from lib.clients.email import GMail
 from lib.clients.email import MailStub
 from lib.domain.contact.service import ContactService
+from lib.domain.inflect.service import InflectService
 from lib.factory import WebinarTitles
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.participants import Participant
 from lib.paths import ETC_PATH
 from lib.sheets import Sheet
-from lib.word_morph import offline_morph
 
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
@@ -39,7 +38,7 @@ class Webinar:
         email: AbstractMail,
         cert_gen: BaseCertificateGenerator,
         tmp_dir: Path,
-        morphological: Callable[[str], str],
+        inflect_service: InflectService,
         contact_service: ContactService,
     ) -> None:
         self.document: Spreadsheet = document
@@ -50,8 +49,8 @@ class Webinar:
         self.email = email
         self.cert_gen = cert_gen
         self.tmp_dir = tmp_dir
-        self.morphological = morphological
         self.contact_service = contact_service
+        self.inflect_service = inflect_service
 
     @classmethod
     def from_url(cls, url: str, test: bool = False) -> "Webinar":
@@ -79,8 +78,8 @@ class Webinar:
             email=email,
             cert_gen=cert_gen,
             tmp_dir=tmp_dir_path,
-            morphological=offline_morph,
             contact_service=ContactService(),
+            inflect_service=InflectService(),
         )
 
     def _is_sheet_filled(self, sheet_name: str) -> bool:
@@ -104,9 +103,8 @@ class Webinar:
         logger.info("filling certificates")
         for participant in self.participants:
             logger.info(f"{participant.fio} taken")
-            fio_given = self.morphological(participant.fio)
-            name = participant.name
-            message = f"Здравствуйте, {name}! Благодарю вас за участие."
+            fio_given = self.inflect_service.inflect_account_fio(participant)
+            message = f"Здравствуйте, {participant.name}! Благодарю вас за участие."
             row = [
                 participant.fio,
                 fio_given,
