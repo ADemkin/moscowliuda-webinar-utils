@@ -4,6 +4,7 @@ from typing import Sequence
 
 from loguru import logger
 
+from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
 from lib.domain.webinar.models import Account
@@ -15,6 +16,7 @@ from lib.sheets import Sheet
 @dataclass(slots=True)
 class WebinarService:
     webinar_repo: WebinarRepo = field(default_factory=WebinarRepo)
+    inflect_service: InflectService = field(default_factory=InflectService)
 
     def import_webinar_and_accounts_by_url(self, url: str) -> Sequence[Account]:
         logger.debug(f"Importing webinar and accounts by url: {url}")
@@ -43,6 +45,9 @@ class WebinarService:
                     email=participant.email,
                 )
                 logger.info(f"Account {account} added")
+                if not self.inflect_service.is_fio_confirmed(account):
+                    self.inflect_service.register_uninflected_parts(account)
+                    logger.info("Uninflected parts registered")
                 accounts.append(account)
             except AccountAlreadyExistsError:
                 logger.info(f"Account {participant} already exists")

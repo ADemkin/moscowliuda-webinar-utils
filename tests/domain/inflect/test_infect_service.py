@@ -20,31 +20,30 @@ def randint() -> int:
 
 
 @pytest.fixture
-def db() -> DB:
-    return DB.create_in_memory()
-
-
-@pytest.fixture
 def inflect_repo(db: DB) -> InflectRepository:
     inflect_storage = InflectStorage(db=db)
     return InflectRepository(inflect_storage=inflect_storage)
 
 
-@pytest.fixture
-def inflect_service(inflect_repo: InflectRepository) -> InflectService:
+@pytest.fixture(scope="function")
+def inflect_service(db: DB, inflect_repo: InflectRepository) -> InflectService:
+    with db.connection() as conn:
+        conn.execute("DELETE FROM inflect_name")
+        conn.execute("DELETE FROM inflect_family_name")
+        conn.execute("DELETE FROM inflect_father_name")
     return InflectService(inflect_repo=inflect_repo)
 
 
 def make_account(
     *,
-    id: int = None,
-    timestamp: datetime = None,
-    family_name: str = None,
-    name: str = None,
-    father_name: str = None,
-    phone: str = None,
-    email: str = None,
-    webinar_id: int = None,
+    id: int | None = None,
+    timestamp: datetime | None = None,
+    family_name: str | None = None,
+    name: str | None = None,
+    father_name: str | None = None,
+    phone: str | None = None,
+    email: str | None = None,
+    webinar_id: int | None = None,
 ) -> Account:
     return Account(
         id=AccountId(id or randint()),

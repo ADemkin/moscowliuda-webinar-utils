@@ -6,11 +6,6 @@ from lib.domain.inflect.repository import InflectStorage
 
 
 @pytest.fixture
-def db() -> DB:
-    return DB.create_in_memory()
-
-
-@pytest.fixture
 def inflect_repo(db: DB) -> InflectRepository:
     inflect_storage = InflectStorage(db=db)
     return InflectRepository(inflect_storage=inflect_storage)

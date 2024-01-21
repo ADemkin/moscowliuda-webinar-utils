@@ -67,7 +67,7 @@ class Webinar:
         )
         tmp_dir_path = ETC_PATH / "tmp"
         tmp_dir_path.mkdir(mode=0o700, exist_ok=True)
-        atexit.register(rmtree, tmp_dir_path)  # type: ignore
+        atexit.register(rmtree, tmp_dir_path)
         email = MailStub() if test else GMail()
         return cls(
             document=sheet.document,

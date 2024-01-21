@@ -18,8 +18,9 @@ class InflectStorage:
             WHERE name = :name
         """
         params = {"name": name}
-        if row := self.db.connection.execute(query, params).fetchone():
-            return row[0]
+        with self.db.connection() as connection:
+            if row := connection.execute(query, params).fetchone():
+                return row[0]
         return None
 
     def set_inflection_by_name(self, name: str, name_datv: str | None) -> None:
@@ -39,7 +40,8 @@ class InflectStorage:
             "name": name,
             "name_datv": name_datv,
         }
-        self.db.connection.execute(query, params)
+        with self.db.connection() as connection:
+            connection.execute(query, params)
 
     def get_inflection_by_family_name(self, family_name: str) -> str | None:
         query = """
@@ -49,8 +51,9 @@ class InflectStorage:
             WHERE family_name = :family_name
         """
         params = {"family_name": family_name}
-        if row := self.db.connection.execute(query, params).fetchone():
-            return row[0]
+        with self.db.connection() as connection:
+            if row := connection.execute(query, params).fetchone():
+                return row[0]
         return None
 
     def set_inflection_by_family_name(
@@ -74,7 +77,8 @@ class InflectStorage:
             "family_name": family_name,
             "family_name_datv": family_name_datv,
         }
-        self.db.connection.execute(query, params)
+        with self.db.connection() as connection:
+            connection.execute(query, params)
 
     def get_inflection_by_father_name(self, father_name: str) -> str | None:
         query = """
@@ -84,8 +88,9 @@ class InflectStorage:
             WHERE father_name = :father_name
         """
         params = {"father_name": father_name}
-        if row := self.db.connection.execute(query, params).fetchone():
-            return row[0]
+        with self.db.connection() as connection:
+            if row := connection.execute(query, params).fetchone():
+                return row[0]
         return None
 
     def set_inflection_by_father_name(
@@ -109,7 +114,8 @@ class InflectStorage:
             "father_name": father_name,
             "father_name_datv": father_name_datv,
         }
-        self.db.connection.execute(query, params)
+        with self.db.connection() as connection:
+            connection.execute(query, params)
 
     def get_unknown_names(self) -> set[str]:
         query = """
@@ -117,7 +123,9 @@ class InflectStorage:
             FROM inflect_name
             WHERE name_datv IS NULL
         """
-        return {row[0] for row in self.db.connection.execute(query).fetchall()}
+        with self.db.connection() as connection:
+            rows = connection.execute(query).fetchall()
+        return {row[0] for row in rows}
 
     def get_unknown_family_names(self) -> set[str]:
         query = """
@@ -125,7 +133,9 @@ class InflectStorage:
             FROM inflect_family_name
             WHERE family_name_datv IS NULL
         """
-        return {row[0] for row in self.db.connection.execute(query).fetchall()}
+        with self.db.connection() as connection:
+            rows = connection.execute(query).fetchall()
+        return {row[0] for row in rows}
 
     def get_unknown_father_names(self) -> set[str]:
         query = """
@@ -133,7 +143,9 @@ class InflectStorage:
             FROM inflect_father_name
             WHERE father_name_datv IS NULL
         """
-        return {row[0] for row in self.db.connection.execute(query).fetchall()}
+        with self.db.connection() as connection:
+            rows = connection.execute(query).fetchall()
+        return {row[0] for row in rows}
 
 
 @dataclass(frozen=True, slots=True)

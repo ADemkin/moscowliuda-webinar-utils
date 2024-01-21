@@ -13,12 +13,7 @@ from lib.domain.webinar.models import WebinarId
 from lib.domain.webinar.repository import WebinarRepo
 
 
-@pytest.fixture(scope="session")
-def db() -> DB:
-    return DB.create_in_memory()
-
-
-@pytest.fixture
+@pytest.fixture(scope="function")
 def webinar_repo(db: DB) -> WebinarRepo:
     return WebinarRepo(db=db)
 
