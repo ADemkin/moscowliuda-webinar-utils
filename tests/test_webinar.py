@@ -10,6 +10,7 @@ from lib.domain.inflect.service import InflectService
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.webinar import Webinar
+from lib.factory import WebinarTitles
 from tests.common import CreateDocumentT
 from tests.common import create_row
 from tests.common import skip_if_no_network
@@ -41,14 +42,13 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     ]
     participants = [Participant.from_row(row) for row in rows]
     document = create_document(rows)
-    title = "Test Webinar"
     date_str = "00-99 Month"
     year = 2022
     mail_stub = MailStub()
     webinar = Webinar(
         document=document,
         participants=participants,
-        title=title,
+        title=WebinarTitles.TEST,
         date_str=date_str,
         year=year,
         email=mail_stub,

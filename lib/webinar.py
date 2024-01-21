@@ -1,5 +1,4 @@
 import atexit
-from datetime import datetime
 from functools import cached_property
 from os import rename
 from pathlib import Path
@@ -32,7 +31,7 @@ class Webinar:
         self,
         document: Spreadsheet,
         participants: list[Participant],
-        title: str,
+        title: WebinarTitles,
         date_str: str,
         year: int,
         email: AbstractMail,
@@ -43,7 +42,7 @@ class Webinar:
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
-        self.title: str = title  # TODO: make enum
+        self.title: WebinarTitles = title  # TODO: make enum
         self.date_str: str = date_str
         self.year: int = year
         self.email = email
@@ -56,7 +55,7 @@ class Webinar:
     def from_url(cls, url: str, test: bool = False) -> "Webinar":
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
-        year = datetime.now().year
+        year = sheet.year
         # get certificates data
         certs_path = ETC_PATH / "certificates" / f"{sheet.date_str} {year}"
         certs_path.mkdir(mode=0o700, exist_ok=True)
@@ -72,7 +71,7 @@ class Webinar:
         return cls(
             document=sheet.document,
             participants=sheet.participants,
-            title=sheet.title,
+            title=WebinarTitles(sheet.title.lower()),
             date_str=sheet.date_str,
             year=year,
             email=email,
@@ -81,10 +80,6 @@ class Webinar:
             contact_service=ContactService(),
             inflect_service=InflectService(),
         )
-
-    def _is_sheet_filled(self, sheet_name: str) -> bool:
-        values = self.document.worksheet(sheet_name).get_all_values()
-        return len(values) == len(self.participants)
 
     @cached_property
     def cert_sheet(self) -> Worksheet:
@@ -142,7 +137,7 @@ class Webinar:
             self.email.send(
                 to=email,
                 bcc=["antondemkin+python@yandex.ru", "moscowliuda@mail.ru"],
-                subject=self.title,
+                subject=str(self.title.value).title(),
                 contents=message,
                 attachments=[str(ascii_file_name)],
             )
@@ -157,7 +152,7 @@ class Webinar:
             WebinarTitles.SPEECH: "П",
             WebinarTitles.GRAMMAR: "Г",
             WebinarTitles.TEST: "Т",
-        }[WebinarTitles(self.title.lower())]
+        }[self.title]
         return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
 
     def import_contacts(self) -> Path:
