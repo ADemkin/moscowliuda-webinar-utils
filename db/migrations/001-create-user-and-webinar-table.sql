@@ -2,7 +2,7 @@
 DROP TABLE IF EXISTS webinar;
 CREATE TABLE IF NOT EXISTS webinar (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    imported_at DATE default (datetime('now')),
+    imported_at DATE DEFAULT (datetime('now')),
     url VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     date_str VARCHAR(255) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS webinar (
 DROP TABLE IF EXISTS account;
 CREATE TABLE IF NOT EXISTS account (
     id INTEGER PRIMARY KEY,
-    timestamp VARCHAR(255),
+    registered_at DATETIME,
     family_name VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     father_name VARCHAR(255) NOT NULL,

@@ -1,4 +1,3 @@
-from datetime import datetime
 from os import urandom
 from pathlib import Path
 
@@ -6,8 +5,7 @@ import pytest
 
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
-from lib.domain.webinar.models import Account
-from lib.domain.webinar.models import AccountId
+from tests.common import make_account
 
 
 def randstr() -> str:
@@ -21,19 +19,6 @@ def randint() -> int:
 @pytest.fixture
 def contact_service(tmp_path: Path) -> ContactService:
     return ContactService(vcard_repo=VCardRepository(path=tmp_path))
-
-
-def make_account() -> Account:
-    return Account(
-        id=AccountId(randint()),
-        timestamp=datetime.now(),
-        family_name=randstr(),
-        name=randstr(),
-        father_name=randstr(),
-        phone=randstr(),
-        email=randstr(),
-        webinar_id=randint(),
-    )
 
 
 @pytest.mark.parametrize("size", [1, 5, 10])

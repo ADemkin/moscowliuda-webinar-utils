@@ -1,6 +1,7 @@
 import sqlite3
 from dataclasses import dataclass
 from dataclasses import field
+from datetime import datetime
 from typing import Sequence
 
 from lib.clients.db import DB
@@ -81,6 +82,7 @@ class WebinarRepo:
     def add_account(
         self,
         webinar_id: int,
+        registered_at: datetime,
         family_name: str,
         name: str,
         father_name: str,
@@ -90,6 +92,7 @@ class WebinarRepo:
         query = """
             INSERT INTO account (
                 webinar_id,
+                registered_at,
                 family_name,
                 name,
                 father_name,
@@ -98,6 +101,7 @@ class WebinarRepo:
             )
             VALUES (
                 :webinar_id,
+                :registered_at,
                 :family_name,
                 :name,
                 :father_name,
@@ -106,7 +110,7 @@ class WebinarRepo:
             )
             RETURNING
                 id,
-                timestamp,
+                registered_at,
                 family_name,
                 name,
                 father_name,
@@ -115,6 +119,7 @@ class WebinarRepo:
                 webinar_id
         """
         params = {
+            "registered_at": registered_at,
             "webinar_id": webinar_id,
             "family_name": family_name,
             "name": name,
@@ -134,7 +139,7 @@ class WebinarRepo:
         query = """
             SELECT
                 id,
-                timestamp,
+                registered_at,
                 family_name,
                 name,
                 father_name,
@@ -163,7 +168,7 @@ class WebinarRepo:
         query = """
             SELECT
                 id,
-                timestamp,
+                registered_at,
                 family_name,
                 name,
                 father_name,

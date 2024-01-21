@@ -7,10 +7,10 @@ from lib.clients.email import MailStub
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
 from lib.domain.inflect.service import InflectService
+from lib.factory import WebinarTitles
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.webinar import Webinar
-from lib.factory import WebinarTitles
 from tests.common import CreateDocumentT
 from tests.common import create_row
 from tests.common import skip_if_no_network

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import pytest
 
@@ -82,6 +83,7 @@ def test_webinar_repo_add_account_gives_account_model(
     webinar = add_random_webinar(webinar_repo=webinar_repo)
     account = webinar_repo.add_account(
         webinar_id=webinar.id,
+        registered_at=datetime.now(),
         family_name="Петров",
         name="Пётр",
         father_name="Петрович",
@@ -112,6 +114,7 @@ def test_webinar_repo_raises_error_when_account_email_already_exists(
     email = "someemail@somedomain.com"
     webinar_repo.add_account(
         webinar_id=webinar.id,
+        registered_at=datetime.now(),
         family_name="Петров",
         name="Пётр",
         father_name="Петрович",
@@ -121,6 +124,7 @@ def test_webinar_repo_raises_error_when_account_email_already_exists(
     with pytest.raises(AccountAlreadyExistsError):
         webinar_repo.add_account(
             webinar_id=webinar.id,
+            registered_at=datetime.now(),
             family_name="Петров",
             name="Пётр",
             father_name="Петрович",
@@ -136,6 +140,7 @@ def test_webinar_repo_raises_error_when_account_phone_already_exists(
     phone = "+7 (916) 321-54-76"
     webinar_repo.add_account(
         webinar_id=webinar.id,
+        registered_at=datetime.now(),
         family_name="Петров",
         name="Пётр",
         father_name="Петрович",
@@ -145,6 +150,7 @@ def test_webinar_repo_raises_error_when_account_phone_already_exists(
     with pytest.raises(AccountAlreadyExistsError):
         webinar_repo.add_account(
             webinar_id=webinar.id,
+            registered_at=datetime.now(),
             family_name="Петров",
             name="Пётр",
             father_name="Петрович",
@@ -172,6 +178,7 @@ def test_webinar_repo_gives_all_webinar_accounts_by_webinar_id(
     assert webinar_repo.get_all_accounts_by_webinar_id(webinar_id=webinar.id) == []
     account1 = webinar_repo.add_account(
         webinar_id=webinar.id,
+        registered_at=datetime.now(),
         family_name="Петров",
         name="Пётр",
         father_name="Петрович",
@@ -180,6 +187,7 @@ def test_webinar_repo_gives_all_webinar_accounts_by_webinar_id(
     )
     account2 = webinar_repo.add_account(
         webinar_id=webinar.id,
+        registered_at=datetime.now(),
         family_name="Петров",
         name="Пётр",
         father_name="Петрович",

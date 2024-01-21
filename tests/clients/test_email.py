@@ -42,7 +42,7 @@ def test_gmail_uses_same_connection_for_all_sends(smtp_mock):
     assert smtp_mock.return_value.send.call_count == 2
 
 
-def test_gmail_calls_smtp_send_with_corect_arguments(smtp_mock):
+def test_gmail_calls_smtp_send_with_correct_arguments(smtp_mock):
     to = randstr()
     bcc = [randstr(), randstr()]
     subject = randstr()

@@ -1,22 +1,10 @@
-from datetime import datetime
-from os import urandom
-
 import pytest
 
 from lib.clients.db import DB
 from lib.domain.inflect.repository import InflectRepository
 from lib.domain.inflect.repository import InflectStorage
 from lib.domain.inflect.service import InflectService
-from lib.domain.webinar.models import Account
-from lib.domain.webinar.models import AccountId
-
-
-def randstr() -> str:
-    return urandom(8).hex()
-
-
-def randint() -> int:
-    return int.from_bytes(urandom(4), byteorder="big")
+from tests.common import make_account
 
 
 @pytest.fixture
@@ -32,29 +20,6 @@ def inflect_service(db: DB, inflect_repo: InflectRepository) -> InflectService:
         conn.execute("DELETE FROM inflect_family_name")
         conn.execute("DELETE FROM inflect_father_name")
     return InflectService(inflect_repo=inflect_repo)
-
-
-def make_account(
-    *,
-    id: int | None = None,
-    timestamp: datetime | None = None,
-    family_name: str | None = None,
-    name: str | None = None,
-    father_name: str | None = None,
-    phone: str | None = None,
-    email: str | None = None,
-    webinar_id: int | None = None,
-) -> Account:
-    return Account(
-        id=AccountId(id or randint()),
-        timestamp=timestamp or datetime.now(),
-        family_name=family_name or randstr(),
-        name=name or randstr(),
-        father_name=father_name or randstr(),
-        phone=phone or randstr(),
-        email=email or randstr(),
-        webinar_id=webinar_id or randint(),
-    )
 
 
 class TestInflectServiceIsConfirmed:

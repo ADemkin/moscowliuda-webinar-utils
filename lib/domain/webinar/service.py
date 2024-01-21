@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from datetime import datetime
 from typing import Sequence
 
 from loguru import logger
@@ -38,6 +39,7 @@ class WebinarService:
             try:
                 account = self.webinar_repo.add_account(
                     webinar_id=webinar.id,
+                    registered_at=participant.timestamp or datetime.now(),
                     family_name=participant.family_name,
                     name=participant.name,
                     father_name=participant.father_name,

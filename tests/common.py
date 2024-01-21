@@ -1,6 +1,7 @@
 from collections import namedtuple
 from datetime import datetime
 from functools import wraps
+from os import urandom
 from typing import Any
 from typing import Callable
 
@@ -8,6 +9,8 @@ import pytest
 from google.auth.exceptions import TransportError
 from gspread.exceptions import WorksheetNotFound
 
+from lib.domain.webinar.models import Account
+from lib.domain.webinar.models import AccountId
 from lib.participants import GOOGLE_TIMESTAMP_FORMAT
 from lib.protocols import ProtoCell
 from lib.protocols import ProtoDocument
@@ -180,3 +183,34 @@ def skipif(exception: BaseException, reason: str) -> Any:
 
 
 skip_if_no_network = skipif(TransportError, "Network is down")
+
+
+def randstr() -> str:
+    return urandom(8).hex()
+
+
+def randint() -> int:
+    return int.from_bytes(urandom(4), byteorder="big")
+
+
+def make_account(
+    *,
+    account_id: int | None = None,
+    registered_at: datetime | None = None,
+    family_name: str | None = None,
+    name: str | None = None,
+    father_name: str | None = None,
+    phone: str | None = None,
+    email: str | None = None,
+    webinar_id: int | None = None,
+) -> Account:
+    return Account(
+        id=AccountId(account_id or randint()),
+        registered_at=registered_at or datetime.now(),
+        family_name=family_name or randstr(),
+        name=name or randstr(),
+        father_name=father_name or randstr(),
+        phone=phone or randstr(),
+        email=email or randstr(),
+        webinar_id=webinar_id or randint(),
+    )

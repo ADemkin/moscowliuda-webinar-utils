@@ -30,7 +30,7 @@ class Webinar:
 @dataclass(frozen=True, slots=True)
 class Account:
     id: AccountId
-    timestamp: datetime
+    registered_at: datetime
     family_name: str
     name: str
     father_name: str
@@ -42,7 +42,7 @@ class Account:
     def from_row(cls, row: tuple) -> "Account":
         return cls(
             id=row[0],
-            timestamp=row[1],
+            registered_at=datetime.fromisoformat(row[1]),
             family_name=row[2],
             name=row[3],
             father_name=row[4],

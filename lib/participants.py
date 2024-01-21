@@ -14,6 +14,13 @@ def get_datetime_from_sheet_timestamp(sheet_timestamp: str) -> datetime | None:
     try:
         return datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)
     except ValueError:
+        pass
+    try:
+        return datetime.strptime(
+            sheet_timestamp,
+            GOOGLE_TIMESTAMP_FORMAT.replace("-", "/"),
+        )
+    except ValueError:
         return None
 
 
