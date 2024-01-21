@@ -7,7 +7,10 @@ test:
 	$(RUN) pytest --cov=lib --cov-report=term-missing --disable-warnings $(ARGS)
 
 mypy:
-	$(RUN) mypy lib/ tests/ bin/
+	$(RUN) mypy --install-types lib/ tests/ bin/
+
+mypy-strict:
+	$(RUN) mypy --strict --install-types lib/ tests/ bin/
 
 flake8:
 	$(RUN) flake8 lib/ tests/ bin/
