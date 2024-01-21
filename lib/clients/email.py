@@ -66,13 +66,13 @@ class MailStub(AbstractMail):
         contents: str | None = None,
         attachments: Sequence[str | IOBase | PosixPath] | None = None,
     ) -> None:
-        args = dict(
-            to=to,
-            bcc=bcc,
-            subject=subject,
-            contents=contents,
-            attachments=attachments,
-        )
+        args = {
+            "to": to,
+            "bcc": bcc,
+            "subject": subject,
+            "contents": contents,
+            "attachments": attachments,
+        }
         self._call_args.append(args)
         logger.debug("MailStub.send: {args}", args=args)
 

@@ -8,7 +8,6 @@ from gspread.exceptions import APIError
 from loguru import logger
 
 from lib.participants import Participant
-from lib.participants import get_datetime_from_sheet_timestamp
 
 FIX_API_ERROR_MESSAGE = """You have to add permissions to spreadsheet.
 Fix APIError:
@@ -47,8 +46,9 @@ class Sheet:
 
 def get_year_from_participants(participants: list[Participant]) -> int:
     for participant in participants:
-        if date := get_datetime_from_sheet_timestamp(participant.timestamp):
-            return date.year
+        if not participant.timestamp:
+            continue
+        return participant.timestamp.year
     return 2024
 
 

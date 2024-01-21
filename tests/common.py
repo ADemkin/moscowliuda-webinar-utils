@@ -22,9 +22,7 @@ CreateDocumentT = Callable[[RowsT], ProtoDocument]
 CreateSheetT = Callable[[RowsT], ProtoSheet]
 MorpherT = Callable[[str], str]
 
-TEST_SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K06" "85oIfkMnAEvQyeJjkOMzLCo/edit"
-)
+TEST_SHEET_URL = "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"  # noqa: E501 fmt: skip
 TITLE_CELL_NAMES: RowT = [
     "Timestamp",
     "Фамилия:",

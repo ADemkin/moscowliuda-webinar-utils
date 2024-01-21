@@ -15,7 +15,8 @@ from lib.participants import Participant
 class ContactService:
     vcard_repo: VCardRepository = field(default_factory=VCardRepository)
 
-    def create_vcard(self, account: Account | Participant, group: str) -> VCard:
+    @staticmethod
+    def create_vcard(account: Account | Participant, group: str) -> VCard:
         return VCard(
             last_name=f"{account.name} {account.family_name}",
             first_name=group,

@@ -22,11 +22,12 @@ def _no_sleep():
 
 
 @skip_if_no_network
-def test_webinar_integration(
+def test_webinar_integration(  # pylint: disable=too-many-locals
     create_document: CreateDocumentT,
     tmp_path_factory,
     _no_sleep,
 ) -> None:
+    # TODO: split test into steps
     webinar_tmp_path = tmp_path_factory.mktemp("webinar")
     contact_tmp_path = tmp_path_factory.mktemp("contacts")
     contact_service = ContactService(

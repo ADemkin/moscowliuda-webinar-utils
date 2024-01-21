@@ -40,21 +40,21 @@ async def handle_exception_middleware(
 
 
 def create_app() -> Application:
-    app = Application()
+    application = Application()
     # setup routes
-    setup_routes(app)
+    setup_routes(application)
     # setup templates
     templates_dir = CWD / "lib" / "templates"
     aiohttp_jinja2.setup(
-        app=app,
+        app=application,
         loader=jinja2.FileSystemLoader(templates_dir),
     )
     # setup middleware
-    app.middlewares.append(handle_exception_middleware)
+    application.middlewares.append(handle_exception_middleware)
     # setup storage
     storage = WebinarStorage()
-    app["storage"] = storage
-    return app
+    application["storage"] = storage
+    return application
 
 
 if __name__ == "__main__":

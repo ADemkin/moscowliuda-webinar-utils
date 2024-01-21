@@ -31,7 +31,7 @@ class Participant:
     def from_row(cls, row: RowT) -> "Participant":
         row_strip: Sequence[str] = [str(i).strip() for i in row]
         return cls(
-            timestamp=row_strip[0],
+            timestamp=get_datetime_from_sheet_timestamp(row_strip[0]),
             family_name=row_strip[1],
             name=row_strip[2],
             father_name=row_strip[3],
