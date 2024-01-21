@@ -3,10 +3,10 @@ from datetime import datetime
 from functools import cached_property
 from os import rename
 from pathlib import Path
+from shutil import rmtree
 from time import sleep
 from typing import Callable
 
-from dotenv import load_dotenv
 from gspread import Spreadsheet
 from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
@@ -24,11 +24,8 @@ from lib.paths import ETC_PATH
 from lib.sheets import Sheet
 from lib.word_morph import offline_morph
 
-URL = "https://docs.google.com/spreadsheets/d/1ilwLmFAQ-FUiRkjVPsLHa4RS9NAxX8chm11siZLYyQU/edit?resourcekey#gid=992781999"  # noqa
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
-
-TEST = False
 
 
 class Webinar:
@@ -57,7 +54,7 @@ class Webinar:
         self.contact_service = contact_service
 
     @classmethod
-    def from_url(cls, url: str = URL) -> "Webinar":
+    def from_url(cls, url: str, test: bool = False) -> "Webinar":
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
         year = datetime.now().year
@@ -71,8 +68,8 @@ class Webinar:
         )
         tmp_dir_path = ETC_PATH / "tmp"
         tmp_dir_path.mkdir(mode=0o700, exist_ok=True)
-        atexit.register(tmp_dir_path.rmdir, ignore_errors=True)  # type: ignore
-        email = MailStub() if TEST else GMail()
+        atexit.register(rmtree, tmp_dir_path)  # type: ignore
+        email = MailStub() if test else GMail()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
@@ -165,7 +162,7 @@ class Webinar:
         }[WebinarTitles(self.title.lower())]
         return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
 
-    def import_contacts(self) -> None:
+    def import_contacts(self) -> Path:
         group = self.get_group_name()
         contacts_file = self.contact_service.save_accounts_to_file(
             accounts=self.participants,
@@ -173,14 +170,4 @@ class Webinar:
         )
         logger.info(f"contacts saved to {contacts_file}")
         logger.info("import this file using icloud.com")
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    webinar = Webinar.from_url(URL)
-    # webinar.import_contacts()
-    # webinar.certificates_sheet_fill()
-    # make sure that names transformed correctly
-    # webinar.certificates_generate()
-    # make sure that certificates are correct
-    # webinar.send_emails_with_certificates(test=False)
+        return contacts_file
