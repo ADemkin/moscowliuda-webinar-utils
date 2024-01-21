@@ -6,8 +6,8 @@ import pytest
 
 from lib.domain.webinar.models import Account
 from lib.domain.webinar.models import AccountId
-from lib.domain.contacts.repository import VCardRepository
-from lib.domain.contacts.service import ContactService
+from lib.domain.contact.repository import VCardRepository
+from lib.domain.contact.service import ContactService
 
 
 def randstr() -> str:

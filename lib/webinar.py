@@ -15,7 +15,7 @@ from loguru import logger
 from lib.clients.email import AbstractMail
 from lib.clients.email import GMail
 from lib.clients.email import MailStub
-from lib.domain.contacts.service import ContactService
+from lib.domain.contact.service import ContactService
 from lib.factory import WebinarTitles
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator

@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from lib.domain.webinar.models import Account
-from lib.domain.contacts.models import VCard
-from lib.domain.contacts.repository import VCardRepository
+from lib.domain.contact.models import VCard
+from lib.domain.contact.repository import VCardRepository
 from lib.participants import Participant
 
 

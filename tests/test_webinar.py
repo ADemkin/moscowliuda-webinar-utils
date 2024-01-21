@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from lib.clients.email import MailStub
-from lib.domain.contacts.service import ContactService
+from lib.domain.contact.service import ContactService
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.webinar import Webinar

@@ -3,7 +3,7 @@ from functools import partial
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from lib.domain.contacts.models import VCard
+from lib.domain.contact.models import VCard
 
 
 @dataclass(frozen=True, slots=True)
