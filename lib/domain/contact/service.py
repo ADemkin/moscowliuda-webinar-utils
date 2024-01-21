@@ -25,22 +25,11 @@ class ContactService:
 
     def save_accounts_to_file(
             self,
-            accounts: Sequence[Account],
+            accounts: Sequence[Account | Participant],
             group: str,
     ) -> Path:
         logger.debug(f"Saving {len(accounts)} accounts to file")
         vcards = [self.create_vcard(account, group) for account in accounts]
         path = self.vcard_repo.save_vcards_to_file(vcards, group)
         logger.debug(f"Saved accounts to {path}")
-        return path
-
-    def save_participants_to_file(
-            self,
-            participants: Sequence[Participant],
-            group: str,
-    ) -> Path:
-        logger.debug(f"Saving {len(participants)} participants to file")
-        vcards = [self.create_vcard(p, group) for p in participants]
-        path = self.vcard_repo.save_vcards_to_file(vcards, group)
-        logger.debug(f"Saved participants to {path}")
         return path

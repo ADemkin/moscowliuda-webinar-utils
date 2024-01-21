@@ -165,8 +165,8 @@ class Webinar:
 
     def import_contacts(self) -> None:
         group = self.get_group_name()
-        contacts_file = self.contact_service.save_participants_to_file(
-            participants=self.participants,
+        contacts_file = self.contact_service.save_accounts_to_file(
+            accounts=self.participants,
             group=group,
         )
         logger.info(f"contacts saved to {contacts_file}")
