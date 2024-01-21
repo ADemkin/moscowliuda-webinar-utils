@@ -21,7 +21,10 @@ pylint:
 ruff-lint:
 	$(RUN) ruff check lib/ tests/ bin/
 
-lint: ruff-lint mypy flake8 pylint
+typos:
+	@typos .
+
+lint: ruff-lint mypy flake8 pylint typos
 
 run:
 	$(RUN) python webinar.py
