@@ -1,5 +1,4 @@
 -- create table for Sheet model
-DROP TABLE IF EXISTS webinar;
 CREATE TABLE IF NOT EXISTS webinar (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     imported_at DATE DEFAULT (datetime('now')),
@@ -11,7 +10,6 @@ CREATE TABLE IF NOT EXISTS webinar (
 );
 
 -- create table users for Participant model
-DROP TABLE IF EXISTS account;
 CREATE TABLE IF NOT EXISTS account (
     id INTEGER PRIMARY KEY,
     registered_at DATETIME,

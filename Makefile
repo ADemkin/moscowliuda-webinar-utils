@@ -46,3 +46,6 @@ fmt: ruff-fmt isort black
 
 backup-db:
 	@sqlite3 db.sqlite3 ".backup db.sqlite3.backup"
+
+db-console:
+	@sqlite3 db.sqlite3

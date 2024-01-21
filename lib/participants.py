@@ -12,6 +12,10 @@ GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"
 
 def get_datetime_from_sheet_timestamp(sheet_timestamp: str) -> datetime | None:
     try:
+        return datetime.fromisoformat(sheet_timestamp)
+    except ValueError:
+        pass
+    try:
         return datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)
     except ValueError:
         pass
