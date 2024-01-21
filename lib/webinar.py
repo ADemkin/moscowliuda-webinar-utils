@@ -15,8 +15,7 @@ from loguru import logger
 from lib.clients.email import AbstractMail
 from lib.clients.email import GMail
 from lib.clients.email import MailStub
-from lib.contacts import create_vcard
-from lib.contacts import save_vcards_to_file
+from lib.domain.contacts.service import ContactService
 from lib.factory import WebinarTitles
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
@@ -43,6 +42,7 @@ class Webinar:
         cert_gen: BaseCertificateGenerator,
         tmp_dir: Path,
         morphological: Callable[[str], str],
+        contact_service: ContactService,
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
@@ -53,6 +53,7 @@ class Webinar:
         self.cert_gen = cert_gen
         self.tmp_dir = tmp_dir
         self.morphological = morphological
+        self.contact_service = contact_service
 
     @classmethod
     def from_url(cls, url: str = URL) -> "Webinar":
@@ -80,6 +81,7 @@ class Webinar:
             cert_gen=cert_gen,
             tmp_dir=tmp_dir_path,
             morphological=offline_morph,
+            contact_service=ContactService(),
         )
 
     def _is_sheet_filled(self, sheet_name: str) -> bool:
@@ -161,25 +163,12 @@ class Webinar:
         }[WebinarTitles(self.title.lower())]
         return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
 
-    def get_participant_vcards(self, group: str) -> list[str]:
-        return [
-            create_vcard(
-                last_name=f"{p.name} {p.family_name}",
-                first_name=group,
-                email=p.email,
-                phone=p.phone,
-                organisation=group,
-            )
-            for p in self.participants
-        ]
-
     def import_contacts(self) -> None:
         group = self.get_group_name()
-        vcards = self.get_participant_vcards(group)
-        logger.info(f"imported {len(vcards)} contacts")
-        webinar_contacts_file = f"{group}.vcf"
-        contacts_file = Path("contacts") / webinar_contacts_file
-        save_vcards_to_file(contacts_file, vcards)
+        contacts_file = self.contact_service.save_participants_to_file(
+            participants=self.participants,
+            group=group,
+        )
         logger.info(f"contacts saved to {contacts_file}")
         logger.info("import this file using icloud.com")
 

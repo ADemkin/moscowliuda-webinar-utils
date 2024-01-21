@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from lib.clients.email import MailStub
+from lib.domain.contacts.service import ContactService
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.webinar import Webinar
@@ -50,6 +51,7 @@ def test_webinar_integration(
         ),
         tmp_dir=tmp_path,
         morphological=offline_morph,
+        contact_service=ContactService(),
     )
 
     # generate certificates
