@@ -57,6 +57,7 @@ def get_participants_from_sheet(
     first_row: int = 0,
 ) -> list[Participant]:
     participants: list[Participant] = []
+    # TODO: по первому столбцу определять какой формат
     for row in sheet.get_all_values()[first_row:]:
         try:
             participants.append(Participant.from_row_v2(row))
