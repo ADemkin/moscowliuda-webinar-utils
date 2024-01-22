@@ -1,25 +1,26 @@
 POETRY:=poetry
 RUN:=${POETRY} run
 ARGS:=''
+PATHS:=lib/ tests/ bin/
 
 
 test:
 	$(RUN) pytest --cov=lib --cov-report=term-missing --disable-warnings $(ARGS)
 
 mypy:
-	$(RUN) mypy --install-types lib/ tests/ bin/
+	$(RUN) mypy --install-types $(PATHS)
 
 mypy-strict:
-	$(RUN) mypy --strict --install-types lib/ tests/ bin/
+	$(RUN) mypy --strict --install-types $(PATHS)
 
 flake8:
-	$(RUN) flake8 lib/ tests/ bin/
+	$(RUN) flake8 $(PATHS)
 
 pylint:
-	$(RUN) pylint lib/ tests/ bin/
+	$(RUN) pylint $(PATHS)
 
 ruff-lint:
-	$(RUN) ruff check lib/ tests/ bin/
+	$(RUN) ruff check $(PATHS)
 
 typos:
 	@typos .
@@ -34,15 +35,18 @@ dev:
 
 
 ruff-fmt:
-	$(RUN) ruff format lib/ tests/ bin/
+	$(RUN) ruff format $(PATHS)
 
 black:
-	$(RUN) black lib/ tests/ bin/
+	$(RUN) black $(PATHS)
 
 isort:
-	$(RUN) isort lib/ tests/ bin/
+	$(RUN) isort $(PATHS)
 
-fmt: ruff-fmt isort black
+typos-fix:
+	@typos -w $(PATHS)
+
+fmt: ruff-fmt isort black typos-fix
 
 backup-db:
 	@sqlite3 db.sqlite3 ".backup db.sqlite3.backup"

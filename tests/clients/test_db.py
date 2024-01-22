@@ -35,7 +35,7 @@ def test_db_migrations_applied_on_init(tmp_path: Path) -> None:
         connection.execute("INSERT INTO test2 (name) VALUES ('a')")
 
 
-def test_db_commit_successfull_transaction(db: DB) -> None:
+def test_db_commit_successful_transaction(db: DB) -> None:
     with db.connection() as connection:
         query = "INSERT INTO test (name) VALUES (:name)"
         params = {"name": "test"}

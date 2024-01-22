@@ -117,7 +117,7 @@ class Webinar:
         for row in self.cert_sheet.get_all_values():
             given_fio = row[1]
             logger.debug(f"{given_fio} taken")
-            cert_file = self.cert_gen.generate_cerificate(given_fio)
+            cert_file = self.cert_gen.generate_certificate(given_fio)
             logger.debug(f"{given_fio} cert path: {str(cert_file)}")
         logger.info("generating certs done")
 
@@ -129,7 +129,7 @@ class Webinar:
             if is_email_sent == "yes":
                 logger.debug(f"{fio} do not need to send email")
                 continue
-            cert_file = self.cert_gen.generate_cerificate(given_fio)
+            cert_file = self.cert_gen.generate_certificate(given_fio)
             logger.info(f"{fio} sending email to {email}")
             ascii_file_name = self.tmp_dir / "certificate.jpeg"
             rename(cert_file, ascii_file_name)

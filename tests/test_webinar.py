@@ -44,14 +44,14 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     document = create_document(rows)
     date_str = "00-99 Month"
     year = 2022
-    mail_stub = MailStub()
+    mail = MailStub()
     webinar = Webinar(
         document=document,
         participants=participants,
         title=WebinarTitle.TEST,
         date_str=date_str,
         year=year,
-        email=mail_stub,
+        email=mail,
         cert_gen=TextCertificateGenerator(
             working_dir=webinar_tmp_path,
             date=date_str,
@@ -78,13 +78,13 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     # send emails
     webinar.send_emails_with_certificates()
     for participant in participants:
-        assert mail_stub.is_sent_to(participant.email)
+        assert mail.is_sent_to(participant.email)
 
     # trigger email send again will not send them
     webinar.send_emails_with_certificates()
     for participant in participants:
-        assert mail_stub.sent_count(participant.email) == 1
-    assert mail_stub.total_send_count == len(rows)
+        assert mail.sent_count(participant.email) == 1
+    assert mail.total_send_count == len(rows)
     assert listdir(webinar_tmp_path) == ["certificate.jpeg"]
 
     # create vcards

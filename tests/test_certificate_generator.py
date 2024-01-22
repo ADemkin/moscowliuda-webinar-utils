@@ -25,7 +25,7 @@ def test_certificate_generates_correct_jpeg_file(
         date="20-21 сентября",
         year=2022,
     )
-    cert = cert_gen.generate_cerificate("Василий Пупкин")
+    cert = cert_gen.generate_certificate("Василий Пупкин")
     assert cert.exists()
     Image.open(cert, formats=["jpeg"]).verify()
 
@@ -46,8 +46,8 @@ def test_if_given_different_names_then_files_are_different(
         date="20-21 сентября",
         year=2022,
     )
-    cert_a = cert_gen.generate_cerificate("Василий Пупкин")
-    cert_b = cert_gen.generate_cerificate("Пётр Курочки")
+    cert_a = cert_gen.generate_certificate("Василий Пупкин")
+    cert_b = cert_gen.generate_certificate("Пётр Курочки")
     assert str(cert_a) != str(cert_b)
     assert Image.open(cert_a).tobytes() != Image.open(cert_b).tobytes()
 
@@ -68,7 +68,7 @@ def test_cert_file_is_created_inside_given_directory(
         date="20-21 сентября",
         year=2022,
     )
-    cert_path = cert_gen.generate_cerificate("Пётр Курочки")
+    cert_path = cert_gen.generate_certificate("Пётр Курочки")
     tmp_dir_contents = list(tmp_path.glob("*"))
     assert len(tmp_dir_contents) == 1
     assert cert_path in tmp_dir_contents
@@ -79,7 +79,7 @@ def test_certificate_contain_all_given_data(tmp_path: Path) -> None:
     date = "26-27 февраля"
     year = 2022
     cert_gen = TextCertificateGenerator.create(tmp_path, date, year)
-    cert_gen.generate_cerificate(name)
+    cert_gen.generate_certificate(name)
     cert_path = tmp_path / name
     assert cert_path.exists()
     content = cert_path.read_text()

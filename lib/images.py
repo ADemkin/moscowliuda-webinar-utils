@@ -122,7 +122,7 @@ class BaseCertificateGenerator:
     def _template_path(self) -> Path:
         return self._templates_dir / self.template
 
-    def generate_cerificate(self, name: str) -> Path:
+    def generate_certificate(self, name: str) -> Path:
         image = create_certificate(
             template=self._template_path,
             name=name,
@@ -145,7 +145,7 @@ class GrammarCertGen(BaseCertificateGenerator):
 class TextCertificateGenerator(BaseCertificateGenerator):
     template = "__no_template__"
 
-    def generate_cerificate(self, name: str) -> Path:
+    def generate_certificate(self, name: str) -> Path:
         file_name = self._working_dir / name
         with open(file_name, "wb") as file:
             file.write(f"template: {self.template}\n".encode())
