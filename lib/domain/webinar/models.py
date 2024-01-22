@@ -1,9 +1,19 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import NamedTuple
 from typing import NewType
 
 WebinarId = NewType("WebinarId", int)
 AccountId = NewType("AccountId", int)
+
+
+class WebinarEntity(NamedTuple):
+    id: int
+    imported_at: str
+    url: str
+    title: str
+    date_str: str
+    year: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,15 +26,26 @@ class Webinar:
     year: int
 
     @classmethod
-    def from_row(cls, row: tuple) -> "Webinar":
+    def from_row(cls, row: WebinarEntity) -> "Webinar":
         return cls(
-            id=row[0],
-            imported_at=row[1],
+            id=WebinarId(row[0]),
+            imported_at=datetime.fromisoformat(row[1]),
             url=row[2],
             title=row[3],
             date_str=row[4],
             year=row[5],
         )
+
+
+class AccountEntity(NamedTuple):
+    id: int
+    registered_at: str
+    family_name: str
+    name: str
+    father_name: str
+    phone: str
+    email: str
+    webinar_id: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,9 +60,9 @@ class Account:
     webinar_id: int
 
     @classmethod
-    def from_row(cls, row: tuple) -> "Account":
+    def from_row(cls, row: AccountEntity) -> "Account":
         return cls(
-            id=row[0],
+            id=AccountId(row[0]),
             registered_at=datetime.fromisoformat(row[1]),
             family_name=row[2],
             name=row[3],

@@ -10,8 +10,10 @@ from lib.domain.webinar.errors import AccountNotFoundError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
 from lib.domain.webinar.errors import WebinarNotFoundError
 from lib.domain.webinar.models import Account
+from lib.domain.webinar.models import AccountEntity
 from lib.domain.webinar.models import AccountId
 from lib.domain.webinar.models import Webinar
+from lib.domain.webinar.models import WebinarEntity
 from lib.domain.webinar.models import WebinarId
 
 
@@ -20,7 +22,7 @@ class WebinarRepo:
     db: DB = field(default_factory=DB)
 
     def add_webinar(self, url: str, date_str: str, title: str, year: int) -> Webinar:
-        query = """
+        query = f"""
             INSERT INTO webinar (
                 url,
                 date_str,
@@ -34,12 +36,7 @@ class WebinarRepo:
                 :year
             )
             RETURNING
-                id,
-                imported_at,
-                url,
-                title,
-                date_str,
-                year
+                {', '.join(WebinarEntity._fields)}
         """
         params = {
             "url": url,
@@ -56,8 +53,8 @@ class WebinarRepo:
             raise WebinarAlreadyExistsError(message) from err
 
     def get_webinar_by_id(self, webinar_id: int) -> Webinar:
-        query = """
-            SELECT id, imported_at, url, title, date_str, year
+        query = f"""
+            SELECT {', '.join(WebinarEntity._fields)}
             FROM webinar
             WHERE id = :id
         """
@@ -89,7 +86,7 @@ class WebinarRepo:
         phone: str,
         email: str,
     ) -> Account:
-        query = """
+        query = f"""
             INSERT INTO account (
                 webinar_id,
                 registered_at,
@@ -109,14 +106,7 @@ class WebinarRepo:
                 :email
             )
             RETURNING
-                id,
-                registered_at,
-                family_name,
-                name,
-                father_name,
-                phone,
-                email,
-                webinar_id
+                {', '.join(AccountEntity._fields)}
         """
         params = {
             "registered_at": registered_at,
@@ -136,16 +126,9 @@ class WebinarRepo:
             raise AccountAlreadyExistsError(message) from err
 
     def get_account_by_id(self, account_id: AccountId) -> Account:
-        query = """
+        query = f"""
             SELECT
-                id,
-                registered_at,
-                family_name,
-                name,
-                father_name,
-                phone,
-                email,
-                webinar_id
+                {', '.join(AccountEntity._fields)}
             FROM account
             WHERE id = :id
         """
@@ -156,8 +139,8 @@ class WebinarRepo:
         raise AccountNotFoundError(f"Account with id={account_id!r} not found")
 
     def get_all_webinars(self) -> Sequence[Webinar]:
-        query = """
-            SELECT id, imported_at, url, title, date_str, year
+        query = f"""
+            SELECT {', '.join(WebinarEntity._fields)}
             FROM webinar
         """
         with self.db.connection() as connection:
@@ -165,16 +148,9 @@ class WebinarRepo:
         return [Webinar.from_row(row) for row in rows]
 
     def get_all_accounts_by_webinar_id(self, webinar_id: WebinarId) -> Sequence[Account]:
-        query = """
+        query = f"""
             SELECT
-                id,
-                registered_at,
-                family_name,
-                name,
-                father_name,
-                phone,
-                email,
-                webinar_id
+                {', '.join(AccountEntity._fields)}
             FROM account
             WHERE webinar_id = :webinar_id
         """
