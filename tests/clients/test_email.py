@@ -1,5 +1,7 @@
 from os import environ
 from os import urandom
+from typing import Generator
+from unittest.mock import Mock
 from unittest.mock import patch
 
 import pytest
@@ -13,7 +15,7 @@ def randstr() -> str:
 
 
 @pytest.fixture
-def smtp_mock():
+def smtp_mock() -> Generator[Mock, None, None]:
     with patch("lib.clients.email.SMTP") as smtp_mock:
         yield smtp_mock
 
@@ -28,21 +30,21 @@ def test_gmail_can_be_created_from_env() -> None:
     assert gmail.password == password
 
 
-def test_gmail_creates_smtp_with_correct_credentials(smtp_mock):
+def test_gmail_creates_smtp_with_correct_credentials(smtp_mock: Mock) -> None:
     user = randstr()
     password = randstr()
     GMail(user=user, password=password).send(to="")
     smtp_mock.assert_called_once_with(user=user, password=password)
 
 
-def test_gmail_uses_same_connection_for_all_sends(smtp_mock):
+def test_gmail_uses_same_connection_for_all_sends(smtp_mock: Mock) -> None:
     gmail = GMail(user="", password="")
     gmail.send(to="")
     gmail.send(to="")
     assert smtp_mock.return_value.send.call_count == 2
 
 
-def test_gmail_calls_smtp_send_with_correct_arguments(smtp_mock):
+def test_gmail_calls_smtp_send_with_correct_arguments(smtp_mock: Mock) -> None:
     to = randstr()
     bcc = [randstr(), randstr()]
     subject = randstr()
@@ -65,7 +67,7 @@ def test_gmail_calls_smtp_send_with_correct_arguments(smtp_mock):
 
 
 @pytest.mark.parametrize("size", [1, 2, 3])
-def test_mailstub_keeps_all_calls(size: int):
+def test_mailstub_keeps_all_calls(size: int) -> None:
     emails = {randstr() for _ in range(size)}
     assert len(emails) == size
     mail_stub = MailStub()

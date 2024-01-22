@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from io import IOBase
 from pathlib import PosixPath
+from typing import Any
 from typing import Mapping
 from typing import Sequence
 
@@ -18,7 +19,7 @@ class AbstractMail(metaclass=ABCMeta):
     def send(
         self,
         to: str,
-        bcc: Sequence[str] = None,
+        bcc: Sequence[str] | None = None,
         subject: str | None = None,
         contents: str | None = None,
         attachments: Sequence[str | IOBase | PosixPath] | None = None,
@@ -38,7 +39,7 @@ class GMail(AbstractMail):
     def send(
         self,
         to: str,
-        bcc: Sequence[str] = None,
+        bcc: Sequence[str] | None = None,
         subject: str | None = None,
         contents: str | None = None,
         attachments: Sequence[str | IOBase | PosixPath] | None = None,
@@ -56,12 +57,12 @@ class GMail(AbstractMail):
 
 class MailStub(AbstractMail):
     def __init__(self) -> None:
-        self._call_args: list[Mapping] = []
+        self._call_args: list[Mapping[str, Any]] = []
 
     def send(
         self,
         to: str,
-        bcc: Sequence[str] = None,
+        bcc: Sequence[str] | None = None,
         subject: str | None = None,
         contents: str | None = None,
         attachments: Sequence[str | IOBase | PosixPath] | None = None,
