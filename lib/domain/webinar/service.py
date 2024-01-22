@@ -6,6 +6,7 @@ from typing import Sequence
 from loguru import logger
 
 from lib.domain.inflect.service import InflectService
+from lib.domain.webinar.enums import WebinarTitle
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
 from lib.domain.webinar.models import Account
@@ -22,12 +23,17 @@ class WebinarService:
     def import_webinar_and_accounts_by_url(self, url: str) -> Sequence[Account]:
         logger.debug(f"Importing webinar and accounts by url: {url}")
         sheet = Sheet.from_url(url)
+        try:
+            title = WebinarTitle(sheet.title)
+        except ValueError:
+            logger.error(f"Unknown webinar title: {sheet.title}")
+            raise
         webinar: Webinar
         try:
             webinar = self.webinar_repo.add_webinar(
                 url=url,
                 date_str=sheet.date_str,
-                title=sheet.title,
+                title=title,
                 year=sheet.year,
             )
             logger.info(f"Webinar {webinar} added")

@@ -5,7 +5,7 @@ from functools import partial
 from pathlib import Path
 from typing import TypedDict
 
-from lib.factory import WebinarTitles
+from lib.domain.webinar.enums import WebinarTitle
 
 
 class WebinarDict(TypedDict):
@@ -17,14 +17,14 @@ class WebinarDict(TypedDict):
 @dataclass(slots=True, frozen=True)
 class WebinarModel:
     id: int
-    title: WebinarTitles
+    title: WebinarTitle
     url: str
 
     @classmethod
     def from_dict(cls, webinar_dict: WebinarDict) -> "WebinarModel":
         return cls(
             id=webinar_dict["id"],
-            title=WebinarTitles(webinar_dict["title"].lower()),
+            title=WebinarTitle(webinar_dict["title"].lower()),
             url=webinar_dict["url"],
         )
 
@@ -48,7 +48,7 @@ class WebinarStorage:
         with open(self.file, "w", encoding="utf-8") as fd:
             fd.write(json.dumps([webinar.to_dict() for webinar in webinars]))
 
-    def add_webinar(self, url: str, title: WebinarTitles) -> int:
+    def add_webinar(self, url: str, title: WebinarTitle) -> int:
         webinars = self.load()
         for webinar in webinars:
             if webinar.url == url:

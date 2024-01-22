@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Sequence
 
 from lib.clients.db import DB
+from lib.domain.webinar.enums import WebinarTitle
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import AccountNotFoundError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
@@ -21,7 +22,7 @@ from lib.domain.webinar.models import WebinarId
 class WebinarRepo:
     db: DB = field(default_factory=DB)
 
-    def add_webinar(self, url: str, date_str: str, title: str, year: int) -> Webinar:
+    def add_webinar(self, url: str, date_str: str, title: WebinarTitle, year: int) -> Webinar:
         query = f"""
             INSERT INTO webinar (
                 url,

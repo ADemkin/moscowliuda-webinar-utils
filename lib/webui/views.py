@@ -9,7 +9,7 @@ from aiohttp.web_urldispatcher import UrlMappingMatchInfo
 from aiohttp_jinja2 import template
 from yarl import URL
 
-from lib.factory import WebinarTitles
+from lib.domain.webinar.enums import WebinarTitle
 from lib.storage import WebinarStorage
 from lib.webinar import Webinar
 
@@ -44,7 +44,7 @@ class ImportWebinarView(BaseView):
         form = await self.request.post()
         url = str(form["url"])
         Webinar.from_url(url)  # will raise if something is wrong
-        title = WebinarTitles.TEST
+        title = WebinarTitle.TEST
         webinar_id = self.storage.add_webinar(url, title)
         location = self.router["webinarView"].url_for(webinar_id=str(webinar_id))
         raise HTTPFound(location=location)

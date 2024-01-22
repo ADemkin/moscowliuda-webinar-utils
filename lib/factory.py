@@ -1,29 +1,19 @@
-from enum import Enum
-from enum import unique
-
+from lib.domain.webinar.enums import WebinarTitle
 from lib.images import BaseCertificateGenerator
 from lib.images import GrammarCertGen
 from lib.images import SpeechCertGen
 from lib.images import TextCertificateGenerator
 
 
-@unique
-class WebinarTitles(Enum):
-    GRAMMAR = "формирование базовых грамматических представлений"
-    SPEECH = "практика запуска речи"
-    TEST = "test webinar"
-
-
 def get_cert_gen_from_webinar_title(
-    title: str | WebinarTitles,
+    title: str | WebinarTitle,
 ) -> type[BaseCertificateGenerator]:
-    if isinstance(title, WebinarTitles):
-        title = title.value
+    # cast str to calm down mypy- it thinks that we need to overload .get method
     title_to_class = {
-        WebinarTitles.GRAMMAR.value: GrammarCertGen,
-        WebinarTitles.SPEECH.value: SpeechCertGen,
-        WebinarTitles.TEST.value: TextCertificateGenerator,
+        str(WebinarTitle.SPEECH): SpeechCertGen,
+        str(WebinarTitle.TEST): TextCertificateGenerator,
+        str(WebinarTitle.GRAMMAR): GrammarCertGen,
     }
-    if class_ := title_to_class.get(title.lower()):
-        return class_
+    if generator_class := title_to_class.get(title.lower()):
+        return generator_class
     raise ValueError(f"Unknown webinar title: {title!r}")

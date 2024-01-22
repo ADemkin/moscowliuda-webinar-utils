@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from lib.factory import WebinarTitles
+from lib.domain.webinar.enums import WebinarTitle
 from lib.storage import WebinarStorage
 
 
@@ -26,7 +26,7 @@ def test_if_webinar_not_found_then_gives_none(storage: WebinarStorage) -> None:
 
 def test_if_webinar_exists_then_gives_webinar(storage: WebinarStorage) -> None:
     url = "some-url"
-    title = WebinarTitles.TEST
+    title = WebinarTitle.TEST
     webinar_id = storage.add_webinar(url, title)
     webinar = storage.get_webinar_by_id(webinar_id)
     assert webinar
@@ -38,7 +38,7 @@ def test_if_webinar_exists_then_it_appears_in_all(
     storage: WebinarStorage,
 ) -> None:
     url = "some-url"
-    title = WebinarTitles.TEST
+    title = WebinarTitle.TEST
     webinar = storage.get_webinar_by_id(storage.add_webinar(url, title))
     all_webinars = storage.get_all_webinars()
     assert webinar in all_webinars

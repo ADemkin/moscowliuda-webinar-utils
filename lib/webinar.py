@@ -15,7 +15,7 @@ from lib.clients.email import GMail
 from lib.clients.email import MailStub
 from lib.domain.contact.service import ContactService
 from lib.domain.inflect.service import InflectService
-from lib.factory import WebinarTitles
+from lib.domain.webinar.enums import WebinarTitle
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.participants import Participant
@@ -31,7 +31,7 @@ class Webinar:
         self,
         document: Spreadsheet,
         participants: list[Participant],
-        title: WebinarTitles,
+        title: WebinarTitle,
         date_str: str,
         year: int,
         email: AbstractMail,
@@ -42,7 +42,7 @@ class Webinar:
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
-        self.title: WebinarTitles = title  # TODO: make enum
+        self.title: WebinarTitle = title
         self.date_str: str = date_str
         self.year: int = year
         self.email = email
@@ -71,7 +71,7 @@ class Webinar:
         return cls(
             document=sheet.document,
             participants=sheet.participants,
-            title=WebinarTitles(sheet.title.lower()),
+            title=WebinarTitle(sheet.title.lower()),
             date_str=sheet.date_str,
             year=year,
             email=email,
@@ -137,7 +137,7 @@ class Webinar:
             self.email.send(
                 to=email,
                 bcc=["antondemkin+python@yandex.ru", "moscowliuda@mail.ru"],
-                subject=str(self.title.value).title(),
+                subject=self.title.title(),
                 contents=message,
                 attachments=[str(ascii_file_name)],
             )
@@ -149,9 +149,9 @@ class Webinar:
 
     def get_group_name(self) -> str:
         short_title = {
-            WebinarTitles.SPEECH: "П",
-            WebinarTitles.GRAMMAR: "Г",
-            WebinarTitles.TEST: "Т",
+            WebinarTitle.SPEECH: "П",
+            WebinarTitle.GRAMMAR: "Г",
+            WebinarTitle.TEST: "Т",
         }[self.title]
         return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
 

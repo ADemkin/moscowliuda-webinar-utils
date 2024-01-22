@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import NamedTuple
 from typing import NewType
 
+from lib.domain.webinar.enums import WebinarTitle
+
 WebinarId = NewType("WebinarId", int)
 AccountId = NewType("AccountId", int)
 
@@ -21,7 +23,7 @@ class Webinar:
     id: WebinarId
     imported_at: datetime
     url: str
-    title: str
+    title: WebinarTitle
     date_str: str
     year: int
 
@@ -31,7 +33,7 @@ class Webinar:
             id=WebinarId(row[0]),
             imported_at=datetime.fromisoformat(row[1]),
             url=row[2],
-            title=row[3],
+            title=WebinarTitle(row[3]),
             date_str=row[4],
             year=row[5],
         )

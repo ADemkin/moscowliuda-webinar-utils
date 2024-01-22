@@ -7,7 +7,7 @@ from lib.clients.email import MailStub
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
 from lib.domain.inflect.service import InflectService
-from lib.factory import WebinarTitles
+from lib.domain.webinar.enums import WebinarTitle
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.webinar import Webinar
@@ -48,7 +48,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     webinar = Webinar(
         document=document,
         participants=participants,
-        title=WebinarTitles.TEST,
+        title=WebinarTitle.TEST,
         date_str=date_str,
         year=year,
         email=mail_stub,
@@ -84,7 +84,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     webinar.send_emails_with_certificates()
     for participant in participants:
         assert mail_stub.sent_count(participant.email) == 1
-    assert mail_stub.total_send_count == 2
+    assert mail_stub.total_send_count == len(rows)
     assert listdir(webinar_tmp_path) == ["certificate.jpeg"]
 
     # create vcards

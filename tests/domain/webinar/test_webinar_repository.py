@@ -1,9 +1,11 @@
 import os
 from datetime import datetime
+from random import choice
 
 import pytest
 
 from lib.clients.db import DB
+from lib.domain.webinar.enums import WebinarTitle
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import AccountNotFoundError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
@@ -21,7 +23,7 @@ def webinar_repo(db: DB) -> WebinarRepo:
 
 def add_random_webinar(webinar_repo: WebinarRepo) -> Webinar:
     webinar_url = f"https://webinar-url.some/{os.urandom(8).hex()}/#"
-    title = "random webinar title"
+    title = choice(list(WebinarTitle))
     date_str = "2020-01-01"
     year = 2020
     return webinar_repo.add_webinar(url=webinar_url, date_str=date_str, title=title, year=year)
@@ -31,7 +33,7 @@ def test_webinar_repo_add_webinar_gives_webinar_model(
     webinar_repo: WebinarRepo,
 ) -> None:
     webinar_url = "https://webinar-url.some/0/#"
-    title = "random webinar title"
+    title = choice(list(WebinarTitle))
     date_str = "2020-01-01"
     year = 2020
     webinar = webinar_repo.add_webinar(url=webinar_url, date_str=date_str, title=title, year=year)
@@ -69,7 +71,7 @@ def test_webinar_repo_raises_error_when_webinar_already_exists(
     webinar_repo: WebinarRepo,
 ) -> None:
     webinar_url = "https://webinar-url.some/2/#"
-    title = "random webinar title"
+    title = choice(list(WebinarTitle))
     date_str = "2020-01-01"
     year = 2020
     webinar_repo.add_webinar(url=webinar_url, date_str=date_str, title=title, year=year)
