@@ -65,10 +65,32 @@ py_version = 310
 line-length = 100
 
 [tool.mypy]
-implicit_optional = true
+no_strict_optional = true
 warn_unreachable = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
+ignore_missing_imports = true
+module = "tests.*"
+
+[[tool.mypy.overrides]]
+module = "gspread.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "yagmail.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "PIL.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "google.*"
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
