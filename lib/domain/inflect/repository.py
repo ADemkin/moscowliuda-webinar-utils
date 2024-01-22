@@ -20,7 +20,8 @@ class InflectStorage:
         params = {"name": name}
         with self.db.connection() as connection:
             if row := connection.execute(query, params).fetchone():
-                return row[0]
+                if row[0] is not None:
+                    return str(row[0])
         return None
 
     def set_inflection_by_name(self, name: str, name_datv: str | None) -> None:
@@ -53,7 +54,8 @@ class InflectStorage:
         params = {"family_name": family_name}
         with self.db.connection() as connection:
             if row := connection.execute(query, params).fetchone():
-                return row[0]
+                if row[0] is not None:
+                    return str(row[0])
         return None
 
     def set_inflection_by_family_name(
@@ -90,7 +92,8 @@ class InflectStorage:
         params = {"father_name": father_name}
         with self.db.connection() as connection:
             if row := connection.execute(query, params).fetchone():
-                return row[0]
+                if row[0] is not None:
+                    return str(row[0])
         return None
 
     def set_inflection_by_father_name(
