@@ -11,6 +11,7 @@ from lib.domain.webinar.enums import WebinarTitle
 from lib.images import TextCertificateGenerator
 from lib.participants import Participant
 from lib.webinar import Webinar
+from tests.common import TEST_SHEET_URL
 from tests.common import CreateDocumentT
 from tests.common import create_row
 from tests.common import skip_if_no_network
@@ -99,3 +100,15 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         assert participant.name in content
         assert participant.email in content
         assert participant.phone in content
+
+
+@skip_if_no_network
+def test_webinar_cen_be_created_from_url(
+    create_document: CreateDocumentT,
+) -> None:
+    rows = [
+        create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
+        create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
+    ]
+    create_document(rows)
+    Webinar.from_url(TEST_SHEET_URL, test=True)

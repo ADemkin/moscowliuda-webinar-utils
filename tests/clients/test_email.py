@@ -1,4 +1,3 @@
-from os import environ
 from os import urandom
 from typing import Generator
 from unittest.mock import Mock
@@ -20,14 +19,19 @@ def smtp_mock() -> Generator[Mock, None, None]:
         yield smtp_mock
 
 
-def test_gmail_can_be_created_from_env() -> None:
+def test_gmail_can_be_created_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     user = randstr()
     password = randstr()
-    environ["GMAILACCOUNT"] = user
-    environ["GMAILAPPLICATIONPASSWORD"] = password
+    monkeypatch.setenv("GMAILACCOUNT", user)
+    monkeypatch.setenv("GMAILAPPLICATIONPASSWORD", password)
     gmail = GMail()
     assert gmail.user == user
     assert gmail.password == password
+
+
+@pytest.fixture
+def gmail() -> GMail:
+    return GMail(user="", password="")
 
 
 def test_gmail_creates_smtp_with_correct_credentials(smtp_mock: Mock) -> None:
@@ -37,20 +41,25 @@ def test_gmail_creates_smtp_with_correct_credentials(smtp_mock: Mock) -> None:
     smtp_mock.assert_called_once_with(user=user, password=password)
 
 
-def test_gmail_uses_same_connection_for_all_sends(smtp_mock: Mock) -> None:
-    gmail = GMail(user="", password="")
+def test_gmail_uses_same_connection_for_all_sends(
+        smtp_mock: Mock,
+        gmail: GMail,
+) -> None:
     gmail.send(to="")
     gmail.send(to="")
     assert smtp_mock.return_value.send.call_count == 2
 
 
-def test_gmail_calls_smtp_send_with_correct_arguments(smtp_mock: Mock) -> None:
+def test_gmail_calls_smtp_send_with_correct_arguments(
+        smtp_mock: Mock,
+        gmail: GMail,
+) -> None:
     to = randstr()
     bcc = [randstr(), randstr()]
     subject = randstr()
     contents = randstr()
     attachments = [randstr(), randstr()]
-    GMail(user="", password="").send(
+    gmail.send(
         to=to,
         bcc=bcc,
         subject=subject,

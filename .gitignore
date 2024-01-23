@@ -8,3 +8,5 @@ venv/
 .coverage
 db.sqlite3
 db.sqlite3.*
+etc/certificates/*
+etc/contacts/*
