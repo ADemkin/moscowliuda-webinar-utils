@@ -9,15 +9,15 @@ from aiohttp.web_urldispatcher import UrlMappingMatchInfo
 from aiohttp_jinja2 import template
 from yarl import URL
 
-from lib.domain.webinar.enums import WebinarTitle
-from lib.storage import WebinarStorage
+from lib.domain.webinar.models import WebinarId
+from lib.domain.webinar.service import WebinarService
 from lib.webinar import Webinar
 
 
 class BaseView(View):
     @property
-    def storage(self) -> WebinarStorage:
-        return self.request.app["storage"]
+    def webinar_service(self) -> WebinarService:
+        return self.request.app["webinar_service"]
 
     @property
     def router(self) -> UrlDispatcher:
@@ -35,7 +35,7 @@ class BaseView(View):
 class IndexView(BaseView):
     @template("webinarList.html")
     async def get(self) -> Mapping:
-        webinars = self.storage.get_all_webinars()
+        webinars = self.webinar_service.get_webinars()
         return {"webinars": webinars}
 
 
@@ -43,25 +43,23 @@ class ImportWebinarView(BaseView):
     async def post(self) -> Response:
         form = await self.request.post()
         url = str(form["url"])
-        Webinar.from_url(url)  # will raise if something is wrong
-        title = WebinarTitle.TEST
-        webinar_id = self.storage.add_webinar(url, title)
-        location = self.router["webinarView"].url_for(webinar_id=str(webinar_id))
+        webinar, _ = self.webinar_service.import_webinar_and_accounts_by_url(url)
+        location = self.router["webinarView"].url_for(
+            webinar_id=str(webinar.id),
+        )
         raise HTTPFound(location=location)
 
 
 class BaseWebinarView(BaseView):
     @property
-    def webinar_id(self) -> int:
-        webinar_id_str = self.match_info["webinar_id"]
-        return int(webinar_id_str)
+    def webinar_id(self) -> WebinarId:
+        return WebinarId(int(self.match_info["webinar_id"]))
 
     @property
     def webinar(self) -> Webinar:
-        webinar = self.storage.get_webinar_by_id(self.webinar_id)
-        if webinar is None:
-            raise HTTPNotFound(text="Вебинар не найден")
-        return Webinar.from_url(webinar.url)
+        if webinar := self.webinar_service.get_webinar_by_id(self.webinar_id):
+            return Webinar.from_url(webinar.url)
+        raise HTTPNotFound(text="Вебинар не найден")
 
     def url_for_webinar_view(self, message: str = "") -> URL:
         url = self.router["webinarView"].url_for(
@@ -75,7 +73,7 @@ class BaseWebinarView(BaseView):
 class WebinarView(BaseWebinarView):
     @template("webinarView.html")
     async def get(self) -> Mapping:
-        webinar = self.storage.get_webinar_by_id(self.webinar_id)
+        webinar = self.webinar_service.get_webinar_by_id(self.webinar_id)
         message = self.query.get("message", None)
         return {
             "webinar": webinar,

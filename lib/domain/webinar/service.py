@@ -1,6 +1,8 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
+from typing import Mapping
 from typing import Sequence
 
 from loguru import logger
@@ -9,8 +11,10 @@ from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.domain.webinar.errors import AccountAlreadyExistsError
 from lib.domain.webinar.errors import WebinarAlreadyExistsError
+from lib.domain.webinar.errors import WebinarNotFoundError
 from lib.domain.webinar.models import Account
 from lib.domain.webinar.models import Webinar
+from lib.domain.webinar.models import WebinarId
 from lib.domain.webinar.repository import WebinarRepo
 from lib.sheets import Sheet
 
@@ -20,7 +24,20 @@ class WebinarService:
     webinar_repo: WebinarRepo = field(default_factory=WebinarRepo)
     inflect_service: InflectService = field(default_factory=InflectService)
 
-    def import_webinar_and_accounts_by_url(self, url: str) -> Sequence[Account]:
+    def get_webinar_by_id(self, webinar_id: WebinarId) -> Webinar | None:
+        try:
+            return self.webinar_repo.get_webinar_by_id(webinar_id)
+        except WebinarNotFoundError:
+            logger.error(f"Webinar {webinar_id} not found")
+            return None
+
+    def get_accounts_by_webinar_id(self, webinar_id: WebinarId) -> Sequence[Account]:
+        return self.webinar_repo.get_accounts_by_webinar_id(webinar_id)
+
+    def import_webinar_and_accounts_by_url(
+        self,
+        url: str,
+    ) -> tuple[Webinar, Sequence[Account]]:
         logger.debug(f"Importing webinar and accounts by url: {url}")
         sheet = Sheet.from_url(url)
         try:
@@ -60,10 +77,17 @@ class WebinarService:
             except AccountAlreadyExistsError:
                 logger.info(f"Account {participant} already exists")
         logger.debug(f"Imported {len(accounts)} accounts for webinar {webinar}")
-        return accounts
+        return webinar, accounts
 
-    def import_webinars_and_accounts_by_urls(self, urls: Sequence[str]) -> Sequence[Account]:
-        accounts: list[Account] = []
+    def import_webinars_and_accounts_by_urls(
+        self,
+        urls: Sequence[str],
+    ) -> Mapping[Webinar, Sequence[Account]]:
+        webinar2accounts: dict[Webinar, Sequence[Account]] = defaultdict(list)
         for url in urls:
-            accounts.extend(self.import_webinar_and_accounts_by_url(url))
-        return accounts
+            webinar, accounts = self.import_webinar_and_accounts_by_url(url)
+            webinar2accounts[webinar] = accounts
+        return webinar2accounts
+
+    def get_webinars(self) -> Sequence[Webinar]:
+        return self.webinar_repo.get_webinars()

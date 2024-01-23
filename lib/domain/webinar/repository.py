@@ -139,7 +139,7 @@ class WebinarRepo:
                 return Account.from_row(row)
         raise AccountNotFoundError(f"Account with id={account_id!r} not found")
 
-    def get_all_webinars(self) -> Sequence[Webinar]:
+    def get_webinars(self) -> Sequence[Webinar]:
         query = f"""
             SELECT {', '.join(WebinarEntity._fields)}
             FROM webinar
@@ -148,7 +148,7 @@ class WebinarRepo:
             rows = connection.execute(query).fetchall()
         return [Webinar.from_row(row) for row in rows]
 
-    def get_all_accounts_by_webinar_id(self, webinar_id: WebinarId) -> Sequence[Account]:
+    def get_accounts_by_webinar_id(self, webinar_id: WebinarId) -> Sequence[Account]:
         query = f"""
             SELECT
                 {', '.join(AccountEntity._fields)}

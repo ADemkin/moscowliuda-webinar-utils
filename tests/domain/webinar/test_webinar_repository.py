@@ -162,12 +162,12 @@ def test_webinar_repo_raises_error_when_account_phone_already_exists(
 
 
 def test_webinar_repo_gives_all_webinars(webinar_repo: WebinarRepo) -> None:
-    webinars_before = webinar_repo.get_all_webinars()
+    webinars_before = webinar_repo.get_webinars()
     webinar1 = add_random_webinar(webinar_repo=webinar_repo)
     webinar2 = add_random_webinar(webinar_repo=webinar_repo)
     assert webinar1 not in webinars_before
     assert webinar2 not in webinars_before
-    webinars = webinar_repo.get_all_webinars()
+    webinars = webinar_repo.get_webinars()
     assert len(webinars) == len(webinars_before) + 2
     assert webinar1 in webinars
     assert webinar2 in webinars
@@ -177,7 +177,7 @@ def test_webinar_repo_gives_all_webinar_accounts_by_webinar_id(
     webinar_repo: WebinarRepo,
 ) -> None:
     webinar = add_random_webinar(webinar_repo=webinar_repo)
-    assert webinar_repo.get_all_accounts_by_webinar_id(webinar_id=webinar.id) == []
+    assert webinar_repo.get_accounts_by_webinar_id(webinar_id=webinar.id) == []
     account1 = webinar_repo.add_account(
         webinar_id=webinar.id,
         registered_at=datetime.now(),
@@ -196,7 +196,7 @@ def test_webinar_repo_gives_all_webinar_accounts_by_webinar_id(
         phone="+7 (916) 321-54-76",
         email="someotheremail",
     )
-    accounts = webinar_repo.get_all_accounts_by_webinar_id(webinar_id=webinar.id)
+    accounts = webinar_repo.get_accounts_by_webinar_id(webinar_id=webinar.id)
     assert len(accounts) == 2
     assert account1 in accounts
     assert account2 in accounts

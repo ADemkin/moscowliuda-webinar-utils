@@ -10,7 +10,7 @@ from aiohttp.web import Response
 from aiohttp.web import middleware
 from aiohttp.web import run_app
 
-from lib.storage import WebinarStorage
+from lib.domain.webinar.service import WebinarService
 from lib.webui.routes import setup_routes
 
 CWD = Path(".")
@@ -51,9 +51,8 @@ def create_app() -> Application:
     )
     # setup middleware
     application.middlewares.append(handle_exception_middleware)
-    # setup storage
-    storage = WebinarStorage()
-    application["storage"] = storage
+    # setup services and repositories
+    application["webinar_service"] = WebinarService()
     return application
 
 
