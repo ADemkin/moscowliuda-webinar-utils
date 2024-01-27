@@ -3,9 +3,10 @@ from unittest.mock import patch
 
 import pytest
 
-from lib.clients.email import MailStub
+from lib.clients.email import TestEmailClient
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
+from lib.domain.email.service import EmailService
 from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.images import TextCertificateGenerator
@@ -32,6 +33,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     # TODO: split test into steps
     webinar_tmp_path = tmp_path_factory.mktemp("webinar")
     contact_tmp_path = tmp_path_factory.mktemp("contacts")
+    email_tmp_path = tmp_path_factory.mktemp("email")
     contact_service = ContactService(
         vcard_repo=VCardRepository(
             path=contact_tmp_path,
@@ -45,14 +47,18 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     document = create_document(rows)
     date_str = "00-99 Month"
     year = 2022
-    mail = MailStub()
+    email_client = TestEmailClient()
+    email_service = EmailService(
+        email_client=email_client,
+        bcc_emails=("abc@abc.com",),
+        tmp_path=email_tmp_path,
+    )
     webinar = Webinar(
         document=document,
         participants=participants,
         title=WebinarTitle.TEST,
         date_str=date_str,
         year=year,
-        email=mail,
         cert_gen=TextCertificateGenerator(
             working_dir=webinar_tmp_path,
             date=date_str,
@@ -61,6 +67,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         tmp_dir=webinar_tmp_path,
         contact_service=contact_service,
         inflect_service=InflectService(),
+        email_service=email_service,
     )
 
     # generate certificates
@@ -79,14 +86,20 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     # send emails
     webinar.send_emails_with_certificates()
     for participant in participants:
-        assert mail.is_sent_to(participant.email)
+        assert email_client.is_sent_to(participant.email)
 
     # trigger email send again will not send them
     webinar.send_emails_with_certificates()
+    file_name = "certificate.jpeg"
     for participant in participants:
-        assert mail.sent_count(participant.email) == 1
-    assert mail.total_send_count == len(rows)
-    assert listdir(webinar_tmp_path) == ["certificate.jpeg"]
+        email = participant.email
+        assert email_client.is_sent_to(email)
+        assert email_client.sent_count(email) == 1
+        attach = email_client.get_attachments(email)
+        assert len(attach) == 1
+        assert file_name in attach[0]
+    assert email_client.total_send_count == len(rows)
+    assert listdir(email_tmp_path) == [file_name]
 
     # create vcards
     webinar.import_contacts()
@@ -104,8 +117,10 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
 
 @skip_if_no_network
 def test_webinar_cen_be_created_from_url(
+    monkeypatch: pytest.MonkeyPatch,
     create_document: CreateDocumentT,
 ) -> None:
+    monkeypatch.setenv("BCC_EMAILS", "a,b")  # not checked
     rows = [
         create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
         create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),

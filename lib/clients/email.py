@@ -1,6 +1,7 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from dataclasses import dataclass
+from dataclasses import field
 from functools import cached_property
 from io import IOBase
 from pathlib import PosixPath
@@ -14,7 +15,7 @@ from yagmail import SMTP
 from lib.environment import env_str_field
 
 
-class AbstractMail(metaclass=ABCMeta):
+class AbstractEmailClient(metaclass=ABCMeta):
     @abstractmethod
     def send(
         self,
@@ -27,8 +28,8 @@ class AbstractMail(metaclass=ABCMeta):
         ...  # pragma: no cover
 
 
-@dataclass
-class GMail(AbstractMail):
+@dataclass(slots=True, frozen=True)
+class GMailClient(AbstractEmailClient):
     user: str = env_str_field("GMAILACCOUNT")
     password: str = env_str_field("GMAILAPPLICATIONPASSWORD")
 
@@ -55,9 +56,9 @@ class GMail(AbstractMail):
         logger.debug(f"Sending mail to {to} done")
 
 
-class MailStub(AbstractMail):
-    def __init__(self) -> None:
-        self._call_args: list[Mapping[str, Any]] = []
+@dataclass(slots=True)
+class TestEmailClient(AbstractEmailClient):
+    _call_args: list[Mapping[str, Any]] = field(default_factory=list)
 
     def send(
         self,
@@ -75,13 +76,20 @@ class MailStub(AbstractMail):
             "attachments": attachments,
         }
         self._call_args.append(args)
-        logger.debug("MailStub.send: {args}", args=args)
+        logger.debug("TestEmailClient.send: {args}", args=args)
 
     def is_sent_to(self, to: str) -> bool:
         return to in {call["to"] for call in self._call_args}
 
     def sent_count(self, to: str) -> int:
         return len([call for call in self._call_args if call["to"] == to])
+
+    def get_attachments(self, to: str) -> list[str]:
+        attachments = []
+        for call in self._call_args:
+            if call["to"] == to:
+                attachments.extend(call["attachments"])
+        return attachments
 
     @property
     def total_send_count(self) -> int:

@@ -1,8 +1,5 @@
-import atexit
 from functools import cached_property
-from os import rename
 from pathlib import Path
-from shutil import rmtree
 from time import sleep
 
 from gspread import Spreadsheet
@@ -10,16 +7,14 @@ from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
 from loguru import logger
 
-from lib.clients.email import AbstractMail
-from lib.clients.email import GMail
-from lib.clients.email import MailStub
 from lib.domain.contact.service import ContactService
+from lib.domain.email.service import EmailService
 from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
 from lib.participants import Participant
-from lib.paths import ETC_PATH
+from lib.paths import TMP_PATH
 from lib.sheets import Sheet
 
 CERTIFICATES = "mailing"
@@ -34,22 +29,22 @@ class Webinar:
         title: WebinarTitle,
         date_str: str,
         year: int,
-        email: AbstractMail,
         cert_gen: BaseCertificateGenerator,
         tmp_dir: Path,
         inflect_service: InflectService,
         contact_service: ContactService,
+        email_service: EmailService,
     ) -> None:
         self.document: Spreadsheet = document
         self.participants: list[Participant] = participants
         self.title: WebinarTitle = title
         self.date_str: str = date_str
         self.year: int = year
-        self.email = email
         self.cert_gen = cert_gen
         self.tmp_dir = tmp_dir
         self.contact_service = contact_service
         self.inflect_service = inflect_service
+        self.email_service = email_service
 
     @classmethod
     def from_url(cls, url: str, test: bool = False) -> "Webinar":
@@ -57,28 +52,30 @@ class Webinar:
         sheet = Sheet.from_url(url)
         year = sheet.year
         # get certificates data
-        certs_path = ETC_PATH / "certificates" / f"{sheet.date_str} {year}"
-        certs_path.mkdir(mode=0o700, exist_ok=True)
+        certs_path = TMP_PATH / "certificates" / f"{sheet.date_str} {year}"
+        certs_path.mkdir(mode=0o660, parents=True, exist_ok=True)
         cert_gen = get_cert_gen_from_webinar_title(sheet.title).create(
             working_dir=certs_path,
             date=sheet.date_str,
             year=year,
         )
-        tmp_dir_path = ETC_PATH / "tmp"
-        tmp_dir_path.mkdir(mode=0o700, exist_ok=True)
-        atexit.register(rmtree, tmp_dir_path)
-        email = MailStub() if test else GMail()
+        tmp_dir_path = TMP_PATH
+        tmp_dir_path.mkdir(mode=0o660, parents=True, exist_ok=True)
+        if test:
+            email_sertive = EmailService.with_test_client()
+        else:
+            email_sertive = EmailService()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
             title=WebinarTitle(sheet.title.lower()),
             date_str=sheet.date_str,
             year=year,
-            email=email,
             cert_gen=cert_gen,
             tmp_dir=tmp_dir_path,
             contact_service=ContactService(),
             inflect_service=InflectService(),
+            email_service=email_sertive,
         )
 
     @cached_property
@@ -131,15 +128,11 @@ class Webinar:
                 continue
             cert_file = self.cert_gen.generate_certificate(given_fio)
             logger.info(f"{fio} sending email to {email}")
-            ascii_file_name = self.tmp_dir / "certificate.jpeg"
-            rename(cert_file, ascii_file_name)
-            logger.debug(f"cert file: {ascii_file_name}")
-            self.email.send(
-                to=email,
-                bcc=["antondemkin+python@yandex.ru", "moscowliuda@mail.ru"],
-                subject=self.title.title(),
-                contents=message,
-                attachments=[str(ascii_file_name)],
+            self.email_service.send_certificate_email(
+                title=self.title,
+                email=email,
+                message=message,
+                cert_path=cert_file,
             )
             row_number = i + 1
             self.cert_sheet.update_cell(row_number, 3, "yes")

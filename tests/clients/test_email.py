@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from lib.clients.email import GMail
-from lib.clients.email import MailStub
+from lib.clients.email import GMailClient
+from lib.clients.email import TestEmailClient
 
 
 def randstr() -> str:
@@ -24,26 +24,26 @@ def test_gmail_can_be_created_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     password = randstr()
     monkeypatch.setenv("GMAILACCOUNT", user)
     monkeypatch.setenv("GMAILAPPLICATIONPASSWORD", password)
-    gmail = GMail()
+    gmail = GMailClient()
     assert gmail.user == user
     assert gmail.password == password
 
 
 @pytest.fixture
-def gmail() -> GMail:
-    return GMail(user="", password="")
+def gmail() -> GMailClient:
+    return GMailClient(user="", password="")
 
 
 def test_gmail_creates_smtp_with_correct_credentials(smtp_mock: Mock) -> None:
     user = randstr()
     password = randstr()
-    GMail(user=user, password=password).send(to="")
+    GMailClient(user=user, password=password).send(to="")
     smtp_mock.assert_called_once_with(user=user, password=password)
 
 
 def test_gmail_uses_same_connection_for_all_sends(
-        smtp_mock: Mock,
-        gmail: GMail,
+    smtp_mock: Mock,
+    gmail: GMailClient,
 ) -> None:
     gmail.send(to="")
     gmail.send(to="")
@@ -51,8 +51,8 @@ def test_gmail_uses_same_connection_for_all_sends(
 
 
 def test_gmail_calls_smtp_send_with_correct_arguments(
-        smtp_mock: Mock,
-        gmail: GMail,
+    smtp_mock: Mock,
+    gmail: GMailClient,
 ) -> None:
     to = randstr()
     bcc = [randstr(), randstr()]
@@ -79,7 +79,7 @@ def test_gmail_calls_smtp_send_with_correct_arguments(
 def test_mailstub_keeps_all_calls(size: int) -> None:
     emails = {randstr() for _ in range(size)}
     assert len(emails) == size
-    mail_stub = MailStub()
+    mail_stub = TestEmailClient()
     for email in emails:
         mail_stub.send(to=email)
     assert mail_stub.total_send_count == size
