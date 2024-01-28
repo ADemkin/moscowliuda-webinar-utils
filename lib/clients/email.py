@@ -56,7 +56,7 @@ class GMailClient(AbstractEmailClient):
         logger.debug(f"Sending mail to {to} done")
 
 
-@dataclass(slots=True)
+@dataclass(frozen=True, slots=True)
 class TestEmailClient(AbstractEmailClient):
     _call_args: list[Mapping[str, Any]] = field(default_factory=list)
 

@@ -5,7 +5,7 @@ from pymorphy2 import MorphAnalyzer  # type: ignore
 from pyphrasy.inflect import PhraseInflector  # type: ignore
 
 
-@dataclass(slots=True)
+@dataclass(frozen=True, slots=True)
 class Inflector:
     inflector: PhraseInflector = field(
         default_factory=lambda: PhraseInflector(MorphAnalyzer()),  # type: ignore

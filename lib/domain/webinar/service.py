@@ -19,7 +19,7 @@ from lib.domain.webinar.repository import WebinarRepo
 from lib.sheets import Sheet
 
 
-@dataclass(slots=True)
+@dataclass(frozen=True, slots=True)
 class WebinarService:
     webinar_repo: WebinarRepo = field(default_factory=WebinarRepo)
     inflect_service: InflectService = field(default_factory=InflectService)
