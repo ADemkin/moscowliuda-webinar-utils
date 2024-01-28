@@ -3,8 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Sequence
 
-from loguru import logger
-
+from lib.logging import logger
 from lib.protocols import RowT
 
 GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"

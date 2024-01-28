@@ -5,7 +5,6 @@ from time import sleep
 from gspread import Spreadsheet
 from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
-from loguru import logger
 
 from lib.domain.contact.service import ContactService
 from lib.domain.email.service import EmailService
@@ -13,6 +12,7 @@ from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
+from lib.logging import logger
 from lib.participants import Participant
 from lib.paths import TMP_PATH
 from lib.sheets import Sheet

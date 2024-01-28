@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from dataclasses import field
 
-from loguru import logger
-
 from lib.domain.inflect.repository import InflectRepository
 from lib.domain.webinar.models import Account
+from lib.logging import logger
 from lib.participants import Participant
 
 

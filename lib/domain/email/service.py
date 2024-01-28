@@ -2,13 +2,12 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 
-from loguru import logger
-
 from lib.clients.email import AbstractEmailClient
 from lib.clients.email import GMailClient
 from lib.clients.email import TestEmailClient
 from lib.domain.webinar.enums import WebinarTitle
 from lib.environment import env_str_tuple_field
+from lib.logging import logger
 from lib.paths import TMP_PATH
 
 

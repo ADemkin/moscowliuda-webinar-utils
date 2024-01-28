@@ -5,8 +5,8 @@ from gspread import Spreadsheet
 from gspread import Worksheet
 from gspread import service_account
 from gspread.exceptions import APIError
-from loguru import logger
 
+from lib.logging import logger
 from lib.participants import Participant
 
 FIX_API_ERROR_MESSAGE = """You have to add permissions to spreadsheet.

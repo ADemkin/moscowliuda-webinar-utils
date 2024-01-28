@@ -5,8 +5,6 @@ from datetime import datetime
 from typing import Mapping
 from typing import Sequence
 
-from loguru import logger
-
 from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.domain.webinar.errors import AccountAlreadyExistsError
@@ -16,6 +14,7 @@ from lib.domain.webinar.models import Account
 from lib.domain.webinar.models import Webinar
 from lib.domain.webinar.models import WebinarId
 from lib.domain.webinar.repository import WebinarRepo
+from lib.logging import logger
 from lib.sheets import Sheet
 
 

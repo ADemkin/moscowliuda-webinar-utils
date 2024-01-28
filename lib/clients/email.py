@@ -9,10 +9,10 @@ from typing import Any
 from typing import Mapping
 from typing import Sequence
 
-from loguru import logger
 from yagmail import SMTP
 
 from lib.environment import env_str_field
+from lib.logging import logger
 
 
 class AbstractEmailClient(metaclass=ABCMeta):

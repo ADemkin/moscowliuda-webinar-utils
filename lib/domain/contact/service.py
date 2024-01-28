@@ -3,11 +3,10 @@ from dataclasses import field
 from pathlib import Path
 from typing import Sequence
 
-from loguru import logger
-
 from lib.domain.contact.models import VCard
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.webinar.models import Account
+from lib.logging import logger
 from lib.participants import Participant
 
 
