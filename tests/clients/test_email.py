@@ -1,4 +1,3 @@
-from os import urandom
 from typing import Generator
 from unittest.mock import Mock
 from unittest.mock import patch
@@ -7,10 +6,7 @@ import pytest
 
 from lib.clients.email import GMailClient
 from lib.clients.email import TestEmailClient
-
-
-def randstr() -> str:
-    return urandom(8).hex()
+from tests.common import randstr
 
 
 @pytest.fixture
