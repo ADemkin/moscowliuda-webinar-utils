@@ -40,7 +40,7 @@ class WebinarService:
         logger.debug(f"Importing webinar and accounts by url: {url}")
         sheet = Sheet.from_url(url)
         try:
-            title = WebinarTitle(sheet.title)
+            title = WebinarTitle(sheet.title.lower())
         except ValueError:
             logger.error(f"Unknown webinar title: {sheet.title}")
             raise
