@@ -11,3 +11,4 @@ db.sqlite3.*
 etc/certificates/*
 etc/contacts/*
 *.log
+tmp/
