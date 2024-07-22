@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import NamedTuple
 from typing import NewType
 
+
 from lib.domain.webinar.enums import WebinarTitle
 
 WebinarId = NewType("WebinarId", int)

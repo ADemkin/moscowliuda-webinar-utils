@@ -11,4 +11,5 @@ class StrEnum(str, Enum):
 class WebinarTitle(StrEnum):
     GRAMMAR = "формирование базовых грамматических представлений"
     SPEECH = "практика запуска речи"
+    PHRASE = "приёмы формирования фразовой речи"
     TEST = "test webinar"

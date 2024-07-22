@@ -142,6 +142,10 @@ class GrammarCertGen(BaseCertificateGenerator):
     template: str = "template_grammar.jpeg"
 
 
+class PhraseCertGen(BaseCertificateGenerator):
+    template: str = "template_phrase.jpeg"
+
+
 class TextCertificateGenerator(BaseCertificateGenerator):
     template = "__no_template__"
 

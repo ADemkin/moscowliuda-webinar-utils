@@ -145,6 +145,7 @@ class Webinar:
             WebinarTitle.SPEECH: "П",
             WebinarTitle.GRAMMAR: "Г",
             WebinarTitle.TEST: "Т",
+            WebinarTitle.PHRASE: "Ф",
         }[self.title]
         return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
 

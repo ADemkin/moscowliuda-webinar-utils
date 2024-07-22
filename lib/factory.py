@@ -3,6 +3,7 @@ from lib.images import BaseCertificateGenerator
 from lib.images import GrammarCertGen
 from lib.images import SpeechCertGen
 from lib.images import TextCertificateGenerator
+from lib.images import PhraseCertGen
 
 
 def get_cert_gen_from_webinar_title(
@@ -13,6 +14,7 @@ def get_cert_gen_from_webinar_title(
         str(WebinarTitle.SPEECH): SpeechCertGen,
         str(WebinarTitle.TEST): TextCertificateGenerator,
         str(WebinarTitle.GRAMMAR): GrammarCertGen,
+        str(WebinarTitle.PHRASE): PhraseCertGen,
     }
     if generator_class := title_to_class.get(title.lower()):
         return generator_class
