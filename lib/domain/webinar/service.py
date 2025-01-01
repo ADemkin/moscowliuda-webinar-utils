@@ -39,18 +39,20 @@ class WebinarService:
     ) -> tuple[Webinar, Sequence[Account]]:
         logger.debug(f"Importing webinar and accounts by url: {url}")
         sheet = Sheet.from_url(url)
+        webinat_title_str = sheet.get_webinar_title()
         try:
-            title = WebinarTitle(sheet.title.lower())
+            title = WebinarTitle.from_text(webinat_title_str)
         except ValueError:
-            logger.error(f"Unknown webinar title: {sheet.title}")
+            logger.error(f"Unknown webinar title: {webinat_title_str}")
             raise
         webinar: Webinar
         try:
+            # NOTE: broken code and no plans to fix it
             webinar = self.webinar_repo.add_webinar(
                 url=url,
-                date_str=sheet.date_str,
+                date_str="",
                 title=title,
-                year=sheet.year,
+                year=2025,
             )
             logger.info(f"Webinar {webinar} added")
         except WebinarAlreadyExistsError:

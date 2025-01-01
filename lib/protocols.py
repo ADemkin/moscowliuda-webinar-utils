@@ -1,5 +1,5 @@
 # pylint: disable=no-self-use,unused-argument,too-few-public-methods
-
+from typing import Any
 from typing import Protocol
 
 RowT = list[str]
@@ -22,7 +22,7 @@ class ProtoSheet(Protocol):
     def cell(self, row: int, col: int) -> ProtoCell:
         ...
 
-    def update_cell(self, row: int, col: int, value: str) -> dict:
+    def update_cell(self, row: int, col: int, value: str) -> dict[str, Any]:
         ...
 
     def append_row(self, row: RowT) -> None:
@@ -47,6 +47,9 @@ class ProtoDocument(Protocol):
 
     @property
     def title(self) -> str:
+        ...
+
+    def update_title(self, title: str) -> None:
         ...
 
     def add_worksheet(

@@ -36,6 +36,8 @@ TITLE_CELL_NAMES: RowT = [
     "Email address",
 ]
 
+DEFAULT_TITLE = "01 - 31 Января 2025 Test Webinar (Responses)"
+
 
 def create_row(
     family: str,
@@ -64,13 +66,12 @@ def prepare_sheet(sheet: ProtoSheet, rows: RowsT) -> ProtoSheet:
 
 
 def prepare_document(document: ProtoDocument, rows: RowsT) -> ProtoDocument:
+    document.update_title(DEFAULT_TITLE)
     for sheet in document.worksheets():
         if sheet.title != "Form Responses 1":
             document.del_worksheet(sheet)
             continue
         prepare_sheet(sheet, rows)
-    assert "Test Webinar" in document.title
-    assert "00-99 Month" in document.title
     return document
 
 
@@ -79,7 +80,7 @@ def create_google_document(rows: RowsT) -> ProtoDocument:
 
 
 def create_stub_document(rows: RowsT) -> ProtoDocument:
-    return prepare_document(WorksheetStub("00-99 Month Test Webinar"), rows)
+    return prepare_document(WorksheetStub(), rows)
 
 
 def create_google_sheet(rows: RowsT) -> ProtoSheet:
@@ -122,10 +123,13 @@ class SpreadsheetStub:
 
 
 class WorksheetStub:
-    def __init__(self, title: str = "00-99 Month Test Webinar") -> None:
-        self._title = title
+    def __init__(self) -> None:
+        self._title = ""
         self._worksheets: list[ProtoSheet] = []
         self.add_worksheet("Form Responses 1")  # can not be deleted
+
+    def update_title(self, title: str) -> None:
+        self._title = title
 
     def worksheets(self) -> list[ProtoSheet]:
         return self._worksheets

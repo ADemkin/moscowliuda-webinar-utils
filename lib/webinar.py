@@ -1,6 +1,8 @@
+from datetime import date
 from functools import cached_property
 from pathlib import Path
 from time import sleep
+from typing import Iterable
 
 from gspread import Spreadsheet
 from gspread import Worksheet
@@ -10,8 +12,8 @@ from lib.domain.contact.service import ContactService
 from lib.domain.email.service import EmailService
 from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.enums import WebinarTitle
-from lib.factory import get_cert_gen_from_webinar_title
 from lib.images import BaseCertificateGenerator
+from lib.images import cert_gen_factory
 from lib.logging import logger
 from lib.participants import Participant
 from lib.paths import TMP_PATH
@@ -25,10 +27,10 @@ class Webinar:
     def __init__(
         self,
         document: Spreadsheet,
-        participants: list[Participant],
+        participants: Iterable[Participant],
         title: WebinarTitle,
-        date_str: str,
-        year: int,
+        started_at: date,
+        finished_at: date,
         cert_gen: BaseCertificateGenerator,
         tmp_dir: Path,
         inflect_service: InflectService,
@@ -36,10 +38,10 @@ class Webinar:
         email_service: EmailService,
     ) -> None:
         self.document: Spreadsheet = document
-        self.participants: list[Participant] = participants
+        self.participants: Iterable[Participant] = participants
         self.title: WebinarTitle = title
-        self.date_str: str = date_str
-        self.year: int = year
+        self.started_at: date = started_at
+        self.finished_at: date = finished_at
         self.cert_gen = cert_gen
         self.tmp_dir = tmp_dir
         self.contact_service = contact_service
@@ -50,32 +52,36 @@ class Webinar:
     def from_url(cls, url: str, test: bool = False) -> "Webinar":
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
-        year = sheet.year
+        title = WebinarTitle.from_text(sheet.get_webinar_title())
+        started_at = sheet.get_started_at()
+        finished_at = sheet.get_finished_at()
+        date_str = f"{started_at:%d.%m.%Y}"
+        year = started_at.year
         # get certificates data
-        certs_path = TMP_PATH / "certificates" / f"{sheet.date_str} {year}"
+        certs_path = TMP_PATH / "certificates" / date_str / str(year)
         certs_path.mkdir(mode=0o660, parents=True, exist_ok=True)
-        cert_gen = get_cert_gen_from_webinar_title(sheet.title).create(
+        cert_gen = cert_gen_factory(title).create(
             working_dir=certs_path,
-            date=sheet.date_str,
-            year=year,
+            started_at=started_at,
+            finished_at=finished_at,
         )
         tmp_dir_path = TMP_PATH
         tmp_dir_path.mkdir(mode=0o660, parents=True, exist_ok=True)
         if test:
-            email_sertive = EmailService.with_test_client()
+            email_sertice = EmailService.with_test_client()
         else:
-            email_sertive = EmailService()
+            email_sertice = EmailService()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
-            title=WebinarTitle(sheet.title.lower()),
-            date_str=sheet.date_str,
-            year=year,
+            title=title,
+            started_at=started_at,
+            finished_at=finished_at,
             cert_gen=cert_gen,
             tmp_dir=tmp_dir_path,
             contact_service=ContactService(),
             inflect_service=InflectService(),
-            email_service=email_sertive,
+            email_service=email_sertice,
         )
 
     @cached_property
@@ -87,7 +93,7 @@ class Webinar:
             logger.info("creating certificates sheet")
             return self.document.add_worksheet(
                 title=CERTIFICATES,
-                rows=len(self.participants),
+                rows=len(list(self.participants)),
                 cols=len(headers),
             )
 
@@ -147,12 +153,12 @@ class Webinar:
             WebinarTitle.TEST: "Т",
             WebinarTitle.PHRASE: "Ф",
         }[self.title]
-        return f"{short_title}{self.date_str.replace(' ', '')} {self.year}"
+        return f"{short_title}{self.finished_at.isoformat()}"
 
     def import_contacts(self) -> Path:
         group = self.get_group_name()
         contacts_file = self.contact_service.save_accounts_to_file(
-            accounts=self.participants,
+            accounts=list(self.participants),
             group=group,
         )
         logger.info(f"contacts saved to {contacts_file}")

@@ -1,36 +1,54 @@
+from datetime import date
+
 import pytest
 
-from lib.sheets import get_webinar_date_and_title
+from lib.sheets import InvalidDocumentTitleError
+from lib.sheets import _split_title_to_dates_and_title
 
 
 @pytest.mark.parametrize(
-    "date,name",
+    "title,started_at,finished_at,webinar_title",
     [
-        ("10-20 Января", "Название вебинара"),
-        ("1-2 Февраля", "Название"),
-        ("2 - 5 Февраля", "Практика Запуска Речи"),
-        ("20 - 25 Февраля", "Название"),
-        ("1-99 Марта", "Длинное Название из нескольких слов"),
-        ("1-99 Марта", "Длинное Название из нескольких слов"),
-        ("28 Апреля - 1 Мая", "Название"),
-        ("28 Апреля - 1 Мая", "Длинное Название из нескольких слов"),
+        (
+            "19 - 20 Февраля 2025 Название",
+            date(2025, 2, 19),
+            date(2025, 2, 20),
+            "Название",
+        ),
+        (
+            "31 Мая - 2 Июня 2025 Название из 4 слов",
+            date(2025, 5, 31),
+            date(2025, 6, 2),
+            "Название из 4 слов",
+        ),
+        (
+            "25 Июля - 1 Августа 2025 Название (Responses)",
+            date(2025, 7, 25),
+            date(2025, 8, 1),
+            "Название",
+        ),
     ],
 )
-def test_gives_date_and_title_if_given_correct_title(date: str, name: str) -> None:
-    title = f" {date} {name} (Responses) "
-    assert get_webinar_date_and_title(title) == (date, name)
+def test_split_title_to_dates_and_title(
+    title: str,
+    started_at: date,
+    finished_at: date,
+    webinar_title: str,
+) -> None:
+    assert _split_title_to_dates_and_title(title) == (started_at, finished_at, webinar_title)
 
 
 @pytest.mark.parametrize(
     "title",
     [
-        "",
-        "123",
-        "10 февраля название",
-        "12-12 месяц",
-        "название",
+        "unknown format",
+        "19-20 Февраля 2025 без пробела между датами",
+        "19 - 20 Февраля без года",
+        "19 Февраля - 20 Февраля без года",
+        "19 - 20 Мумраля 2025 неизвестный месяц",
+        "19 Мумраля - 20 Мумраля 2025 неизвестный месяц",
     ],
 )
-def test_if_given_incorrect_title_then_raises(title: str) -> None:
-    with pytest.raises(RuntimeError):
-        get_webinar_date_and_title(title)
+def test_split_title_to_dates_and_title_raises_if_unknown_format(title: str) -> None:
+    with pytest.raises(InvalidDocumentTitleError):
+        _split_title_to_dates_and_title(title)

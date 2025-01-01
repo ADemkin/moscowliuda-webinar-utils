@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -5,6 +6,7 @@ from PIL import Image
 
 from lib.images import BaseCertificateGenerator
 from lib.images import GrammarCertGen
+from lib.images import PhraseCertGen
 from lib.images import SpeechCertGen
 from lib.images import TextCertificateGenerator
 
@@ -14,6 +16,7 @@ from lib.images import TextCertificateGenerator
     [
         GrammarCertGen,
         SpeechCertGen,
+        PhraseCertGen,
     ],
 )
 def test_certificate_generates_correct_jpeg_file(
@@ -22,8 +25,8 @@ def test_certificate_generates_correct_jpeg_file(
 ) -> None:
     cert_gen = cert_gen_class.create(
         working_dir=tmp_path,
-        date="20-21 сентября",
-        year=2022,
+        started_at=date(2024, 12, 31),
+        finished_at=date(2024, 12, 31),
     )
     cert = cert_gen.generate_certificate("Василий Пупкин")
     assert cert.exists()
@@ -35,6 +38,7 @@ def test_certificate_generates_correct_jpeg_file(
     [
         GrammarCertGen,
         SpeechCertGen,
+        PhraseCertGen,
     ],
 )
 def test_if_given_different_names_then_files_are_different(
@@ -43,8 +47,8 @@ def test_if_given_different_names_then_files_are_different(
 ) -> None:
     cert_gen = cert_gen_class.create(
         working_dir=tmp_path,
-        date="20-21 сентября",
-        year=2022,
+        started_at=date(2024, 12, 31),
+        finished_at=date(2024, 12, 31),
     )
     cert_a = cert_gen.generate_certificate("Василий Пупкин")
     cert_b = cert_gen.generate_certificate("Пётр Курочки")
@@ -57,6 +61,7 @@ def test_if_given_different_names_then_files_are_different(
     [
         GrammarCertGen,
         SpeechCertGen,
+        PhraseCertGen,
     ],
 )
 def test_cert_file_is_created_inside_given_directory(
@@ -65,8 +70,8 @@ def test_cert_file_is_created_inside_given_directory(
 ) -> None:
     cert_gen = cert_gen_class.create(
         working_dir=tmp_path,
-        date="20-21 сентября",
-        year=2022,
+        started_at=date(2024, 12, 31),
+        finished_at=date(2024, 12, 31),
     )
     cert_path = cert_gen.generate_certificate("Пётр Курочки")
     tmp_dir_contents = list(tmp_path.glob("*"))
@@ -74,15 +79,30 @@ def test_cert_file_is_created_inside_given_directory(
     assert cert_path in tmp_dir_contents
 
 
-def test_certificate_contain_all_given_data(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "started_at,finished_at,date_expected,year_expected",
+    [
+        (date(2024, 12, 30), date(2024, 12, 31), "30 - 31 декабря", 2024),
+        (date(2024, 12, 30), date(2025, 1, 2), "30 декабря - 2 января", 2025),
+    ],
+)
+def test_certificate_contain_all_given_data(
+    tmp_path: Path,
+    started_at: date,
+    finished_at: date,
+    date_expected: str,
+    year_expected: int,
+) -> None:
     name = "Иванов Иван Иванович"
-    date = "26-27 февраля"
-    year = 2022
-    cert_gen = TextCertificateGenerator.create(tmp_path, date, year)
+    cert_gen = TextCertificateGenerator.create(
+        working_dir=tmp_path,
+        started_at=started_at,
+        finished_at=finished_at,
+    )
     cert_gen.generate_certificate(name)
     cert_path = tmp_path / name
     assert cert_path.exists()
     content = cert_path.read_text()
     assert name in content
-    assert f"{year} г." in content
-    assert date in content
+    assert f"{year_expected} г." in content
+    assert date_expected in content

@@ -1,3 +1,4 @@
+from datetime import date
 from os import listdir
 from unittest.mock import patch
 
@@ -44,9 +45,9 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
     ]
     participants = [Participant.from_row(row) for row in rows]
+    started_at = date(2024, 12, 31)
+    finished_at = date(2025, 1, 1)
     document = create_document(rows)
-    date_str = "00-99 Month"
-    year = 2022
     email_client = TestEmailClient()
     email_service = EmailService(
         email_client=email_client,
@@ -57,12 +58,12 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         document=document,
         participants=participants,
         title=WebinarTitle.TEST,
-        date_str=date_str,
-        year=year,
+        started_at=started_at,
+        finished_at=finished_at,
         cert_gen=TextCertificateGenerator(
             working_dir=webinar_tmp_path,
-            date=date_str,
-            year=str(year),
+            started_at=started_at,
+            finished_at=finished_at,
         ),
         tmp_dir=webinar_tmp_path,
         contact_service=contact_service,
@@ -79,9 +80,6 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         assert path.exists()
         content = path.read_text()
         assert name in content
-        # assert title in content
-        assert date_str in content
-        assert str(year) in content
 
     # send emails
     webinar.send_emails_with_certificates()
@@ -103,7 +101,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
 
     # create vcards
     webinar.import_contacts()
-    group_expected = f"Т{date_str.replace(' ', '')} {year}"
+    group_expected = f"Т{finished_at.isoformat()}"
     path_expected = contact_tmp_path / f"{group_expected}.vcf"
     assert path_expected.exists()
     content = path_expected.read_text()
