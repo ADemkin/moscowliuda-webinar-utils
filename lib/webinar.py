@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import date
 from functools import cached_property
 from pathlib import Path
@@ -21,52 +22,37 @@ from lib.sheets import Sheet
 
 CERTIFICATES = "mailing"
 PARTICIPANTS = "Form Responses 1"
+DIR_MODE = 0o660
 
 
+@dataclass(frozen=True)
 class Webinar:
-    def __init__(
-        self,
-        document: Spreadsheet,
-        participants: Iterable[Participant],
-        title: WebinarTitle,
-        started_at: date,
-        finished_at: date,
-        cert_gen: BaseCertificateGenerator,
-        tmp_dir: Path,
-        inflect_service: InflectService,
-        contact_service: ContactService,
-        email_service: EmailService,
-    ) -> None:
-        self.document: Spreadsheet = document
-        self.participants: Iterable[Participant] = participants
-        self.title: WebinarTitle = title
-        self.started_at: date = started_at
-        self.finished_at: date = finished_at
-        self.cert_gen = cert_gen
-        self.tmp_dir = tmp_dir
-        self.contact_service = contact_service
-        self.inflect_service = inflect_service
-        self.email_service = email_service
+    document: Spreadsheet
+    participants: Iterable[Participant]
+    title: WebinarTitle
+    started_at: date
+    finished_at: date
+    cert_gen: BaseCertificateGenerator
+    inflect_service: InflectService
+    contact_service: ContactService
+    email_service: EmailService
 
     @classmethod
     def from_url(cls, url: str, test: bool = False) -> "Webinar":
         logger.debug("creating webinar")
+        TMP_PATH.mkdir(mode=DIR_MODE, parents=True, exist_ok=True)
         sheet = Sheet.from_url(url)
         title = WebinarTitle.from_text(sheet.get_webinar_title())
         started_at = sheet.get_started_at()
         finished_at = sheet.get_finished_at()
-        date_str = f"{started_at:%d.%m.%Y}"
-        year = started_at.year
         # get certificates data
-        certs_path = TMP_PATH / "certificates" / date_str / str(year)
-        certs_path.mkdir(mode=0o660, parents=True, exist_ok=True)
+        certs_path = TMP_PATH / "certificates" / f"{started_at:%d.%m.%Y}"
+        certs_path.mkdir(mode=DIR_MODE, parents=True, exist_ok=True)
         cert_gen = cert_gen_factory(title).create(
             working_dir=certs_path,
             started_at=started_at,
             finished_at=finished_at,
         )
-        tmp_dir_path = TMP_PATH
-        tmp_dir_path.mkdir(mode=0o660, parents=True, exist_ok=True)
         if test:
             email_sertice = EmailService.with_test_client()
         else:
@@ -78,7 +64,6 @@ class Webinar:
             started_at=started_at,
             finished_at=finished_at,
             cert_gen=cert_gen,
-            tmp_dir=tmp_dir_path,
             contact_service=ContactService(),
             inflect_service=InflectService(),
             email_service=email_sertice,

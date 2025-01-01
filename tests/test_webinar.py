@@ -65,7 +65,6 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
             started_at=started_at,
             finished_at=finished_at,
         ),
-        tmp_dir=webinar_tmp_path,
         contact_service=contact_service,
         inflect_service=InflectService(),
         email_service=email_service,
