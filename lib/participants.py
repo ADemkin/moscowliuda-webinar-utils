@@ -1,9 +1,7 @@
-import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Sequence
 
-from lib.logging import logger
 from lib.protocols import RowT
 
 GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"
@@ -81,7 +79,4 @@ def normalize_phone_number(number: str) -> str:
 
 
 def normalize_email(email: str) -> str:
-    email = email.lower()
-    if not re.match(r"[a-zA-Z0-9._-]+@\w+\.\w+", email):
-        logger.warning(f"{email!r} is not a valid email")
-    return email
+    return email.lower()

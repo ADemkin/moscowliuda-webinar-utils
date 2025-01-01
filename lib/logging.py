@@ -1,3 +1,5 @@
-from loguru import logger
+from loguru import logger as _logger
 
-logger.add("app.log", encoding="utf-8", rotation="10MB")
+_logger.add("app.log", encoding="utf-8", rotation="10MB")
+
+logger = _logger
