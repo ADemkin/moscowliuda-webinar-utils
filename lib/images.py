@@ -131,7 +131,8 @@ class BaseCertificateGenerator:
         return self._templates_dir / self.template
 
     def _get_year_text(self) -> str:
-        return f"{self._finished_at.year} г."
+        year = self._finished_at.year
+        return f"{year} г."
 
     def _get_date_text(self) -> str:
         finish_month = MONTH2NAME[self._finished_at.month]
