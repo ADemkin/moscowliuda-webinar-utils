@@ -5,7 +5,6 @@ from typing import Sequence
 
 from lib.domain.contact.models import VCard
 from lib.domain.contact.repository import VCardRepository
-from lib.domain.webinar.models import Account
 from lib.logging import logger
 from lib.participants import Participant
 
@@ -15,7 +14,7 @@ class ContactService:
     vcard_repo: VCardRepository = field(default_factory=VCardRepository)
 
     @staticmethod
-    def create_vcard(account: Account | Participant, group: str) -> VCard:
+    def create_vcard(account: Participant, group: str) -> VCard:
         return VCard(
             last_name=f"{account.name} {account.family_name}",
             first_name=group,
@@ -26,7 +25,7 @@ class ContactService:
 
     def save_accounts_to_file(
         self,
-        accounts: Sequence[Account | Participant],
+        accounts: Sequence[Participant],
         group: str,
     ) -> Path:
         logger.debug(f"Saving {len(accounts)} accounts to file")

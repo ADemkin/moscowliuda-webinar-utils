@@ -1,7 +1,6 @@
 import click
 from dotenv import load_dotenv
 
-from lib.domain.webinar.service import WebinarService
 from lib.webinar import Webinar
 
 
@@ -44,14 +43,6 @@ def send(url: str) -> None:
     if click.confirm(click.style("Send emails?", fg="red"), abort=True):
         Webinar.from_url(url).send_emails_with_certificates()
         click.echo("Emails sent")
-
-
-@cli.command(name="import")
-@click.argument("url")
-def _import(url: str) -> None:
-    click.echo(f"Importing webinar from {url}")
-    accounts = WebinarService().import_webinar_and_accounts_by_url(url)
-    click.echo(f"{len(accounts)} accounts imported")
 
 
 if __name__ == "__main__":
