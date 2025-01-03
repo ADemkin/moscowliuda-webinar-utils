@@ -20,7 +20,7 @@ pylint:
 	$(RUN) pylint $(PATHS)
 
 ruff-lint:
-	$(RUN) ruff check $(PATHS)
+	$(RUN) ruff check  $(PATHS)
 
 typos:
 	@typos .
@@ -30,15 +30,9 @@ lint: ruff-lint mypy flake8 pylint typos
 run:
 	$(RUN) python webinar.py
 
-dev:
-	$(RUN) gunicorn server:acreate_app --bind localhost:8080 --reload  --worker-class aiohttp.GunicornWebWorker
-
-
 ruff-fmt:
+	$(RUN) ruff check --fix $(PATHS)
 	$(RUN) ruff format $(PATHS)
-
-black:
-	$(RUN) black $(PATHS)
 
 isort:
 	$(RUN) isort $(PATHS)
@@ -46,7 +40,7 @@ isort:
 typos-fix:
 	@typos -w $(PATHS)
 
-fmt: ruff-fmt isort black typos-fix
+fmt: ruff-fmt isort typos-fix
 
 backup-db:
 	@sqlite3 db.sqlite3 ".backup db.sqlite3.backup"
