@@ -9,12 +9,10 @@ from gspread import Spreadsheet
 from gspread import Worksheet
 from gspread.exceptions import WorksheetNotFound
 
+from lib.domain.certificate.service import CertificateService
 from lib.domain.contact.service import ContactService
 from lib.domain.email.service import EmailService
-from lib.domain.inflect.service import InflectService
 from lib.domain.webinar.enums import WebinarTitle
-from lib.images import BaseCertificateGenerator
-from lib.images import cert_gen_factory
 from lib.logging import logger
 from lib.participants import Participant
 from lib.paths import TMP_PATH
@@ -32,8 +30,7 @@ class Webinar:
     title: WebinarTitle
     started_at: date
     finished_at: date
-    cert_gen: BaseCertificateGenerator
-    inflect_service: InflectService
+    certificate_service: CertificateService
     contact_service: ContactService
     email_service: EmailService
 
@@ -45,11 +42,8 @@ class Webinar:
         title = WebinarTitle.from_text(sheet.get_webinar_title())
         started_at = sheet.get_started_at()
         finished_at = sheet.get_finished_at()
-        # get certificates data
-        certs_path = TMP_PATH / "certificates" / f"{started_at:%d.%m.%Y}"
-        certs_path.mkdir(mode=DIR_MODE, parents=True, exist_ok=True)
-        cert_gen = cert_gen_factory(title).create(
-            working_dir=certs_path,
+        certificate_service = CertificateService(
+            title=title,
             started_at=started_at,
             finished_at=finished_at,
         )
@@ -63,15 +57,14 @@ class Webinar:
             title=title,
             started_at=started_at,
             finished_at=finished_at,
-            cert_gen=cert_gen,
+            certificate_service=certificate_service,
             contact_service=ContactService(),
-            inflect_service=InflectService(),
             email_service=email_sertice,
         )
 
     @cached_property
     def cert_sheet(self) -> Worksheet:
-        headers = ["fio", "given_fio", "name", "email", "custom_text"]
+        headers = ["fio", "[deprecated]", "is_sent", "email", "custom_text"]
         try:
             return self.document.worksheet(CERTIFICATES)
         except WorksheetNotFound:
@@ -86,44 +79,28 @@ class Webinar:
         logger.info("filling certificates")
         for participant in self.participants:
             logger.info(f"{participant.fio} taken")
-            fio_given = self.inflect_service.inflect_account_fio(participant)
             message = f"Здравствуйте, {participant.name}! Благодарю вас за участие."
-            row = [
-                participant.fio,
-                fio_given,
-                "no",
-                participant.email,
-                message,
-            ]
+            row = [participant.fio, "-", "no", participant.email, message]
             self.cert_sheet.append_row(row)
             logger.info(f"{participant.fio} done")
-            sleep(1)  # Quota limit is 60 rps
+            sleep(1)  # Quota limit is 60 rpm
         logger.info("filling certificates done")
-
-    def certificates_generate(self) -> None:
-        logger.info("generating certs")
-        for row in self.cert_sheet.get_all_values():
-            given_fio = row[1]
-            logger.debug(f"{given_fio} taken")
-            cert_file = self.cert_gen.generate_certificate(given_fio)
-            logger.debug(f"{given_fio} cert path: {str(cert_file)}")
-        logger.info("generating certs done")
 
     def send_emails_with_certificates(self) -> None:
         logger.info("sending emails")
         for i, row in enumerate(self.cert_sheet.get_all_values()):
-            fio, given_fio, is_email_sent, email, message = row
+            fio, _, is_email_sent, email, message = row
             logger.debug(f"{fio} taken")
             if is_email_sent == "yes":
                 logger.debug(f"{fio} do not need to send email")
                 continue
-            cert_file = self.cert_gen.generate_certificate(given_fio)
+            certificate = self.certificate_service.generate(fio)
             logger.info(f"{fio} sending email to {email}")
             self.email_service.send_certificate_email(
                 title=self.title,
                 email=email,
                 message=message,
-                cert_path=cert_file,
+                certificate=certificate,
             )
             row_number = i + 1
             self.cert_sheet.update_cell(row_number, 3, "yes")

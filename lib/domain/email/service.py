@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 from dataclasses import field
+from io import BytesIO
 from pathlib import Path
 
 from lib.clients.email import AbstractEmailClient
 from lib.clients.email import GMailClient
 from lib.clients.email import TestEmailClient
+from lib.domain.certificate.model import Certificate
 from lib.domain.webinar.enums import WebinarTitle
 from lib.environment import env_str_tuple_field
 from lib.logging import logger
@@ -21,25 +23,22 @@ class EmailService:
     def with_test_client(cls) -> "EmailService":
         return cls(email_client=TestEmailClient())
 
-    def _save_certificate_to_ascii_file(self, cert_path: Path) -> Path:
-        self.tmp_path.mkdir(mode=0o660, parents=True, exist_ok=True)
-        ascii_file_name = self.tmp_path / "certificate.jpeg"
-        cert_path.rename(ascii_file_name)
-        return ascii_file_name
-
     def send_certificate_email(
         self,
         title: WebinarTitle,
         email: str,
         message: str,
-        cert_path: Path,
+        certificate: Certificate,
     ) -> None:
         logger.debug(f"Sending certificate message to {email}...")
+        buffer = BytesIO()
+        certificate.write(buffer)
+        buffer.seek(0)
         self.email_client.send(
             to=email,
             bcc=self.bcc_emails,
             subject=title.title(),
             contents=message,
-            attachments=[str(self._save_certificate_to_ascii_file(cert_path))],
+            attachments=[buffer],
         )
         logger.debug(f"Certificate message sent to {email}.")

@@ -1,9 +1,11 @@
+from datetime import date
 from pathlib import Path
 from random import choice
 
 import pytest
 
 from lib.clients.email import TestEmailClient
+from lib.domain.certificate.model import Certificate
 from lib.domain.email.service import EmailService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.environment import EnvironmentVariableNotSetError
@@ -52,13 +54,18 @@ def test_email_service_send_certificate_email(
     email = "participant@somemail.com"
     message = randstr()
     title = choice(list(WebinarTitle))
+    certificate = Certificate(
+        title=title,
+        name="Мельникова Людмила Андреевна",
+        started_at=date(2024, 12, 30),
+        finished_at=date(2024, 12, 31),
+    )
     email_service.send_certificate_email(
         title=title,
         email=email,
         message=message,
-        cert_path=cert_path,
+        certificate=certificate,
     )
     assert email_client.total_send_count == 1
     assert email_client.is_sent_to(email)
     assert email_client.sent_count(email) == 1
-    assert "certificate.jpeg" in email_client.get_attachments(email)[0]
