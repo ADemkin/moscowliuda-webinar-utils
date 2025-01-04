@@ -14,7 +14,6 @@ from lib.webinar import Webinar
 from tests.common import TEST_SHEET_URL
 from tests.common import CreateDocumentT
 from tests.common import create_row
-from tests.common import skip_if_no_network
 
 
 @pytest.fixture
@@ -23,7 +22,6 @@ def _no_sleep():
         yield
 
 
-@skip_if_no_network
 def test_webinar_integration(  # pylint: disable=too-many-locals
     create_document: CreateDocumentT,
     tmp_path_factory,
@@ -31,7 +29,6 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
 ) -> None:
     # TODO: split test into steps
     contact_tmp_path = tmp_path_factory.mktemp("contacts")
-    email_tmp_path = tmp_path_factory.mktemp("email")
     contact_service = ContactService(
         vcard_repo=VCardRepository(
             path=contact_tmp_path,
@@ -49,7 +46,6 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     email_service = EmailService(
         email_client=email_client,
         bcc_emails=("abc@abc.com",),
-        tmp_path=email_tmp_path,
     )
     certificate_service = CertificateService(
         title=WebinarTitle.TEST,
@@ -57,7 +53,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         finished_at=finished_at,
     )
     webinar = Webinar(
-        document=document,
+        document=document,  # type: ignore
         participants=participants,
         title=WebinarTitle.TEST,
         started_at=started_at,
@@ -98,7 +94,6 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         assert participant.phone in content
 
 
-@skip_if_no_network
 def test_webinar_cen_be_created_from_url(
     monkeypatch: pytest.MonkeyPatch,
     create_document: CreateDocumentT,

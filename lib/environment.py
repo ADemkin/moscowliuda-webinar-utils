@@ -5,8 +5,7 @@ from typing import Any
 from typing import Callable
 
 
-class EnvironmentVariableNotSetError(Exception):
-    ...
+class EnvironmentVariableNotSetError(Exception): ...
 
 
 def get_env_variable(

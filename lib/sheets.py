@@ -139,8 +139,7 @@ def ensure_permissions(document: Spreadsheet) -> None:
     try:
         document.worksheets()
     except APIError as err:
-        resp = err._extract_text(err.response)  # pylint: disable=protected-access
-        if resp["code"] == 403:
+        if err.code == 403:
             raise RuntimeError(FIX_API_ERROR_MESSAGE) from err
         raise err
 

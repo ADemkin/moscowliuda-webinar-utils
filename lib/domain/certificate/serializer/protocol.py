@@ -9,5 +9,4 @@ class Serializable(Protocol):
         title: str,
         name: str,
         date_text: str,
-    ) -> None:
-        ...
+    ) -> None: ...

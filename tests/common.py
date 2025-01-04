@@ -1,12 +1,8 @@
 from collections import namedtuple
 from datetime import datetime
-from functools import wraps
 from os import urandom
-from typing import Any
 from typing import Callable
 
-import pytest
-from google.auth.exceptions import TransportError
 from gspread.exceptions import WorksheetNotFound
 
 from lib.participants import GOOGLE_TIMESTAMP_FORMAT
@@ -75,7 +71,7 @@ def prepare_document(document: ProtoDocument, rows: RowsT) -> ProtoDocument:
 
 
 def create_google_document(rows: RowsT) -> ProtoDocument:
-    return prepare_document(open_spreadsheet(TEST_SHEET_URL), rows)
+    return prepare_document(open_spreadsheet(TEST_SHEET_URL), rows)  # type: ignore
 
 
 def create_stub_document(rows: RowsT) -> ProtoDocument:
@@ -125,7 +121,7 @@ class WorksheetStub:
     def __init__(self) -> None:
         self._title = ""
         self._worksheets: list[ProtoSheet] = []
-        self.add_worksheet("Form Responses 1")  # can not be deleted
+        self.add_worksheet("Form Responses 1", 100, 100)  # can not be deleted
 
     def update_title(self, title: str) -> None:
         self._title = title
@@ -146,8 +142,9 @@ class WorksheetStub:
     def add_worksheet(
         self,
         title: str,
-        rows: int = 100,  # pylint: disable=unused-argument
-        cols: int = 100,  # pylint: disable=unused-argument
+        rows: int,  # pylint: disable=unused-argument
+        cols: int,  # pylint: disable=unused-argument
+        index: int | None = None,  # pylint: disable=unused-argument
     ) -> ProtoSheet:
         sheet = SpreadsheetStub(title)
         self._worksheets.append(sheet)
@@ -164,28 +161,6 @@ class WorksheetStub:
 
 def create_stub_sheet(rows: RowsT) -> ProtoSheet:
     return prepare_sheet(SpreadsheetStub(), rows)
-
-
-def skipif(exception: BaseException, reason: str) -> Any:
-    """Helper to skip some tests if certain exception is raised.
-
-    Main goal is to skip online integration tests if network is down.
-    """
-
-    def decorator(func: Callable) -> Any:
-        @wraps(func)
-        def wrapper(*args, **kwargs) -> Callable:  # pylint: disable=inconsistent-return-statements
-            try:
-                return func(*args, **kwargs)
-            except exception:  # type: ignore
-                pytest.skip(reason)
-
-        return wrapper
-
-    return decorator
-
-
-skip_if_no_network = skipif(TransportError, "Network is down")
 
 
 def randstr() -> str:

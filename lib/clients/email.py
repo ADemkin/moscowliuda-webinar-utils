@@ -24,8 +24,7 @@ class AbstractEmailClient(metaclass=ABCMeta):
         subject: str | None = None,
         contents: str | None = None,
         attachments: Sequence[str | IOBase | PosixPath] | None = None,
-    ) -> None:
-        ...  # pragma: no cover
+    ) -> None: ...  # pragma: no cover
 
 
 @dataclass(slots=True, frozen=True)

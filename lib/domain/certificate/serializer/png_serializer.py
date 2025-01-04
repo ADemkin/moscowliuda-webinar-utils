@@ -32,10 +32,10 @@ class CertificatePNGSerializer:
         self,
         image: Image,
         name: str,
-        min_size: int = 100,
-        max_size: int = 150,
-        max_rel_text_width: float = 0.81,
     ) -> FreeTypeFont:
+        min_size: int = 100
+        max_size: int = 150
+        max_rel_text_width: float = 0.81
         image_width, _ = image.size
         max_text_width = image_width * max_rel_text_width
         for font_size in range(min_size, max_size):

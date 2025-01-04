@@ -15,7 +15,6 @@ from lib.domain.email.service import EmailService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.logging import logger
 from lib.participants import Participant
-from lib.paths import TMP_PATH
 from lib.sheets import Sheet
 
 CERTIFICATES = "mailing"
@@ -37,7 +36,6 @@ class Webinar:
     @classmethod
     def from_url(cls, url: str, test: bool = False) -> "Webinar":
         logger.debug("creating webinar")
-        TMP_PATH.mkdir(mode=DIR_MODE, parents=True, exist_ok=True)
         sheet = Sheet.from_url(url)
         title = WebinarTitle.from_text(sheet.get_webinar_title())
         started_at = sheet.get_started_at()
