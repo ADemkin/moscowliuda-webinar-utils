@@ -47,18 +47,13 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         email_client=email_client,
         bcc_emails=("abc@abc.com",),
     )
-    certificate_service = CertificateService(
-        title=WebinarTitle.TEST,
-        started_at=started_at,
-        finished_at=finished_at,
-    )
     webinar = Webinar(
         document=document,  # type: ignore
         participants=participants,
         title=WebinarTitle.TEST,
         started_at=started_at,
         finished_at=finished_at,
-        certificate_service=certificate_service,
+        certificate_service=CertificateService(),
         contact_service=contact_service,
         email_service=email_service,
     )

@@ -40,11 +40,6 @@ class Webinar:
         title = WebinarTitle.from_text(sheet.get_webinar_title())
         started_at = sheet.get_started_at()
         finished_at = sheet.get_finished_at()
-        certificate_service = CertificateService(
-            title=title,
-            started_at=started_at,
-            finished_at=finished_at,
-        )
         if test:
             email_sertice = EmailService.with_test_client()
         else:
@@ -55,7 +50,7 @@ class Webinar:
             title=title,
             started_at=started_at,
             finished_at=finished_at,
-            certificate_service=certificate_service,
+            certificate_service=CertificateService(),
             contact_service=ContactService(),
             email_service=email_sertice,
         )
@@ -92,7 +87,12 @@ class Webinar:
             if is_email_sent == "yes":
                 logger.debug(f"{fio} do not need to send email")
                 continue
-            certificate = self.certificate_service.generate(fio)
+            certificate = self.certificate_service.generate(
+                title=self.title,
+                started_at=self.started_at,
+                finished_at=self.finished_at,
+                name=fio,
+            )
             logger.info(f"{fio} sending email to {email}")
             self.email_service.send_certificate_email(
                 title=self.title,

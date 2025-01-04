@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from functools import cached_property
 from io import IOBase
-from pathlib import PosixPath
+from pathlib import Path
 from typing import Any
 from typing import Mapping
 from typing import Sequence
@@ -23,7 +23,7 @@ class AbstractEmailClient(metaclass=ABCMeta):
         bcc: Sequence[str] | None = None,
         subject: str | None = None,
         contents: str | None = None,
-        attachments: Sequence[str | IOBase | PosixPath] | None = None,
+        attachments: Sequence[str | IOBase | Path] | None = None,
     ) -> None: ...  # pragma: no cover
 
 
@@ -42,7 +42,7 @@ class GMailClient(AbstractEmailClient):
         bcc: Sequence[str] | None = None,
         subject: str | None = None,
         contents: str | None = None,
-        attachments: Sequence[str | IOBase | PosixPath] | None = None,
+        attachments: Sequence[str | IOBase | Path] | None = None,
     ) -> None:
         logger.debug(f"Sending mail to {to}")
         self.smtp.send(
@@ -65,7 +65,7 @@ class TestEmailClient(AbstractEmailClient):
         bcc: Sequence[str] | None = None,
         subject: str | None = None,
         contents: str | None = None,
-        attachments: Sequence[str | IOBase | PosixPath] | None = None,
+        attachments: Sequence[str | IOBase | Path] | None = None,
     ) -> None:
         args = {
             "to": to,

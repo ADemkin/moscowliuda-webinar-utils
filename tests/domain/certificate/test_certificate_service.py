@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
+from typing import IO
 
 import pytest
 from PIL import Image
@@ -37,14 +38,13 @@ def test_certificate_service_generates_certificate(
     title: WebinarTitle,
     name: str,
 ) -> None:
-    service = CertificateService(
+    service = CertificateService()
+    certificate = service.generate(
         title=title,
         started_at=started_at,
         finished_at=finished_at,
+        name=name,
     )
-
-    certificate = service.generate(name)
-
     assert certificate.title == title
     assert certificate.name == name
     assert certificate.started_at == started_at
@@ -55,7 +55,7 @@ def test_certificate_service_generates_certificate(
 class CertificateTextSerializer:
     def serialize(
         self,
-        buffer: BytesIO,
+        buffer: IO[bytes],
         title: str,
         name: str,
         date_text: str,

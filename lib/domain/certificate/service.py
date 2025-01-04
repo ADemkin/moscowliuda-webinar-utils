@@ -11,16 +11,19 @@ from .serializer.protocol import Serializable
 
 @dataclass(frozen=True, slots=True)
 class CertificateService:
-    title: WebinarTitle
-    started_at: date
-    finished_at: date
     serializer: Serializable = field(default_factory=CertificatePNGSerializer)
 
-    def generate(self, name: str) -> Certificate:
+    def generate(
+        self,
+        title: WebinarTitle,
+        started_at: date,
+        finished_at: date,
+        name: str,
+    ) -> Certificate:
         return Certificate(
-            title=self.title,
+            title=title,
             name=name,
-            started_at=self.started_at,
-            finished_at=self.finished_at,
+            started_at=started_at,
+            finished_at=finished_at,
             serializer=self.serializer,
         )

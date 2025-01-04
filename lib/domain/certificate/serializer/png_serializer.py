@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
-from io import BytesIO
 from pathlib import Path
+from typing import IO
 
 from PIL.Image import Image
 from PIL.Image import open as _open_image
@@ -96,7 +96,7 @@ class CertificatePNGSerializer:
 
     def serialize(
         self,
-        buffer: BytesIO,
+        buffer: IO[bytes],
         title: str,
         name: str,
         date_text: str,

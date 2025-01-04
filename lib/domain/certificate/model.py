@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import date
-from io import BytesIO
+from typing import IO
 
 from lib.const import MONTH2NAME
 from lib.domain.webinar.enums import WebinarTitle
@@ -36,7 +36,7 @@ class Certificate:
             WebinarTitle.TEST: "Тестовый вебинар",
         }[self.title]
 
-    def write(self, buffer: BytesIO) -> None:
+    def write(self, buffer: IO[bytes]) -> None:
         self.serializer.serialize(
             buffer=buffer,
             title=self._get_webinar_title_text(),
