@@ -14,7 +14,7 @@ mypy-strict:
 	$(RUN) mypy --strict --install-types $(PATHS)
 
 flake8:
-	$(RUN) flake8 $(PATHS)
+	$(RUN) flake8 --extend-ignore=E701 $(PATHS)
 
 pylint:
 	$(RUN) pylint $(PATHS)

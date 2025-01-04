@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "moscowliuda-webinar"
-version = "0.1.0"
+version = "1.0.0"
 description = "Automation for @moscowliuda webinar"
 authors = ["Anton Demkin <antondemkin@yandex.ru>"]
 packages = [
@@ -11,30 +11,21 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-Pillow = "^9.2.0"
-loguru = "^0.6.0"
-python-dotenv = "^0.20.0"
-yagmail = "^0.15.285"
-gspread = "^5.5.0"
-pymorphy2 = "^0.9.1"
-pyphrasy = "^0.2.0"
-pymorphy2-dicts-ru = "^2.4.417127.4579844"
-aiohttp = "^3.8.3"
-aiohttp-jinja2 = "^1.5"
-gunicorn = "^20.1.0"
-pytest-coverage = "^0.0"
-click = "^8.1.7"
-ruff = "^0.1.14"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.1.3"
-mypy = "^0.971"
-flake8 = "^5.0.4"
-pylint = "^2.15.0"
+python = "^3.13"
+loguru = "^0.7.3"
+python-dotenv = "^1.0.1"
+yagmail = "^0.15.293"
+gspread = "^6.1.4"
+click = "^8.1.8"
+pillow = "^11.1.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.12.0"
+ruff = "^0.8.5"
+pytest = "^8.3.4"
+pytest-coverage = "^0.0"
+pylint = "^3.3.3"
+mypy = "^1.14.1"
+flake8 = "^7.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -53,13 +44,15 @@ disable = [
     'too-many-instance-attributes',
     'fixme',
     'duplicate-code',
+    'invalid-field-call',
+    'too-many-positional-arguments',
 ]
 load-plugins = 'pylint.extensions.no_self_use'
 
 [tool.isort]
 force_single_line = true
 line_length = 100
-py_version = 310
+py_version = 312
 
 [tool.black]
 line-length = 100
@@ -94,6 +87,9 @@ ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
+extend-ignore = ["UP035"]
 
 [tool.ruff.format]
 quote-style = "double"
