@@ -14,3 +14,11 @@ class WebinarTitle(str, Enum):
     @classmethod
     def from_text(cls, text: str) -> WebinarTitle:
         return cls(text.lower())
+
+    def short(self) -> str:
+        return {
+            WebinarTitle.GRAMMAR: "Г",
+            WebinarTitle.SPEECH: "П",
+            WebinarTitle.TEST: "Т",
+            WebinarTitle.PHRASE: "Ф",
+        }[self]

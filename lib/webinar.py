@@ -4,6 +4,7 @@ from functools import cached_property
 from pathlib import Path
 from time import sleep
 from typing import Iterable
+from typing import Self
 
 from gspread import Spreadsheet
 from gspread import Worksheet
@@ -34,16 +35,13 @@ class Webinar:
     email_service: EmailService
 
     @classmethod
-    def from_url(cls, url: str, test: bool = False) -> "Webinar":
+    def from_url(cls, url: str, test: bool = False) -> Self:
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
         title = WebinarTitle.from_text(sheet.get_webinar_title())
         started_at = sheet.get_started_at()
         finished_at = sheet.get_finished_at()
-        if test:
-            email_sertice = EmailService.with_test_client()
-        else:
-            email_sertice = EmailService()
+        email_service = EmailService.with_test_client() if test else EmailService()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
@@ -52,7 +50,7 @@ class Webinar:
             finished_at=finished_at,
             certificate_service=CertificateService(),
             contact_service=ContactService(),
-            email_service=email_sertice,
+            email_service=email_service,
         )
 
     @cached_property
@@ -106,17 +104,8 @@ class Webinar:
             sleep(3)
         logger.info("sending emails done")
 
-    def get_group_name(self) -> str:
-        short_title = {
-            WebinarTitle.SPEECH: "П",
-            WebinarTitle.GRAMMAR: "Г",
-            WebinarTitle.TEST: "Т",
-            WebinarTitle.PHRASE: "Ф",
-        }[self.title]
-        return f"{short_title}{self.finished_at.isoformat()}"
-
     def import_contacts(self) -> Path:
-        group = self.get_group_name()
+        group = f"{self.title.short()}{self.finished_at.isoformat()}"
         contacts_file = self.contact_service.save_accounts_to_file(
             accounts=list(self.participants),
             group=group,
