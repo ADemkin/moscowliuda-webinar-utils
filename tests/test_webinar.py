@@ -18,7 +18,7 @@ from tests.common import create_row
 
 
 @pytest.fixture
-def _no_sleep() -> Generator:
+def _no_sleep() -> Generator[None, None, None]:
     with patch("lib.webinar.sleep"):
         yield
 

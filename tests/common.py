@@ -81,7 +81,7 @@ class SpreadsheetStub:
             value = self._rows[row - 1][col - 1]
         return Cell(value)
 
-    def update_cell(self, row: int, col: int, value: str) -> dict:
+    def update_cell(self, row: int, col: int, value: str) -> dict[str, str]:
         col_index = col - 1
         row_values = self._rows[row - 1]
         while len(row_values) <= col_index:
