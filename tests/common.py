@@ -158,7 +158,7 @@ def create_google_document(rows: RowsT) -> ProtoDocument:
 
 
 def create_stub_document(rows: RowsT) -> WorksheetStub:
-    return prepare_document(WorksheetStub(), rows)
+    return prepare_document(WorksheetStub(), rows)  # type: ignore[arg-type,return-value]
 
 
 def create_google_sheet(rows: RowsT) -> ProtoSheet:
@@ -166,7 +166,7 @@ def create_google_sheet(rows: RowsT) -> ProtoSheet:
 
 
 def create_stub_sheet(rows: RowsT) -> SpreadsheetStub:
-    return prepare_sheet(SpreadsheetStub(), rows)
+    return prepare_sheet(SpreadsheetStub(), rows)  # type: ignore[arg-type,return-value]
 
 
 def randstr() -> str:
