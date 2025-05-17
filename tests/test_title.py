@@ -7,7 +7,7 @@ from lib.sheets import _split_title_to_dates_and_title
 
 
 @pytest.mark.parametrize(
-    "title,started_at,finished_at,webinar_title",
+    ("title", "started_at", "finished_at", "webinar_title"),
     [
         (
             "19 - 20 Февраля 2025 Название",

@@ -12,7 +12,7 @@ from lib.domain.webinar.enums import WebinarTitle
 
 
 @pytest.mark.parametrize(
-    "started_at,finished_at",
+    ("started_at", "finished_at"),
     [
         (date(2021, 1, 1), date(2021, 1, 2)),
         (date(2021, 2, 1), date(2021, 3, 2)),
@@ -64,7 +64,7 @@ class CertificateTextSerializer:
 
 
 @pytest.mark.parametrize(
-    "started_at,finished_at",
+    ("started_at", "finished_at"),
     [
         (date(2021, 1, 1), date(2021, 1, 2)),
         (date(2021, 2, 1), date(2021, 3, 2)),

@@ -1,13 +1,12 @@
 from pathlib import Path
-from typing import Generator
 
 import pytest
 
 from lib.clients.db import DB
 
 
-@pytest.fixture(scope="function")
-def db(tmp_path: Path) -> Generator[DB, None, None]:
+@pytest.fixture
+def db(tmp_path: Path) -> DB:
     query = """
         DROP TABLE IF EXISTS test;
         CREATE TABLE IF NOT EXISTS test (
@@ -15,7 +14,7 @@ def db(tmp_path: Path) -> Generator[DB, None, None]:
             name TEXT
         );
     """
-    yield DB(
+    return DB(
         path=tmp_path / "test.sqlite3",
         migrations=[query],
     )
@@ -53,7 +52,7 @@ def test_db_drop_failed_transaction(db: DB) -> None:
             raise Exception("Test exception")
             connection.execute(query, params)  # type: ignore
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match="Test exception"):
         _raise_inside_transaction()
 
     with db.connection() as connection:

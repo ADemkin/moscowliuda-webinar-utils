@@ -5,7 +5,7 @@ from lib.participants import normalize_phone_number
 
 
 @pytest.mark.parametrize(
-    "account,expected",
+    ("account", "expected"),
     [
         ("@moscowliuda", "moscowliuda"),
         ("_antondemkin_", "_antondemkin_"),
@@ -16,7 +16,7 @@ def test_normalize_instagram_account(account: str, expected: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "phone_raw,expected",
+    ("phone_raw", "expected"),
     [
         ("+79161234567", "+79161234567"),
         ("89161234567", "+79161234567"),

@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Generator
 from unittest.mock import patch
 
 import pytest
@@ -17,15 +18,15 @@ from tests.common import create_row
 
 
 @pytest.fixture
-def _no_sleep():
+def _no_sleep() -> Generator:
     with patch("lib.webinar.sleep"):
         yield
 
 
+@pytest.mark.usefixtures("_no_sleep")
 def test_webinar_integration(  # pylint: disable=too-many-locals
     create_document: CreateDocumentT,
     tmp_path_factory,
-    _no_sleep,
 ) -> None:
     # TODO: split test into steps
     contact_tmp_path = tmp_path_factory.mktemp("contacts")
