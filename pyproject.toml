@@ -93,6 +93,8 @@ exclude = [".venv"]
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
+    "ISC001",  # ruff complain about conflict with formatter
+    "COM812",  # ruff complain about conflict with formatter
     "RUF001",  # allow cyrillic
     "D",  # do not require docstrings
     "TD",  # allow plain TODO comment
