@@ -1,2 +1,2 @@
-from .service import CertificateService
 from .model import Certificate
+from .service import CertificateService
