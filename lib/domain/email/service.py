@@ -14,7 +14,7 @@ from lib.environment import env_str_tuple_field
 @dataclass(frozen=True, slots=True)
 class EmailService:
     email_client: AbstractEmailClient = field(default_factory=GMailClient)
-    bcc_emails: tuple[str, ...] = env_str_tuple_field("BCC_EMAILS")  # type: ignore[assignment]
+    bcc_emails: tuple[str, ...] = env_str_tuple_field("BCC_EMAILS")
 
     @classmethod
     def with_test_client(cls) -> "EmailService":
