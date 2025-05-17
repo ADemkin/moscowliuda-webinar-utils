@@ -23,9 +23,7 @@ pillow = "^11.1.0"
 ruff = "^0.8.5"
 pytest = "^8.3.4"
 pytest-coverage = "^0.0"
-pylint = "^3.3.3"
 mypy = "^1.14.1"
-flake8 = "^7.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -49,11 +47,13 @@ disable = [
 ]
 load-plugins = 'pylint.extensions.no_self_use'
 
+# TODO: remove
 [tool.isort]
 force_single_line = true
 line_length = 100
 py_version = 312
 
+# TODO: remove
 [tool.black]
 line-length = 100
 
@@ -87,9 +87,31 @@ ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
+fix = true
+exclude = [".venv"]
 
 [tool.ruff.lint]
-extend-ignore = ["UP035"]
+select = ["ALL"]
+ignore = [
+    "RUF001",  # allow cyrillic
+    "D",  # do not require docstrings
+    "TD",  # allow plain TODO comment
+    "FIX002",  # allow TODO comments
+    "UP035",  # allow import from typing
+    "FA102",  # do not require future annotations
+    "S311",  # allow random module
+    "EM101",  # allow string literals in exceptions
+    "RUF009",  # allow custom dataclass field functions
+    "TRY003",  # allow long exception messages
+    "EM102",  # allow exception f-string messagrs
+]
 
-[tool.ruff.format]
-quote-style = "double"
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "S101",
+    "ANN",
+    "PLR2004",
+]

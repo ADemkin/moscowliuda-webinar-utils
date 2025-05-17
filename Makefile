@@ -13,19 +13,13 @@ mypy:
 mypy-strict:
 	$(RUN) mypy --strict --install-types $(PATHS)
 
-flake8:
-	$(RUN) flake8 --extend-ignore=E701 $(PATHS)
-
-pylint:
-	$(RUN) pylint $(PATHS)
-
 ruff-lint:
 	$(RUN) ruff check  $(PATHS)
 
 typos:
 	@typos .
 
-lint: ruff-lint mypy flake8 pylint typos
+lint: ruff-lint mypy typos
 
 run:
 	$(RUN) python webinar.py
@@ -34,13 +28,10 @@ ruff-fmt:
 	$(RUN) ruff check --fix $(PATHS)
 	$(RUN) ruff format $(PATHS)
 
-isort:
-	$(RUN) isort $(PATHS)
-
 typos-fix:
 	@typos -w $(PATHS)
 
-fmt: ruff-fmt isort typos-fix
+fmt: ruff-fmt typos-fix
 
 backup-db:
 	@sqlite3 db.sqlite3 ".backup db.sqlite3.backup"
