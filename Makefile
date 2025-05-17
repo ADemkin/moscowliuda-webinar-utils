@@ -1,6 +1,6 @@
 POETRY:=poetry
 RUN:=${POETRY} run
-ARGS:=''
+ARGS:='--live'
 PATHS:=lib/ tests/ bin/
 
 
@@ -8,7 +8,7 @@ test:
 	$(RUN) pytest --cov=lib --cov-report=term-missing --disable-warnings $(ARGS)
 
 mypy:
-	$(RUN) mypy --install-types $(PATHS)
+	$(RUN) mypy $(PATHS)
 
 mypy-strict:
 	$(RUN) mypy --strict --install-types $(PATHS)
