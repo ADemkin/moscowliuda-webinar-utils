@@ -89,9 +89,11 @@ def test_webinar_cen_be_created_from_url(
     create_document: CreateDocumentT,
 ) -> None:
     monkeypatch.setenv("BCC_EMAILS", "a,b")
+    monkeypatch.setenv("GMAILACCOUNT", "some@gmail.com")
+    monkeypatch.setenv("GMAILAPPLICATIONPASSWORD", "123")
     rows = [
         create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
         create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
     ]
     create_document(rows)
-    Webinar.from_url_with_test_email_client(TEST_SHEET_URL)
+    Webinar.from_url(TEST_SHEET_URL)
