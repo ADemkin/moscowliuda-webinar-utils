@@ -1,0 +1,1 @@
+from .png_serializer import CertificatePNGSerializer

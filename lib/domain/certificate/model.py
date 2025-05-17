@@ -6,8 +6,8 @@ from typing import BinaryIO
 from lib.domain.webinar.enums import WebinarTitle
 from lib.utils import date_range_to_text
 
-from .serializer.png_serializer import CertificatePNGSerializer
-from .serializer.protocol import Serializable
+from .serializer import CertificatePNGSerializer
+from .serializer import Serializable
 
 
 @dataclass(frozen=True, slots=True)

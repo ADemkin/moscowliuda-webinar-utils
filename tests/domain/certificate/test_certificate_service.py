@@ -5,8 +5,8 @@ from typing import IO
 import pytest
 from PIL import Image
 
-from lib.domain.certificate.model import Certificate
-from lib.domain.certificate.service import CertificateService
+from lib.domain.certificate import Certificate
+from lib.domain.certificate import CertificateService
 from lib.domain.webinar.enums import WebinarTitle
 
 

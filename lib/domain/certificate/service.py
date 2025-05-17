@@ -5,8 +5,8 @@ from datetime import date
 from lib.domain.webinar.enums import WebinarTitle
 
 from .model import Certificate
-from .serializer.png_serializer import CertificatePNGSerializer
-from .serializer.protocol import Serializable
+from .serializer import CertificatePNGSerializer
+from .serializer import Serializable
 
 
 @dataclass(frozen=True, slots=True)
