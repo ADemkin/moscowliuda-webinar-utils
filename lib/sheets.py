@@ -10,6 +10,7 @@ from gspread import service_account
 from gspread.exceptions import APIError
 
 from lib.const import NAME2MONTH
+from lib.domain.webinar.enums import WebinarTitle
 from lib.logging import logger
 from lib.participants import Participant
 
@@ -71,9 +72,9 @@ class Sheet:
         _, finished_at, _ = _split_title_to_dates_and_title(self.document_title)
         return finished_at
 
-    def get_webinar_title(self) -> str:
+    def get_webinar_title(self) -> WebinarTitle:
         _, _, title = _split_title_to_dates_and_title(self.document_title)
-        return title.lower()
+        return WebinarTitle.from_text(title)
 
 
 def get_participants_from_sheet(

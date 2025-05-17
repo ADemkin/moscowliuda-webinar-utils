@@ -19,8 +19,6 @@ from lib.participants import Participant
 from lib.sheets import Sheet
 
 CERTIFICATES = "mailing"
-PARTICIPANTS = "Form Responses 1"
-DIR_MODE = 0o660
 
 
 @dataclass(frozen=True)
@@ -41,16 +39,13 @@ class Webinar:
     def from_url(cls, url: str) -> Self:
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
-        title = WebinarTitle.from_text(sheet.get_webinar_title())
-        started_at = sheet.get_started_at()
-        finished_at = sheet.get_finished_at()
         email_service = EmailService()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
-            title=title,
-            started_at=started_at,
-            finished_at=finished_at,
+            title=sheet.get_webinar_title(),
+            started_at=sheet.get_started_at(),
+            finished_at=sheet.get_finished_at(),
             certificate_service=CertificateService(),
             contact_service=ContactService(),
             email_service=email_service,
@@ -60,16 +55,13 @@ class Webinar:
     def from_url_with_test_email_client(cls, url: str) -> Self:
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
-        title = WebinarTitle.from_text(sheet.get_webinar_title())
-        started_at = sheet.get_started_at()
-        finished_at = sheet.get_finished_at()
         email_service = EmailService.with_test_client()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
-            title=title,
-            started_at=started_at,
-            finished_at=finished_at,
+            title=sheet.get_webinar_title(),
+            started_at=sheet.get_started_at(),
+            finished_at=sheet.get_finished_at(),
             certificate_service=CertificateService(),
             contact_service=ContactService(),
             email_service=email_service,
