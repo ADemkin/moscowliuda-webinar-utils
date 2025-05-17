@@ -10,12 +10,15 @@ class EnvironmentVariableNotSetError(Exception):
 
 
 def get_env_variable[T](
-    cast: Callable[[str | T], T],
+    *,
+    cast: Callable[[str], T],
     var_name: str,
     default: T | None = None,
 ) -> T:
-    if (value := environ.get(var_name, default)) is not None:
+    if (value := environ.get(var_name)) is not None:
         return cast(value)
+    if default is not None:
+        return default
     raise EnvironmentVariableNotSetError(var_name)
 
 
