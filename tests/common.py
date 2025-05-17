@@ -38,7 +38,7 @@ TITLE_CELL_NAMES: RowT = [
 DEFAULT_TITLE = "01 - 31 Января 2025 Test Webinar (Responses)"
 
 
-def create_row(
+def create_row_v2(
     family: str,
     name: str,
     father: str,
@@ -49,12 +49,11 @@ def create_row(
     timestamp = datetime.strftime(now, GOOGLE_TIMESTAMP_FORMAT)
     return [
         timestamp,
+        email,
         family,
         name,
         father,
         phone,
-        "-",
-        email,
     ]
 
 

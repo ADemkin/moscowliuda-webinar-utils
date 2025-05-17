@@ -40,19 +40,6 @@ class Participant:
     instagram: str = ""
 
     @classmethod
-    def from_row(cls, row: RowT) -> Self:
-        row_strip: Sequence[str] = [str(i).strip() for i in row]
-        return cls(
-            timestamp=get_datetime_from_sheet_timestamp(row_strip[0]),
-            family_name=row_strip[1],
-            name=row_strip[2],
-            father_name=row_strip[3],
-            phone=normalize_phone_number(row_strip[4]),
-            instagram=normalize_instagram_account(row_strip[5]),
-            email=normalize_email(row_strip[6]),
-        )
-
-    @classmethod
     def from_row_v2(cls, row: RowT) -> Self:
         row_strip: Sequence[str] = [str(i).strip() for i in row]
         return cls(

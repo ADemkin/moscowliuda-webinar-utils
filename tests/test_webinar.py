@@ -12,7 +12,7 @@ from lib.participants import Participant
 from lib.webinar import Webinar
 from tests.common import TEST_SHEET_URL
 from tests.common import CreateDocumentT
-from tests.common import create_row
+from tests.common import create_row_v2
 
 
 def test_webinar_integration(
@@ -27,10 +27,10 @@ def test_webinar_integration(
         ),
     )
     rows = [
-        create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
-        create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
+        create_row_v2("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
+        create_row_v2("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
     ]
-    participants = [Participant.from_row(row) for row in rows]
+    participants = [Participant.from_row_v2(row) for row in rows]
     started_at = date(2024, 12, 31)
     finished_at = date(2025, 1, 1)
     document = create_document(rows)
@@ -92,8 +92,8 @@ def test_webinar_cen_be_created_from_url(
     monkeypatch.setenv("GMAILACCOUNT", "some@gmail.com")
     monkeypatch.setenv("GMAILAPPLICATIONPASSWORD", "123")
     rows = [
-        create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
-        create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
+        create_row_v2("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
+        create_row_v2("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
     ]
     create_document(rows)
     Webinar.from_url(TEST_SHEET_URL)
