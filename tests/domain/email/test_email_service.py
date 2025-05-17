@@ -25,7 +25,9 @@ def test_if_environment_not_set_then_raise_exception(email_client: TestEmailClie
 
 @pytest.mark.parametrize("size", [1, 3, 5])
 def test_bcc_emails_are_set_from_environment(
-    size: int, monkeypatch: pytest.MonkeyPatch, email_client: TestEmailClient
+    size: int,
+    monkeypatch: pytest.MonkeyPatch,
+    email_client: TestEmailClient,
 ) -> None:
     bcc_emails = [randstr() for _ in range(size)]
     monkeypatch.setenv("BCC_EMAILS", ",".join(bcc_emails))

@@ -60,7 +60,7 @@ class CertificateTextSerializer:
         name: str,
         date_text: str,
     ) -> None:
-        buffer.write(f"{title} {name} {date_text}".encode("utf-8"))
+        buffer.write(f"{title} {name} {date_text}".encode())
 
 
 @pytest.mark.parametrize(

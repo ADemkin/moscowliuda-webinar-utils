@@ -1,6 +1,6 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Sequence
 
 from lib.protocols import RowT
 
@@ -62,7 +62,7 @@ class Participant:
 
     @property
     def fio(self) -> str:
-        return " ".join((self.family_name, self.name, self.father_name))
+        return f"{self.family_name} {self.name} {self.father_name}"
 
 
 def normalize_instagram_account(account: str) -> str:
@@ -74,8 +74,7 @@ def normalize_phone_number(number: str) -> str:
     number = "".join(c for c in number if c.isdigit())
     if number.startswith("8"):
         number = f"7{number[1:]}"
-    number = f"+{number}" if number else ""
-    return number
+    return f"+{number}" if number else ""
 
 
 def normalize_email(email: str) -> str:

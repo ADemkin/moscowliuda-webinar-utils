@@ -1,7 +1,7 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
-from typing import Sequence
 
 from lib.domain.contact.models import VCard
 from lib.domain.contact.repository import VCardRepository

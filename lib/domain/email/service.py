@@ -14,7 +14,7 @@ from lib.environment import env_str_tuple_field
 @dataclass(frozen=True, slots=True)
 class EmailService:
     email_client: AbstractEmailClient = field(default_factory=GMailClient)
-    bcc_emails: tuple[str, ...] = env_str_tuple_field("BCC_EMAILS")
+    bcc_emails: tuple[str, ...] = env_str_tuple_field("BCC_EMAILS")  # type: ignore[assignment]
 
     @classmethod
     def with_test_client(cls) -> "EmailService":
@@ -29,7 +29,7 @@ class EmailService:
     ) -> None:
         with TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / "certificate.png"
-            with open(path, "wb+") as fd:
+            with path.open("wb") as fd:
                 certificate.write(fd)
             self.email_client.send(
                 to=email,

@@ -1,25 +1,29 @@
-from collections import namedtuple
+from contextlib import suppress
 from datetime import datetime
+from datetime import timezone
 from os import urandom
 from typing import Callable
+from typing import NamedTuple
 
 from gspread.exceptions import WorksheetNotFound
 
 from lib.participants import GOOGLE_TIMESTAMP_FORMAT
-from lib.protocols import ProtoCell
 from lib.protocols import ProtoDocument
 from lib.protocols import ProtoSheet
 from lib.protocols import RowsT
 from lib.protocols import RowT
 from lib.sheets import open_spreadsheet
 
-cell = namedtuple("cell", ["value"])
+
+class Cell(NamedTuple):
+    value: str | None
+
 
 CreateDocumentT = Callable[[RowsT], ProtoDocument]
 CreateSheetT = Callable[[RowsT], ProtoSheet]
 
 # fmt: off
-TEST_SHEET_URL = "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"  # noqa: E501
+TEST_SHEET_URL = "https://docs.google.com/spreadsheets/d/1w1m46wDCy3yOyqgI8K0685oIfkMnAEvQyeJjkOMzLCo/edit"
 # fmt: on
 TITLE_CELL_NAMES: RowT = [
     "Timestamp",
@@ -41,7 +45,8 @@ def create_row(
     phone: str = "+79161234567",
     email: str = "email@yandex.ru",
 ) -> RowT:
-    timestamp = datetime.strftime(datetime.now(), GOOGLE_TIMESTAMP_FORMAT)
+    now = datetime.now(timezone.utc)
+    timestamp = datetime.strftime(now, GOOGLE_TIMESTAMP_FORMAT)
     return [
         timestamp,
         family,
@@ -71,7 +76,8 @@ def prepare_document(document: ProtoDocument, rows: RowsT) -> ProtoDocument:
 
 
 def create_google_document(rows: RowsT) -> ProtoDocument:
-    return prepare_document(open_spreadsheet(TEST_SHEET_URL), rows)  # type: ignore
+    sheet = open_spreadsheet(TEST_SHEET_URL)
+    return prepare_document(sheet, rows)  # type: ignore[arg-type]
 
 
 def create_stub_document(rows: RowsT) -> ProtoDocument:
@@ -99,11 +105,11 @@ class SpreadsheetStub:
     def row_values(self, row: int) -> RowT:
         return self._rows[row - 1]
 
-    def cell(self, row: int, col: int) -> ProtoCell:
-        try:
-            return cell(self._rows[row][col - 1])
-        except IndexError:
-            return cell(None)
+    def cell(self, row: int, col: int) -> Cell:
+        value = None
+        with suppress(IndexError):
+            value = self._rows[row - 1][col - 1]
+        return Cell(value)
 
     def update_cell(self, row: int, col: int, value: str) -> dict:
         col_index = col - 1
@@ -120,20 +126,20 @@ class SpreadsheetStub:
 class WorksheetStub:
     def __init__(self) -> None:
         self._title = ""
-        self._worksheets: list[ProtoSheet] = []
+        self._worksheets: list[SpreadsheetStub] = []
         self.add_worksheet("Form Responses 1", 100, 100)  # can not be deleted
 
     def update_title(self, title: str) -> None:
         self._title = title
 
-    def worksheets(self) -> list[ProtoSheet]:
+    def worksheets(self) -> list[SpreadsheetStub]:
         return self._worksheets
 
-    def worksheet(self, title: str) -> ProtoSheet:
+    def worksheet(self, title: str) -> SpreadsheetStub:
         for sheet in self._worksheets:
             if sheet.title == title:
                 return sheet
-        raise WorksheetNotFound()
+        raise WorksheetNotFound
 
     @property
     def title(self) -> str:
@@ -142,10 +148,10 @@ class WorksheetStub:
     def add_worksheet(
         self,
         title: str,
-        rows: int,  # pylint: disable=unused-argument
-        cols: int,  # pylint: disable=unused-argument
-        index: int | None = None,  # pylint: disable=unused-argument
-    ) -> ProtoSheet:
+        rows: int,  # noqa: ARG002
+        cols: int,  # noqa: ARG002
+        index: int | None = None,  # noqa: ARG002
+    ) -> SpreadsheetStub:
         sheet = SpreadsheetStub(title)
         self._worksheets.append(sheet)
         return sheet
@@ -156,10 +162,10 @@ class WorksheetStub:
             if _sheet.title == title:
                 self._worksheets.pop(i)
                 return
-        raise WorksheetNotFound()
+        raise WorksheetNotFound
 
 
-def create_stub_sheet(rows: RowsT) -> ProtoSheet:
+def create_stub_sheet(rows: RowsT) -> SpreadsheetStub:
     return prepare_sheet(SpreadsheetStub(), rows)
 
 

@@ -1,13 +1,13 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from collections.abc import Mapping
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from functools import cached_property
 from io import IOBase
 from pathlib import Path
 from typing import Any
-from typing import Mapping
-from typing import Sequence
 
 from yagmail import SMTP
 

@@ -1,3 +1,5 @@
+from collections.abc import Generator
+from collections.abc import Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from dataclasses import field
@@ -5,8 +7,6 @@ from functools import partial
 from pathlib import Path
 from sqlite3 import Connection
 from sqlite3 import connect
-from typing import Generator
-from typing import Sequence
 
 from lib.environment import env_str_field
 from lib.paths import DB_PATH
@@ -38,7 +38,7 @@ class DB:
         connection = self.get_connection()
         try:
             yield connection
-        except:  # noqa
+        except:
             connection.rollback()
             raise
         else:

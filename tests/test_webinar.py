@@ -1,5 +1,5 @@
+from collections.abc import Generator
 from datetime import date
-from typing import Generator
 from unittest.mock import patch
 
 import pytest
@@ -49,7 +49,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         bcc_emails=("abc@abc.com",),
     )
     webinar = Webinar(
-        document=document,  # type: ignore
+        document=document,  # type: ignore[arg-type]
         participants=participants,
         title=WebinarTitle.TEST,
         started_at=started_at,

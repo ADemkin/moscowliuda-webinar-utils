@@ -1,24 +1,26 @@
+from dataclasses import Field
 from dataclasses import field
 from functools import partial
 from os import environ
-from typing import Any
 from typing import Callable
 
 
-class EnvironmentVariableNotSetError(Exception): ...
+class EnvironmentVariableNotSetError(Exception):
+    def __init__(self, variable: str) -> None:
+        super().__init__(f"Environment variable {variable!r} is not set")
 
 
-def get_env_variable(
-    cast: Callable[[str], Any],
+def get_env_variable[T](
+    cast: Callable[[str | T], T],
     var_name: str,
-    default: Any | None = None,
-) -> Any:
+    default: T | None = None,
+) -> T:
     if (value := environ.get(var_name, default)) is not None:
         return cast(value)
-    raise EnvironmentVariableNotSetError(f"Environment variable {var_name!r} is not set")
+    raise EnvironmentVariableNotSetError(var_name)
 
 
-def env_str_field(var_name: str, default: str | None = None) -> str:
+def env_str_field(var_name: str, default: str | None = None) -> Field[str]:
     return field(
         default_factory=partial(
             get_env_variable,
@@ -29,7 +31,7 @@ def env_str_field(var_name: str, default: str | None = None) -> str:
     )
 
 
-def env_str_tuple_field(var_name: str) -> tuple[str, ...]:
+def env_str_tuple_field(var_name: str) -> Field[tuple[str, ...]]:
     def split_to_str(text: str) -> tuple[str, ...]:
         return tuple(str(e) for e in text.split(","))
 

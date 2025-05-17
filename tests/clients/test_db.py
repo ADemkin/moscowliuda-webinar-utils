@@ -49,10 +49,10 @@ def test_db_drop_failed_transaction(db: DB) -> None:
         with db.connection() as connection:
             query = "INSERT INTO test (name) VALUES (:name)"
             params = {"name": "test"}
-            raise Exception("Test exception")
-            connection.execute(query, params)  # type: ignore
+            raise ValueError("Test")
+            connection.execute(query, params)  # type: ignore[unreachable]
 
-    with pytest.raises(Exception, match="Test exception"):
+    with pytest.raises(ValueError, match="Test"):
         _raise_inside_transaction()
 
     with db.connection() as connection:

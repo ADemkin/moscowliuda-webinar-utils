@@ -15,7 +15,7 @@ from tests.common import create_stub_sheet
     params=[
         create_google_document,
         create_stub_document,
-    ]
+    ],
 )
 def create_document(request: Any) -> CreateDocumentT:
     return request.param

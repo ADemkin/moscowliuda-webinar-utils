@@ -1,9 +1,9 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from functools import cached_property
 from pathlib import Path
 from time import sleep
-from typing import Iterable
 from typing import Self
 
 from gspread import Spreadsheet
@@ -80,18 +80,19 @@ class Webinar:
     def send_emails_with_certificates(self) -> None:
         logger.info("sending emails")
         for i, row in enumerate(self.cert_sheet.get_all_values()):
-            fio, _, is_email_sent, email, message = row
-            logger.debug(f"{fio} taken")
+            full_name, _, is_email_sent, email, message = row
+            email_logger = logger.bind(full_name=full_name)
             if is_email_sent == "yes":
-                logger.debug(f"{fio} do not need to send email")
+                email_logger.info("email already sent")
                 continue
             certificate = self.certificate_service.generate(
                 title=self.title,
                 started_at=self.started_at,
                 finished_at=self.finished_at,
-                name=fio,
+                name=full_name,
             )
-            logger.info(f"{fio} sending email to {email}")
+            # logger.info(f"{full_name} sending email to {email}")
+            email_logger.debug("sending email")
             self.email_service.send_certificate_email(
                 title=self.title,
                 email=email,
@@ -100,7 +101,7 @@ class Webinar:
             )
             row_number = i + 1
             self.cert_sheet.update_cell(row_number, 3, "yes")
-            logger.info(f"{fio} done")
+            email_logger.info("email sent")
             sleep(3)
         logger.info("sending emails done")
 
