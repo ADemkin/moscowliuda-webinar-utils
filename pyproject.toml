@@ -106,6 +106,7 @@ ignore = [
     "RUF009",  # allow custom dataclass field functions
     "TRY003",  # allow long exception messages
     "EM102",  # allow exception f-string messagrs
+    "F401",  # allow empty imports in __init__.py
 ]
 
 [tool.ruff.lint.isort]
