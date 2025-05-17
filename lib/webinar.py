@@ -34,14 +34,36 @@ class Webinar:
     contact_service: ContactService
     email_service: EmailService
 
+    _email_sleep: int = 3
+    _sheet_sleep: int = 1
+
     @classmethod
-    def from_url(cls, url: str, test: bool = False) -> Self:
+    def from_url(cls, url: str) -> Self:
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
         title = WebinarTitle.from_text(sheet.get_webinar_title())
         started_at = sheet.get_started_at()
         finished_at = sheet.get_finished_at()
-        email_service = EmailService.with_test_client() if test else EmailService()
+        email_service = EmailService()
+        return cls(
+            document=sheet.document,
+            participants=sheet.participants,
+            title=title,
+            started_at=started_at,
+            finished_at=finished_at,
+            certificate_service=CertificateService(),
+            contact_service=ContactService(),
+            email_service=email_service,
+        )
+
+    @classmethod
+    def from_url_with_test_email_client(cls, url: str) -> Self:
+        logger.debug("creating webinar")
+        sheet = Sheet.from_url(url)
+        title = WebinarTitle.from_text(sheet.get_webinar_title())
+        started_at = sheet.get_started_at()
+        finished_at = sheet.get_finished_at()
+        email_service = EmailService.with_test_client()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
@@ -69,12 +91,12 @@ class Webinar:
     def certificates_sheet_fill(self) -> None:
         logger.info("filling certificates")
         for participant in self.participants:
-            logger.info(f"{participant.fio} taken")
+            participant_logger = logger.bind(full_name=participant.fio)
             message = f"Здравствуйте, {participant.name}! Благодарю вас за участие."
             row = [participant.fio, "-", "no", participant.email, message]
             self.cert_sheet.append_row(row)
-            logger.info(f"{participant.fio} done")
-            sleep(1)  # Quota limit is 60 rpm
+            participant_logger.info("done")
+            sleep(self._sheet_sleep)  # Quota limit is 60 rpm
         logger.info("filling certificates done")
 
     def send_emails_with_certificates(self) -> None:
@@ -91,7 +113,6 @@ class Webinar:
                 finished_at=self.finished_at,
                 name=full_name,
             )
-            # logger.info(f"{full_name} sending email to {email}")
             email_logger.debug("sending email")
             self.email_service.send_certificate_email(
                 title=self.title,
@@ -102,7 +123,7 @@ class Webinar:
             row_number = i + 1
             self.cert_sheet.update_cell(row_number, 3, "yes")
             email_logger.info("email sent")
-            sleep(3)
+            sleep(self._email_sleep)
         logger.info("sending emails done")
 
     def import_contacts(self) -> Path:

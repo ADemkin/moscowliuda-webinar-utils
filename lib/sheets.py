@@ -2,6 +2,7 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
+from http import HTTPStatus
 
 from gspread import Spreadsheet
 from gspread import Worksheet
@@ -12,12 +13,6 @@ from lib.const import NAME2MONTH
 from lib.logging import logger
 from lib.participants import Participant
 
-FIX_API_ERROR_MESSAGE = """You have to add permissions to spreadsheet.
-Fix APIError:
-
-Share > Get Link > Change > Anyone with link > Editor
-
-"""
 PARTICIPANTS = "Form Responses 1"
 
 RE_DATE = r"(\d{1,2})"
@@ -27,6 +22,16 @@ RE_TITLE = r"(.*)"
 SAME_MONTH_RE = re.compile(rf"{RE_DATE} - {RE_DATE} {RE_MONTH} {RE_YEAR} {RE_TITLE}")
 RE_DATE_MONTH = rf"{RE_DATE} {RE_MONTH}"
 DIFF_MONTH_RE = re.compile(rf"{RE_DATE_MONTH} - {RE_DATE_MONTH} {RE_YEAR} {RE_TITLE}")
+
+
+class ApiPermissionError(Exception):
+    def __init__(self) -> None:
+        message = """You have to add permissions to spreadsheet.
+Fix APIError:
+
+Share > Get Link > Change > Anyone with link > Editor
+"""
+        super().__init__(message)
 
 
 class InvalidDocumentTitleError(Exception):
@@ -79,10 +84,11 @@ def get_participants_from_sheet(
     # TODO: по первому столбцу определять какой формат
     for row in sheet.get_all_values()[first_row:]:
         try:
-            participants.append(Participant.from_row_v2(row))
-        except Exception as err:
+            participant = Participant.from_row_v2(row)
+        except Exception as err:  # noqa: BLE001
             logger.error(err)
             continue
+        participants.append(participant)
     return participants
 
 
@@ -139,9 +145,9 @@ def ensure_permissions(document: Spreadsheet) -> None:
     try:
         document.worksheets()
     except APIError as err:
-        if err.code == 403:
-            raise RuntimeError(FIX_API_ERROR_MESSAGE) from err
-        raise err
+        if err.code == HTTPStatus.FORBIDDEN:
+            raise ApiPermissionError from err
+        raise
 
 
 def open_spreadsheet(url: str) -> Spreadsheet:

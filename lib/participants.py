@@ -1,8 +1,11 @@
-from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from lib.protocols import RowT
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"
 
@@ -13,11 +16,11 @@ def get_datetime_from_sheet_timestamp(sheet_timestamp: str) -> datetime | None:
     except ValueError:
         pass
     try:
-        return datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)
+        return datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)  # noqa: DTZ007
     except ValueError:
         pass
     try:
-        return datetime.strptime(
+        return datetime.strptime(  # noqa: DTZ007
             sheet_timestamp,
             GOOGLE_TIMESTAMP_FORMAT.replace("-", "/"),
         )

@@ -1,4 +1,3 @@
-from dataclasses import Field
 from dataclasses import field
 from functools import partial
 from os import environ
@@ -20,7 +19,7 @@ def get_env_variable[T](
     raise EnvironmentVariableNotSetError(var_name)
 
 
-def env_str_field(var_name: str, default: str | None = None) -> Field[str]:
+def env_str_field(var_name: str, default: str | None = None) -> str:
     return field(
         default_factory=partial(
             get_env_variable,
@@ -31,7 +30,7 @@ def env_str_field(var_name: str, default: str | None = None) -> Field[str]:
     )
 
 
-def env_str_tuple_field(var_name: str) -> Field[tuple[str, ...]]:
+def env_str_tuple_field(var_name: str) -> tuple[str, ...]:
     def split_to_str(text: str) -> tuple[str, ...]:
         return tuple(str(e) for e in text.split(","))
 

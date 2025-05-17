@@ -39,7 +39,8 @@ def send(url: str) -> None:
     if click.confirm("Open mailing sheet?", default=True):
         click.launch(url)
     if click.confirm("Test emails?", default=True):
-        Webinar.from_url(url, test=True).send_emails_with_certificates()
+        webinar = Webinar.from_url_with_test_email_client(url)
+        webinar.send_emails_with_certificates()
     if click.confirm(click.style("Send emails?", fg="red"), abort=True):
         Webinar.from_url(url).send_emails_with_certificates()
         click.echo("Emails sent")
