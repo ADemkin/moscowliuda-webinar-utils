@@ -1,4 +1,3 @@
-# pylint: disable=no-self-use,unused-argument,too-few-public-methods
 from typing import Any
 from typing import Protocol
 

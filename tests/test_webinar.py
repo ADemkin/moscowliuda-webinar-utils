@@ -94,10 +94,10 @@ def test_webinar_cen_be_created_from_url(
     monkeypatch: pytest.MonkeyPatch,
     create_document: CreateDocumentT,
 ) -> None:
-    monkeypatch.setenv("BCC_EMAILS", "a,b")  # not checked
+    monkeypatch.setenv("BCC_EMAILS", "a,b")
     rows = [
         create_row("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
         create_row("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
     ]
     create_document(rows)
-    Webinar.from_url(TEST_SHEET_URL, test=True)
+    Webinar.from_url_with_test_email_client(TEST_SHEET_URL)

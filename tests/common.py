@@ -58,36 +58,6 @@ def create_row(
     ]
 
 
-def prepare_sheet(sheet: ProtoSheet, rows: RowsT) -> ProtoSheet:
-    sheet.clear()
-    sheet.append_row(TITLE_CELL_NAMES)
-    sheet.append_rows(rows)
-    return sheet
-
-
-def prepare_document(document: ProtoDocument, rows: RowsT) -> ProtoDocument:
-    document.update_title(DEFAULT_TITLE)
-    for sheet in document.worksheets():
-        if sheet.title != "Form Responses 1":
-            document.del_worksheet(sheet)
-            continue
-        prepare_sheet(sheet, rows)
-    return document
-
-
-def create_google_document(rows: RowsT) -> ProtoDocument:
-    sheet = open_spreadsheet(TEST_SHEET_URL)
-    return prepare_document(sheet, rows)  # type: ignore[arg-type]
-
-
-def create_stub_document(rows: RowsT) -> ProtoDocument:
-    return prepare_document(WorksheetStub(), rows)
-
-
-def create_google_sheet(rows: RowsT) -> ProtoSheet:
-    return create_google_document(rows).worksheet("Form Responses 1")
-
-
 class SpreadsheetStub:
     def __init__(self, title: str = "title") -> None:
         self._rows: RowsT = []
@@ -163,6 +133,36 @@ class WorksheetStub:
                 self._worksheets.pop(i)
                 return
         raise WorksheetNotFound
+
+
+def prepare_sheet(sheet: ProtoSheet, rows: RowsT) -> ProtoSheet:
+    sheet.clear()
+    sheet.append_row(TITLE_CELL_NAMES)
+    sheet.append_rows(rows)
+    return sheet
+
+
+def prepare_document(document: ProtoDocument, rows: RowsT) -> ProtoDocument:
+    document.update_title(DEFAULT_TITLE)
+    for sheet in document.worksheets():
+        if sheet.title != "Form Responses 1":
+            document.del_worksheet(sheet)
+            continue
+        prepare_sheet(sheet, rows)
+    return document
+
+
+def create_google_document(rows: RowsT) -> ProtoDocument:
+    sheet = open_spreadsheet(TEST_SHEET_URL)
+    return prepare_document(sheet, rows)  # type: ignore[arg-type]
+
+
+def create_stub_document(rows: RowsT) -> WorksheetStub:
+    return prepare_document(WorksheetStub(), rows)
+
+
+def create_google_sheet(rows: RowsT) -> ProtoSheet:
+    return create_google_document(rows).worksheet("Form Responses 1")
 
 
 def create_stub_sheet(rows: RowsT) -> SpreadsheetStub:
