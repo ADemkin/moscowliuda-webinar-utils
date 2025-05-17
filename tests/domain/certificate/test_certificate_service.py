@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
 from typing import IO
@@ -51,7 +50,6 @@ def test_certificate_service_generates_certificate(
     assert certificate.finished_at == finished_at
 
 
-@dataclass
 class CertificateTextSerializer:
     def serialize(
         self,

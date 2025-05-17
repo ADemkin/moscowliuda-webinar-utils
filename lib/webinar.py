@@ -127,7 +127,7 @@ class Webinar:
         logger.info("sending emails done")
 
     def import_contacts(self) -> Path:
-        group = f"{self.title.short()}{self.finished_at.isoformat()}"
+        group = f"{self.title.short()} {self.finished_at.isoformat()}"
         contacts_file = self.contact_service.save_accounts_to_file(
             accounts=list(self.participants),
             group=group,

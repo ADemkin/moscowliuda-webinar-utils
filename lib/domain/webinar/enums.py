@@ -17,8 +17,16 @@ class WebinarTitle(str, Enum):
 
     def short(self) -> str:
         return {
-            WebinarTitle.GRAMMAR: "Г",
-            WebinarTitle.SPEECH: "П",
-            WebinarTitle.TEST: "Т",
-            WebinarTitle.PHRASE: "Ф",
+            WebinarTitle.GRAMMAR: "грамматика",
+            WebinarTitle.SPEECH: "запуск",
+            WebinarTitle.TEST: "тест",
+            WebinarTitle.PHRASE: "фраза",
+        }[self]
+
+    def long(self) -> str:
+        return {
+            WebinarTitle.GRAMMAR: "Формирование базовых\nграмматических представлений",
+            WebinarTitle.SPEECH: "Практика запуска речи",
+            WebinarTitle.PHRASE: "Приёмы формирования\nфразовой речи",
+            WebinarTitle.TEST: "Тестовый вебинар",
         }[self]

@@ -78,7 +78,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
 
     # create vcards
     webinar.import_contacts()
-    group_expected = f"Т{finished_at.isoformat()}"
+    group_expected = f"тест {finished_at.isoformat()}"
     path_expected = contact_tmp_path / f"{group_expected}.vcf"
     assert path_expected.exists()
     content = path_expected.read_text()
