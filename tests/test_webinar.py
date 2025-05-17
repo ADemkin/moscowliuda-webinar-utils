@@ -15,7 +15,7 @@ from tests.common import CreateDocumentT
 from tests.common import create_row
 
 
-def test_webinar_integration(  # pylint: disable=too-many-locals
+def test_webinar_integration(
     create_document: CreateDocumentT,
     tmp_path_factory,
 ) -> None:
