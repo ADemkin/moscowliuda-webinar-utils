@@ -2,7 +2,9 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
+from functools import lru_cache
 from http import HTTPStatus
+from typing import Self
 
 from gspread import Spreadsheet
 from gspread import Worksheet
@@ -52,7 +54,7 @@ class Sheet:
     document: Spreadsheet
 
     @classmethod
-    def from_url(cls, url: str) -> "Sheet":
+    def from_url(cls, url: str) -> Self:
         document = open_spreadsheet(url)
         participants = get_participants_from_sheet(
             document.worksheet(PARTICIPANTS),
@@ -93,6 +95,7 @@ def get_participants_from_sheet(
     return participants
 
 
+@lru_cache
 def _split_title_to_dates_and_title(title: str) -> tuple[date, date, str]:
     """Достать из названия документа даты проведения и название вебинара.
 

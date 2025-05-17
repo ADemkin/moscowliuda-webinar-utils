@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
+from typing import Self
 
 from lib.protocols import RowT
 
@@ -39,7 +40,7 @@ class Participant:
     instagram: str = ""
 
     @classmethod
-    def from_row(cls, row: RowT) -> "Participant":
+    def from_row(cls, row: RowT) -> Self:
         row_strip: Sequence[str] = [str(i).strip() for i in row]
         return cls(
             timestamp=get_datetime_from_sheet_timestamp(row_strip[0]),
@@ -52,7 +53,7 @@ class Participant:
         )
 
     @classmethod
-    def from_row_v2(cls, row: RowT) -> "Participant":
+    def from_row_v2(cls, row: RowT) -> Self:
         row_strip: Sequence[str] = [str(i).strip() for i in row]
         return cls(
             timestamp=get_datetime_from_sheet_timestamp(row_strip[0]),
