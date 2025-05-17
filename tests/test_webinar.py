@@ -1,6 +1,4 @@
-from collections.abc import Generator
 from datetime import date
-from unittest.mock import patch
 
 import pytest
 
@@ -17,13 +15,6 @@ from tests.common import CreateDocumentT
 from tests.common import create_row
 
 
-@pytest.fixture
-def _no_sleep() -> Generator[None, None, None]:
-    with patch("lib.webinar.sleep"):
-        yield
-
-
-@pytest.mark.usefixtures("_no_sleep")
 def test_webinar_integration(  # pylint: disable=too-many-locals
     create_document: CreateDocumentT,
     tmp_path_factory,
@@ -57,6 +48,8 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
         certificate_service=CertificateService(),
         contact_service=contact_service,
         email_service=email_service,
+        email_sleep=0,
+        sheet_sleep=0,
     )
     # prepare certificates
     webinar.certificates_sheet_fill()
@@ -65,6 +58,7 @@ def test_webinar_integration(  # pylint: disable=too-many-locals
     webinar.send_emails_with_certificates()
     for participant in participants:
         assert email_client.is_sent_to(participant.email)
+    assert email_client.total_send_count == len(rows)
 
     # trigger email send again will not send them
     webinar.send_emails_with_certificates()

@@ -32,8 +32,8 @@ class Webinar:
     contact_service: ContactService
     email_service: EmailService
 
-    _email_sleep: int = 3
-    _sheet_sleep: int = 1
+    email_sleep: int = 3
+    sheet_sleep: int = 1
 
     @classmethod
     def from_url(cls, url: str) -> Self:
@@ -88,7 +88,7 @@ class Webinar:
             row = [participant.fio, "-", "no", participant.email, message]
             self.cert_sheet.append_row(row)
             participant_logger.info("done")
-            sleep(self._sheet_sleep)  # Quota limit is 60 rpm
+            sleep(self.sheet_sleep)  # Quota limit is 60 rpm
         logger.info("filling certificates done")
 
     def send_emails_with_certificates(self) -> None:
@@ -115,7 +115,7 @@ class Webinar:
             row_number = i + 1
             self.cert_sheet.update_cell(row_number, 3, "yes")
             email_logger.info("email sent")
-            sleep(self._email_sleep)
+            sleep(self.email_sleep)
         logger.info("sending emails done")
 
     def import_contacts(self) -> Path:
