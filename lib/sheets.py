@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import date
 from functools import lru_cache
 from http import HTTPStatus
+from textwrap import dedent
 from typing import Self
 
 from gspread import Spreadsheet
@@ -22,11 +23,13 @@ PARTICIPANTS = "Form Responses 1"
 
 class ApiPermissionError(Exception):
     def __init__(self) -> None:
-        message = """You have to add permissions to spreadsheet.
-Fix APIError:
+        message = dedent(
+            """You have to add permissions to spreadsheet.
+            Fix APIError:
 
-Share > Get Link > Change > Anyone with link > Editor
-"""
+            Share > Get Link > Change > Anyone with link > Editor
+            """
+        )
         super().__init__(message)
 
 

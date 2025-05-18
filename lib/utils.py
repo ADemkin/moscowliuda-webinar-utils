@@ -1,5 +1,6 @@
 import re
 from datetime import date
+from textwrap import dedent
 
 from lib.const import MONTH2NAME
 from lib.const import NAME2MONTH
@@ -39,11 +40,13 @@ def date_range_to_text(started_at: date, finished_at: date) -> str:
 
 class InvalidTitleError(Exception):
     def __init__(self, title: str) -> None:
-        message = f"""Неверный формат названия документа: {title!r}
-Ожидается формат:
-19-20 Февраля 2025 Формирование базовых грамматических представлений\n
-31 Мая - 2 Июня 2025 Формирование базовых грамматических представлений\n
-        """
+        message = dedent(
+            f"""Неверный формат названия документа: {title!r}
+            Ожидается формат:
+            19-20 Февраля 2025 Формирование базовых грамматических представлений\n
+            31 Мая - 2 Июня 2025 Формирование базовых грамматических представлений\n
+            """
+        )
         super().__init__(message)
 
 
