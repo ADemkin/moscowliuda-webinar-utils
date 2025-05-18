@@ -1,12 +1,12 @@
 from datetime import date
 from io import BytesIO
-from typing import IO
 
 import pytest
 from PIL import Image
 
 from lib.domain.certificate import Certificate
 from lib.domain.certificate import CertificateService
+from lib.domain.certificate import CertificateTextSerializer
 from lib.domain.webinar.enums import WebinarTitle
 
 
@@ -48,17 +48,6 @@ def test_certificate_service_generates_certificate(
     assert certificate.name == name
     assert certificate.started_at == started_at
     assert certificate.finished_at == finished_at
-
-
-class CertificateTextSerializer:
-    def serialize(
-        self,
-        buffer: IO[bytes],
-        title: str,
-        name: str,
-        date_text: str,
-    ) -> None:
-        buffer.write(f"{title} {name} {date_text}".encode())
 
 
 @pytest.mark.parametrize(
