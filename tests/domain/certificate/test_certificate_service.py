@@ -8,6 +8,7 @@ from lib.domain.certificate import Certificate
 from lib.domain.certificate import CertificateService
 from lib.domain.certificate import CertificateTextSerializer
 from lib.domain.webinar.enums import WebinarTitle
+from lib.utils import date_range_to_text
 
 
 @pytest.mark.parametrize(
@@ -71,7 +72,7 @@ def test_certificate_service_generates_certificate(
         "Ким Алла Кимовна",
     ],
 )
-def test_certificate_contains_correct_name(
+def test_certificate_contains_correct_text(
     started_at: date,
     finished_at: date,
     title: WebinarTitle,
@@ -86,8 +87,14 @@ def test_certificate_contains_correct_name(
     )
     buffer = BytesIO()
     certificate.write(buffer)
-    text = buffer.getvalue().decode("utf-8").replace("\n", " ")
+    text = buffer.getvalue().decode("utf-8")
     assert name in text
+    assert title.long() in text
+    formatted_date_range = date_range_to_text(
+        started_at=started_at,
+        finished_at=finished_at,
+    )
+    assert formatted_date_range in text
 
 
 def test_serialized_certificate_can_be_decoded_as_png_image() -> None:
