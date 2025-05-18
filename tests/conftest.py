@@ -22,6 +22,7 @@ def pytest_addoption(parser: Any) -> None:
         create_google_document,
         create_stub_document,
     ],
+    ids=["google", "stub"],
 )
 def create_document(request: Any) -> CreateDocumentT:
     if request.param == create_google_document and not request.config.getoption("--live"):
