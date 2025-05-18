@@ -15,16 +15,9 @@ from lib.const import NAME2MONTH
 from lib.domain.webinar.enums import WebinarTitle
 from lib.logging import logger
 from lib.participants import Participant
+from lib.utils import text_to_date_range_and_title
 
 PARTICIPANTS = "Form Responses 1"
-
-RE_DATE = r"(\d{1,2})"
-RE_MONTH = r"(\w+)"
-RE_YEAR = r"(\d{4})"
-RE_TITLE = r"(.*)"
-SAME_MONTH_RE = re.compile(rf"{RE_DATE} - {RE_DATE} {RE_MONTH} {RE_YEAR} {RE_TITLE}")
-RE_DATE_MONTH = rf"{RE_DATE} {RE_MONTH}"
-DIFF_MONTH_RE = re.compile(rf"{RE_DATE_MONTH} - {RE_DATE_MONTH} {RE_YEAR} {RE_TITLE}")
 
 
 class ApiPermissionError(Exception):
@@ -34,16 +27,6 @@ Fix APIError:
 
 Share > Get Link > Change > Anyone with link > Editor
 """
-        super().__init__(message)
-
-
-class InvalidDocumentTitleError(Exception):
-    def __init__(self, title: str) -> None:
-        message = f"""Невереный формат названия документа: {title!r}
-Ожидается формат:
-19-20 Февраля 2025 Формирование базовых грамматических представлений\n
-31 Мая - 2 Июня 2025 Формирование базовых грамматических представлений\n
-        """
         super().__init__(message)
 
 
@@ -103,46 +86,16 @@ def _split_title_to_dates_and_title(title: str) -> tuple[date, date, str]:
     19 - 20 Февраля 2025 Формирование базовых грамматических представлений (Responses)
     31 Мая - 2 Июня 2025 Формирование базовых грамматических представлений (Responses)
 
+    Рейзит:
+    - InvalidTitleError если не получилось распарсить название документа
+
     Возвращает:
     - дату начала
     - дату окончания
     - название вебинара строкой
     """
-
-    def name2month(name: str) -> int:
-        try:
-            return NAME2MONTH[name.lower()]
-        except KeyError as err:
-            raise InvalidDocumentTitleError(title) from err
-
     title = title.removesuffix(" (Responses)")
-    if match := SAME_MONTH_RE.match(title):
-        start_day, end_day, month, year, title = match.groups()
-        started_at = date(
-            year=int(year),
-            month=name2month(month),
-            day=int(start_day),
-        )
-        finished_at = date(
-            year=int(year),
-            month=name2month(month),
-            day=int(end_day),
-        )
-        return started_at, finished_at, title
-    if match := DIFF_MONTH_RE.match(title):  # type: ignore[unreachable]
-        start_day, start_month, end_day, end_month, year, title = match.groups()
-        started_at = date(
-            year=int(year),
-            month=name2month(start_month),
-            day=int(start_day),
-        )
-        finished_at = date(
-            year=int(year),
-            month=name2month(end_month),
-            day=int(end_day),
-        )
-        return started_at, finished_at, title
-    raise InvalidDocumentTitleError(title)
+    return text_to_date_range_and_title(title)
 
 
 def ensure_permissions(document: Spreadsheet) -> None:

@@ -2,8 +2,8 @@ from datetime import date
 
 import pytest
 
-from lib.sheets import InvalidDocumentTitleError
 from lib.sheets import _split_title_to_dates_and_title
+from lib.utils import InvalidTitleError
 
 
 @pytest.mark.parametrize(
@@ -50,5 +50,6 @@ def test_split_title_to_dates_and_title(
     ],
 )
 def test_split_title_to_dates_and_title_raises_if_unknown_format(title: str) -> None:
-    with pytest.raises(InvalidDocumentTitleError):
+    with pytest.raises(InvalidTitleError, match=r"Неверный формат .*") as err:
         _split_title_to_dates_and_title(title)
+    assert title in str(err.value)
