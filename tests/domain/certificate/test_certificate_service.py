@@ -72,7 +72,7 @@ def test_certificate_service_generates_certificate(
         "Ким Алла Кимовна",
     ],
 )
-def test_certificate_contains_correct_text(
+def test_serialized_certificate_contains_correct_text(
     started_at: date,
     finished_at: date,
     title: WebinarTitle,
@@ -95,6 +95,9 @@ def test_certificate_contains_correct_text(
         finished_at=finished_at,
     )
     assert formatted_date_range in text
+    assert str(started_at.day) in text
+    assert str(finished_at.day) in text
+    assert str(finished_at.year) in text
 
 
 def test_serialized_certificate_can_be_decoded_as_png_image() -> None:
