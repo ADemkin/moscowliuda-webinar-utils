@@ -4,9 +4,9 @@ from datetime import date
 from lib.const import MONTH2NAME
 from lib.const import NAME2MONTH
 
-__ALL__ = [
-    "date_range_to_text",
+__all__ = [
     "InvalidTitleError",
+    "date_range_to_text",
     "text_to_date_range_and_title",
 ]
 
@@ -33,7 +33,7 @@ def date_range_to_text(started_at: date, finished_at: date) -> str:
     else:
         start_month = MONTH2NAME[started_at.month]
         text += f"{start_day} {start_month} - {finish_day} {finish_month}"
-    text += "\n{finished_at.year} г."
+    text += f"\n{finished_at.year} г."
     return text
 
 
