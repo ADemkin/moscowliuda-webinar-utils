@@ -1,3 +1,4 @@
+from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -14,21 +15,17 @@ GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"
 
 
 def get_datetime_from_sheet_timestamp(sheet_timestamp: str) -> datetime | None:
-    try:
-        return datetime.fromisoformat(sheet_timestamp)
-    except ValueError:
-        pass
-    try:
-        return datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)  # noqa: DTZ007
-    except ValueError:
-        pass
-    try:
-        return datetime.strptime(  # noqa: DTZ007
+    dt = None
+    with suppress(ValueError):
+        dt = datetime.fromisoformat(sheet_timestamp)
+    with suppress(ValueError):
+        dt = dt or datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)  # noqa: DTZ007
+    with suppress(ValueError):
+        dt = dt or datetime.strptime(  # noqa: DTZ007
             sheet_timestamp,
             GOOGLE_TIMESTAMP_FORMAT.replace("-", "/"),
         )
-    except ValueError:
-        return None
+    return dt
 
 
 @dataclass(slots=True, frozen=True)
