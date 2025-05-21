@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from typing import Self
 from dataclasses import field
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Self
 
 from lib.clients.email import AbstractEmailClient
 from lib.clients.email import GMailClient

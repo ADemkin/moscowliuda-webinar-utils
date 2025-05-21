@@ -96,4 +96,5 @@ def test_webinar_cen_be_created_from_url(
         create_row_v2("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
     ]
     create_document(rows)
-    Webinar.from_url(TEST_SHEET_URL)
+    webinar = Webinar.from_url(TEST_SHEET_URL)
+    webinar.with_test_client()

@@ -1,6 +1,7 @@
 import click
 from dotenv import load_dotenv
 
+from lib.domain.email.service import EmailService
 from lib.webinar import Webinar
 
 
@@ -24,8 +25,12 @@ def fill(url: str) -> None:
 
 @cli.command()
 @click.argument("url")
-def send(url: str) -> None:
-    Webinar.from_url(url).send_emails_with_certificates()
+@click.option("--test", is_flag=True, default=False)
+def send(url: str, test: bool) -> None:  # noqa: FBT001
+    webinar = Webinar.from_url(url)
+    if test:
+        webinar = webinar.with_test_client()
+    webinar.from_url(url).send_emails_with_certificates()
 
 
 if __name__ == "__main__":

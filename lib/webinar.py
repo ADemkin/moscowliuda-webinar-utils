@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
+from dataclasses import replace
 from datetime import date
 from functools import cached_property
 from itertools import count
@@ -35,6 +36,7 @@ class Webinar:
 
     email_sleep: int = 3
     sheet_sleep: int = 1
+    testing: bool = False
 
     @classmethod
     def from_url(cls, url: str) -> Self:
@@ -49,6 +51,14 @@ class Webinar:
             certificate_service=CertificateService(),
             contact_service=ContactService(),
             email_service=EmailService(),
+        )
+
+    def with_test_client(self) -> Self:
+        return replace(
+            self,
+            email_service=EmailService.with_test_client(),
+            testing=True,
+            email_sleep=0,
         )
 
     @cached_property
@@ -95,7 +105,8 @@ class Webinar:
                 message=message,
                 certificate=certificate,
             )
-            self.cert_sheet.update_cell(row_number, 2, "yes")
+            if not self.testing:
+                self.cert_sheet.update_cell(row_number, 2, "yes")
             email_logger.info("email sent")
             sleep(self.email_sleep)
         logger.info("sending emails done")
