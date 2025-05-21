@@ -11,7 +11,7 @@ mypy:
 	$(RUN) mypy $(PATHS)
 
 mypy-strict:
-	$(RUN) mypy --strict --install-types $(PATHS)
+	$(RUN) mypy --strict $(PATHS)
 
 ruff-lint:
 	$(RUN) ruff check  $(PATHS)
