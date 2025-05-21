@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 from typing import Self
 
 from lib.types import RowT
-from lib.utils import get_datetime_from_sheet_timestamp
 from lib.utils import normalize_email
 from lib.utils import normalize_phone_number
 
@@ -14,7 +13,6 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True, frozen=True)
 class Participant:
-    timestamp: datetime | None
     family_name: str
     name: str
     father_name: str
@@ -25,7 +23,6 @@ class Participant:
     def from_row_v2(cls, row: RowT) -> Self:
         row_strip: Sequence[str] = [str(i).strip() for i in row]
         return cls(
-            timestamp=get_datetime_from_sheet_timestamp(row_strip[0]),
             email=normalize_email(row_strip[1]),
             family_name=row_strip[2],
             name=row_strip[3],

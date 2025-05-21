@@ -1,5 +1,4 @@
 from contextlib import suppress
-from datetime import datetime
 from datetime import timezone
 from os import urandom
 from typing import Callable
@@ -12,7 +11,6 @@ from lib.types import ProtoDocument
 from lib.types import ProtoSheet
 from lib.types import RowsT
 from lib.types import RowT
-from lib.utils import GOOGLE_TIMESTAMP_FORMAT
 
 
 class Cell(NamedTuple):
@@ -45,10 +43,8 @@ def create_row_v2(
     phone: str = "+79161234567",
     email: str = "email@yandex.ru",
 ) -> RowT:
-    now = datetime.now(timezone.utc)
-    timestamp = datetime.strftime(now, GOOGLE_TIMESTAMP_FORMAT)
     return [
-        timestamp,
+        "not-used-timestamp",
         email,
         family,
         name,

@@ -1,7 +1,6 @@
 import re
 from contextlib import suppress
 from datetime import date
-from datetime import datetime
 from textwrap import dedent
 
 from lib.const import MONTH2NAME
@@ -19,8 +18,6 @@ _RE_SAME_MONTH = re.compile(
 _RE_DIFFERENT_MONTH = re.compile(
     rf"{_RE_DAY_MONTH} - {_RE_DAY_MONTH} {_RE_YEAR} {_RE_TITLE}",
 )
-
-GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"
 
 
 def date_range_to_text(started_at: date, finished_at: date) -> str:
@@ -94,17 +91,3 @@ def normalize_phone_number(number: str) -> str:
 
 def normalize_email(email: str) -> str:
     return email.lower()
-
-
-def get_datetime_from_sheet_timestamp(sheet_timestamp: str) -> datetime | None:
-    dt = None
-    with suppress(ValueError):
-        dt = datetime.fromisoformat(sheet_timestamp)
-    with suppress(ValueError):
-        dt = dt or datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)  # noqa: DTZ007
-    with suppress(ValueError):
-        dt = dt or datetime.strptime(  # noqa: DTZ007
-            sheet_timestamp,
-            GOOGLE_TIMESTAMP_FORMAT.replace("-", "/"),
-        )
-    return dt

@@ -18,7 +18,6 @@ def randint() -> int:
 
 def make_participant() -> Participant:
     return Participant(
-        timestamp=None,
         family_name=randstr(),
         name=randstr(),
         father_name=randstr(),
