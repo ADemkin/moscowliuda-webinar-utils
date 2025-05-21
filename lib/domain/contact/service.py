@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterable
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
@@ -25,11 +25,10 @@ class ContactService:
 
     def save_accounts_to_file(
         self,
-        accounts: Sequence[Participant],
+        accounts: Iterable[Participant],
         group: str,
     ) -> Path:
-        logger.debug(f"Saving {len(accounts)} accounts to file")
         vcards = [self.create_vcard(account, group) for account in accounts]
         path = self.vcard_repo.save_vcards_to_file(vcards, group)
-        logger.debug(f"Saved accounts to {path}")
+        logger.debug("vcards saved", path=path)
         return path

@@ -66,10 +66,10 @@ class SpreadsheetStub:
         self._rows = []
 
     def append_row(self, row: RowT) -> None:
-        self._rows.append(row)
+        self._rows.append(list(row))
 
     def append_rows(self, rows: RowsT) -> None:
-        self._rows.extend(rows)
+        self._rows.extend(list(r) for r in rows)
 
     def row_values(self, row: int) -> RowT:
         return self._rows[row - 1]

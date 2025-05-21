@@ -2,6 +2,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from functools import cached_property
+from itertools import count
 from pathlib import Path
 from time import sleep
 from typing import Self
@@ -69,7 +70,7 @@ class Webinar:
 
     @cached_property
     def cert_sheet(self) -> Worksheet:
-        headers = ["fio", "[deprecated]", "is_sent", "email", "custom_text"]
+        headers = ("fio", "is_sent", "email", "custom_text")
         try:
             return self.document.worksheet(CERTIFICATES)
         except WorksheetNotFound:
@@ -82,19 +83,18 @@ class Webinar:
 
     def certificates_sheet_fill(self) -> None:
         logger.info("filling certificates")
+        rows = []
         for participant in self.participants:
-            participant_logger = logger.bind(full_name=participant.fio)
             message = f"Здравствуйте, {participant.name}! Благодарю вас за участие."
-            row = [participant.fio, "-", "no", participant.email, message]
-            self.cert_sheet.append_row(row)
-            participant_logger.info("certificate sheet filled")
-            sleep(self.sheet_sleep)  # Quota limit is 60 rpm
+            row = (participant.fio, "no", participant.email, message)
+            rows.append(row)
+        self.cert_sheet.append_rows(rows)
         logger.info("filling certificates done")
 
     def send_emails_with_certificates(self) -> None:
         logger.info("sending emails")
-        for i, row in enumerate(self.cert_sheet.get_all_values()):
-            full_name, _, is_email_sent, email, message = row
+        for row_number, row in zip(count(1), self.cert_sheet.get_all_values()):
+            full_name, is_email_sent, email, message = row
             email_logger = logger.bind(full_name=full_name)
             if is_email_sent == "yes":
                 email_logger.info("email already sent")
@@ -112,8 +112,7 @@ class Webinar:
                 message=message,
                 certificate=certificate,
             )
-            row_number = i + 1
-            self.cert_sheet.update_cell(row_number, 3, "yes")
+            self.cert_sheet.update_cell(row_number, 2, "yes")
             email_logger.info("email sent")
             sleep(self.email_sleep)
         logger.info("sending emails done")
