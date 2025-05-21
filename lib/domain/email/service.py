@@ -38,3 +38,16 @@ class EmailService:
                 contents=message,
                 attachments=[path],
             )
+
+    def send_email(
+        self,
+        title: str,
+        email: str,
+        message: str,
+    ) -> None:
+        self.email_client.send(
+            to=email,
+            bcc=self.bcc_emails,
+            subject=title,
+            contents=message,
+        )
