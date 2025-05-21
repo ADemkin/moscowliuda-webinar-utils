@@ -20,7 +20,6 @@ class Participant:
     father_name: str
     phone: str
     email: str
-    instagram: str = ""
 
     @classmethod
     def from_row_v2(cls, row: RowT) -> Self:

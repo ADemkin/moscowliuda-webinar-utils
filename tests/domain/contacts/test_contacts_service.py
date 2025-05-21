@@ -24,7 +24,6 @@ def make_participant() -> Participant:
         father_name=randstr(),
         phone=randstr(),
         email=randstr(),
-        instagram=randstr(),
     )
 
 
