@@ -1,18 +1,6 @@
 import pytest
 
-from lib.participants import normalize_instagram_account
-from lib.participants import normalize_phone_number
-
-
-@pytest.mark.parametrize(
-    ("account", "expected"),
-    [
-        ("@moscowliuda", "moscowliuda"),
-        ("_antondemkin_", "_antondemkin_"),
-    ],
-)
-def test_normalize_instagram_account(account: str, expected: str) -> None:
-    assert normalize_instagram_account(account) == expected
+from lib.utils import normalize_phone_number
 
 
 @pytest.mark.parametrize(

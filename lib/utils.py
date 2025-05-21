@@ -85,3 +85,14 @@ def text_to_date_range_and_title(text: str) -> tuple[date, date, str]:
     else:
         raise InvalidTitleError(text)
     return started_at, finished_at, title
+
+
+def normalize_phone_number(number: str) -> str:
+    number = "".join(c for c in number if c.isdigit())
+    if number.startswith("8"):
+        number = f"7{number[1:]}"
+    return f"+{number}" if number else ""
+
+
+def normalize_email(email: str) -> str:
+    return email.lower()

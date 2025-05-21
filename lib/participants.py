@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 from typing import Self
 
 from lib.protocols import RowT
+from lib.utils import normalize_email
+from lib.utils import normalize_phone_number
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -54,19 +56,3 @@ class Participant:
     @property
     def fio(self) -> str:
         return f"{self.family_name} {self.name} {self.father_name}"
-
-
-def normalize_instagram_account(account: str) -> str:
-    return account.lstrip("@")
-
-
-def normalize_phone_number(number: str) -> str:
-    number = number.lstrip("+")
-    number = "".join(c for c in number if c.isdigit())
-    if number.startswith("8"):
-        number = f"7{number[1:]}"
-    return f"+{number}" if number else ""
-
-
-def normalize_email(email: str) -> str:
-    return email.lower()
