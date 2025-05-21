@@ -1,31 +1,15 @@
-from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
 from typing import Self
 
 from lib.protocols import RowT
+from lib.utils import get_datetime_from_sheet_timestamp
 from lib.utils import normalize_email
 from lib.utils import normalize_phone_number
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
-GOOGLE_TIMESTAMP_FORMAT = "%d-%m-%Y %H:%M:%S"
-
-
-def get_datetime_from_sheet_timestamp(sheet_timestamp: str) -> datetime | None:
-    dt = None
-    with suppress(ValueError):
-        dt = datetime.fromisoformat(sheet_timestamp)
-    with suppress(ValueError):
-        dt = dt or datetime.strptime(sheet_timestamp, GOOGLE_TIMESTAMP_FORMAT)  # noqa: DTZ007
-    with suppress(ValueError):
-        dt = dt or datetime.strptime(  # noqa: DTZ007
-            sheet_timestamp,
-            GOOGLE_TIMESTAMP_FORMAT.replace("-", "/"),
-        )
-    return dt
 
 
 @dataclass(slots=True, frozen=True)
