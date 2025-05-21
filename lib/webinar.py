@@ -87,7 +87,7 @@ class Webinar:
             message = f"Здравствуйте, {participant.name}! Благодарю вас за участие."
             row = [participant.fio, "-", "no", participant.email, message]
             self.cert_sheet.append_row(row)
-            participant_logger.info("done")
+            participant_logger.info("certificate sheet filled")
             sleep(self.sheet_sleep)  # Quota limit is 60 rpm
         logger.info("filling certificates done")
 
@@ -124,6 +124,5 @@ class Webinar:
             accounts=list(self.participants),
             group=group,
         )
-        logger.info(f"contacts saved to {contacts_file}")
-        logger.info("import this file using icloud.com")
+        logger.info("contacts saved", file=str(contacts_file))
         return contacts_file

@@ -2,25 +2,18 @@ import sys
 
 from loguru import logger as _logger
 
-
-def _format(record: dict) -> str:
-    base = f"{record['time']} {record['level'].name} {record['message']}"
-    extras = "\n".join(f"   {k} = {v}" for k, v in record["extra"].items())
-    if extras:
-        extras = f"{extras}\n"
-    return f"{base}\n{extras}"
-
-
 _logger.remove()
 _logger.add(
-    "app.log",
+    "app-v1.log",
     encoding="utf-8",
+    serialize=True,
     rotation="10MB",
-    format=_format,  # type: ignore[arg-type]
+    format="{message}",
 )
 _logger.add(
     sys.stdout,
-    format=_format,  # type: ignore[arg-type]
+    serialize=True,
+    format="{message}",
 )
 
 logger = _logger
