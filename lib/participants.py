@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from typing import Self
 
-from lib.protocols import RowT
+from lib.types import RowT
 from lib.utils import get_datetime_from_sheet_timestamp
 from lib.utils import normalize_email
 from lib.utils import normalize_phone_number

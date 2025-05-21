@@ -7,11 +7,11 @@ from typing import NamedTuple
 
 from gspread.exceptions import WorksheetNotFound
 
-from lib.protocols import ProtoDocument
-from lib.protocols import ProtoSheet
-from lib.protocols import RowsT
-from lib.protocols import RowT
 from lib.sheets import open_spreadsheet
+from lib.types import ProtoDocument
+from lib.types import ProtoSheet
+from lib.types import RowsT
+from lib.types import RowT
 from lib.utils import GOOGLE_TIMESTAMP_FORMAT
 
 
