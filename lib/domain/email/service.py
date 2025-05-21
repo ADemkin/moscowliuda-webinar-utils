@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Self
 from dataclasses import field
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -17,7 +18,7 @@ class EmailService:
     bcc_emails: tuple[str, ...] = env_str_tuple_field("BCC_EMAILS")
 
     @classmethod
-    def with_test_client(cls) -> "EmailService":
+    def with_test_client(cls) -> Self:
         return cls(email_client=TestEmailClient())
 
     def send_certificate_email(

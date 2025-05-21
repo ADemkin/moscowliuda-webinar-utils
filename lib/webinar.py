@@ -40,7 +40,6 @@ class Webinar:
     def from_url(cls, url: str) -> Self:
         logger.debug("creating webinar")
         sheet = Sheet.from_url(url)
-        email_service = EmailService()
         return cls(
             document=sheet.document,
             participants=sheet.participants,
@@ -49,23 +48,7 @@ class Webinar:
             finished_at=sheet.get_finished_at(),
             certificate_service=CertificateService(),
             contact_service=ContactService(),
-            email_service=email_service,
-        )
-
-    @classmethod
-    def from_url_with_test_email_client(cls, url: str) -> Self:
-        logger.debug("creating webinar")
-        sheet = Sheet.from_url(url)
-        email_service = EmailService.with_test_client()
-        return cls(
-            document=sheet.document,
-            participants=sheet.participants,
-            title=sheet.get_webinar_title(),
-            started_at=sheet.get_started_at(),
-            finished_at=sheet.get_finished_at(),
-            certificate_service=CertificateService(),
-            contact_service=ContactService(),
-            email_service=email_service,
+            email_service=EmailService(),
         )
 
     @cached_property
