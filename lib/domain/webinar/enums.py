@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from enum import unique
 
 
 @unique
-class WebinarTitle(str, Enum):
+class WebinarTitle(StrEnum):
     GRAMMAR = "формирование базовых грамматических представлений"
     SPEECH = "практика запуска речи"
     PHRASE = "приёмы формирования фразовой речи"

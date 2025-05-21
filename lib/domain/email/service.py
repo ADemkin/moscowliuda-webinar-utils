@@ -35,7 +35,7 @@ class EmailService:
             self.email_client.send(
                 to=email,
                 bcc=self.bcc_emails,
-                subject=title.title(),
+                subject=str(title).title(),
                 contents=message,
                 attachments=[path],
             )

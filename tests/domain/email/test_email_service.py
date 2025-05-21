@@ -49,13 +49,9 @@ def email_service(
 def test_email_service_send_certificate_email(
     email_service: EmailService,
     email_client: TestEmailClient,
-    tmp_path: Path,
 ) -> None:
-    cert_path = tmp_path / "certificate.jpeg"
-    cert_path.touch()
     email = "participant@somemail.com"
-    message = randstr()
-    title = choice(list(WebinarTitle))
+    title: WebinarTitle = choice(list(WebinarTitle))  # type: ignore[assignment]
     certificate = Certificate(
         title=title,
         name="Мельникова Людмила Андреевна",
@@ -65,7 +61,7 @@ def test_email_service_send_certificate_email(
     email_service.send_certificate_email(
         title=title,
         email=email,
-        message=message,
+        message=randstr(),
         certificate=certificate,
     )
     assert email_client.total_send_count == 1
