@@ -1,0 +1,6 @@
+[x] rewrite tests with faker
+[ ] move to uv
+[ ] rewrite tests with factory fixtures style
+[ ] think about abstraction of user and emailing
+[ ] think about moving user to database
+[ ] think about using sqlalchemy for database
