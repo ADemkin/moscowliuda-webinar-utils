@@ -26,10 +26,8 @@ def test_webinar_integration(
             path=contact_tmp_path,
         ),
     )
-    rows = [
-        create_row_v2("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
-        create_row_v2("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
-    ]
+    size = 2
+    rows = [create_row_v2() for _ in range(size)]
     participants = [Participant.from_row_v2(row) for row in rows]
     started_at = date(2024, 12, 31)
     finished_at = date(2025, 1, 1)
@@ -49,7 +47,6 @@ def test_webinar_integration(
         contact_service=contact_service,
         email_service=email_service,
         email_sleep=0,
-        sheet_sleep=0,
     )
     # prepare certificates
     webinar.certificates_sheet_fill()
@@ -92,8 +89,8 @@ def test_webinar_cen_be_created_from_url(
     monkeypatch.setenv("GMAILACCOUNT", "some@gmail.com")
     monkeypatch.setenv("GMAILAPPLICATIONPASSWORD", "123")
     rows = [
-        create_row_v2("Мазаев", "Антон", "Андреевич", email="a@ya.ru"),
-        create_row_v2("Мельникова", "Людмила", "Андреевна", email="l@ya.ru"),
+        create_row_v2(),
+        create_row_v2(),
     ]
     create_document(rows)
     webinar = Webinar.from_url(TEST_SHEET_URL)
