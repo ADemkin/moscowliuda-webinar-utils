@@ -5,7 +5,7 @@ PATHS:=lib/ tests/ bin/
 
 
 test:
-	$(RUN) pytest --cov=lib --cov-report=term-missing --disable-warnings $(ARGS)
+	$(RUN) pytest --live --cov=lib --cov-report=term-missing --disable-warnings $(ARGS)
 
 mypy:
 	$(RUN) mypy $(PATHS)
