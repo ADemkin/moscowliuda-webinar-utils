@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import patch
 
 import pytest
 
@@ -9,6 +10,7 @@ from lib.domain.contact.service import ContactService
 from lib.domain.email.service import EmailService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.participants import Participant
+from lib.sheets import Sheet
 from lib.webinar import Webinar
 from tests.common import TEST_SHEET_URL
 from tests.common import CreateDocumentT
@@ -37,8 +39,9 @@ def test_webinar_integration(
         email_client=email_client,
         bcc_emails=("abc@abc.com",),
     )
+    sheet = Sheet(document)  # type: ignore[arg-type]
     webinar = Webinar(
-        document=document,  # type: ignore[arg-type]
+        sheet=sheet,
         participants=participants,
         title=WebinarTitle.TEST,
         started_at=started_at,
@@ -88,6 +91,8 @@ def test_webinar_cen_be_created_from_url(
     monkeypatch.setenv("BCC_EMAILS", "a,b")
     monkeypatch.setenv("GMAILACCOUNT", "some@gmail.com")
     monkeypatch.setenv("GMAILAPPLICATIONPASSWORD", "123")
-    create_document([create_row_v2() for _ in range(2)])
-    webinar = Webinar.from_url(TEST_SHEET_URL)
+    document = create_document([create_row_v2() for _ in range(2)])
+    sheet = Sheet(document)  # type: ignore[arg-type]
+    with patch.object(Sheet, Sheet.from_url.__name__, lambda _: sheet):
+        webinar = Webinar.from_url(TEST_SHEET_URL)
     webinar.with_test_client()
