@@ -57,24 +57,21 @@ class Webinar:
             email_sleep=0,
         )
 
-    def certificates_sheet_fill(self) -> None:
-        logger.info("filling certificates")
+    def prepare_emails(self) -> None:
+        logger.info("preparing emails")
         rows = []
         for participant in self.participants:
             message = f"Здравствуйте, {participant.name}! Благодарю вас за участие."
-            row = (participant.fio, False, participant.email, message)
+            row = (participant.fio, participant.email, message)
             rows.append(row)
-        self.sheet.prepare_mailing(rows)
+        self.sheet.prepare_emails(rows)
         logger.info("filling certificates done")
 
     def send_emails_with_certificates(self) -> None:
         logger.info("sending emails")
-        for row in self.sheet.get_mailing_rows():
-            row_id, full_name, is_sent, email, message = row
+        for row in self.sheet.get_emails_ready_to_send():
+            row_id, full_name, email, message = row
             email_logger = logger.bind(full_name=full_name)
-            if is_sent:
-                email_logger.info("email already sent")
-                continue
             certificate = self.certificate_service.generate(
                 title=self.title,
                 started_at=self.started_at,

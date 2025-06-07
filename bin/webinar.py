@@ -20,7 +20,7 @@ def contacts(url: str) -> None:
 @cli.command()
 @click.argument("url")
 def fill(url: str) -> None:
-    Webinar.from_url(url).certificates_sheet_fill()
+    Webinar.from_url(url).prepare_emails()
 
 
 @cli.command()

@@ -95,22 +95,23 @@ class Sheet:
     def get_cert_sheet(self) -> Worksheet:
         return self.document.worksheet(CERTIFICATES_SHEET_NAME)
 
-    def prepare_mailing(
+    def prepare_emails(
         self,
-        rows: Sequence[tuple[str, bool, str, str]],
+        rows: Sequence[tuple[str, str, str]],
     ) -> None:
         rows_str: list[tuple[str, str, str, str]] = [
-            (row[0], str(IsSent.from_bool(row[1])), row[2], row[3]) for row in rows
+            (row[0], IsSent.FALSE, row[1], row[2]) for row in rows
         ]
         cert_sheet = self.create_cert_sheet(len(rows))
-        cert_sheet.clear()
         cert_sheet.append_rows(rows_str)
 
-    def get_mailing_rows(self) -> Iterable[tuple[int, str, bool, str, str]]:
+    def get_emails_ready_to_send(self) -> Iterable[tuple[int, str, str, str]]:
         cert_sheet = self.get_cert_sheet()
         rows = cert_sheet.get_all_values()
         for row_id, row in zip(count(1), rows):
-            yield (row_id, row[0], bool(IsSent(row[1])), row[2], row[3])
+            if bool(IsSent(row[1])):
+                continue
+            yield (row_id, row[0], row[2], row[3])
 
     def mark_as_sent(self, row_id: int) -> None:
         cert_sheet = self.get_cert_sheet()

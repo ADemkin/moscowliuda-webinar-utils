@@ -52,7 +52,7 @@ def test_webinar_integration(
         email_sleep=0,
     )
     # prepare certificates
-    webinar.certificates_sheet_fill()
+    webinar.prepare_emails()
 
     # send emails
     webinar.send_emails_with_certificates()
