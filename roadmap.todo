@@ -1,4 +1,5 @@
 [x] rewrite tests with faker
+[x] abstract sheets (documents) and all related logic
 [ ] move to uv
 [ ] rewrite tests with factory fixtures style
 [ ] think about abstraction of user and emailing
