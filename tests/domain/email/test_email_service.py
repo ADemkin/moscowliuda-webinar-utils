@@ -1,6 +1,9 @@
 from datetime import date
 from pathlib import Path
 from random import choice
+from typing import Generator
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -43,10 +46,20 @@ def email_service(
 ) -> EmailService:
     bcc_emails = ["test1@test.com", "test2@test.com"]
     monkeypatch.setenv("BCC_EMAILS", ",".join(bcc_emails))
-    return EmailService(email_client=email_client)
+    return EmailService(
+        email_client=email_client,
+        send_timeout_sec=0,
+    )
+
+
+@pytest.fixture
+def sleep_mock() -> Generator[MagicMock]:
+    with patch("lib.domain.email.service.sleep") as sleep_mock:
+        yield sleep_mock
 
 
 def test_email_service_send_certificate_email(
+    sleep_mock: MagicMock,
     email_service: EmailService,
     email_client: TestEmailClient,
 ) -> None:
@@ -67,3 +80,4 @@ def test_email_service_send_certificate_email(
     assert email_client.total_send_count == 1
     assert email_client.is_sent_to(email)
     assert email_client.sent_count(email) == 1
+    sleep_mock.assert_called_once_with(email_service.send_timeout_sec)

@@ -5,7 +5,6 @@ from datetime import date
 from functools import cached_property
 from itertools import count
 from pathlib import Path
-from time import sleep
 from typing import Self
 
 from gspread import Spreadsheet
@@ -33,8 +32,6 @@ class Webinar:
     contact_service: ContactService
     email_service: EmailService
 
-    email_sleep: int = 3
-
     @classmethod
     def from_url(cls, url: str) -> Self:
         logger.debug("creating webinar")
@@ -54,7 +51,6 @@ class Webinar:
         return replace(
             self,
             email_service=EmailService.with_test_client(),
-            email_sleep=0,
         )
 
     def prepare_emails(self) -> None:
@@ -87,7 +83,6 @@ class Webinar:
             )
             self.sheet.mark_as_sent(row_id)
             email_logger.info("email sent")
-            sleep(self.email_sleep)
         logger.info("sending emails done")
 
     def import_contacts(self) -> Path:

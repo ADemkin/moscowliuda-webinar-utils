@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from time import sleep
 from typing import Self
 
 from lib.clients.email import AbstractEmailClient
@@ -16,10 +17,14 @@ from lib.environment import env_str_tuple_field
 class EmailService:
     email_client: AbstractEmailClient = field(default_factory=GMailClient)
     bcc_emails: tuple[str, ...] = env_str_tuple_field("BCC_EMAILS")
+    send_timeout_sec: int = 3
 
     @classmethod
     def with_test_client(cls) -> Self:
-        return cls(email_client=TestEmailClient())
+        return cls(
+            email_client=TestEmailClient(),
+            send_timeout_sec=0,
+        )
 
     def send_certificate_email(
         self,
@@ -39,6 +44,7 @@ class EmailService:
                 contents=message,
                 attachments=[path],
             )
+        sleep(self.send_timeout_sec)
 
     def send_email(
         self,
