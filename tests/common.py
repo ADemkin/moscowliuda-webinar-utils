@@ -1,9 +1,9 @@
 from contextlib import suppress
-from datetime import timezone
 from os import urandom
 from typing import Callable
 from typing import NamedTuple
 
+import pytest
 from faker import Faker
 from gspread.exceptions import WorksheetNotFound
 
@@ -38,28 +38,6 @@ DEFAULT_TITLE = "01 - 31 Января 2025 Test Webinar (Responses)"
 
 ru_faker = Faker("ru_RU")
 international_faker = Faker()
-
-
-def create_row_v2(
-    family: str | None = None,
-    name: str | None = None,
-    father: str | None = None,
-    phone: str | None = None,
-    email: str | None = None,
-) -> RowT:
-    family = family or ru_faker.last_name_female()
-    name = name or ru_faker.first_name()
-    father = father or ru_faker.middle_name()
-    phone = phone or international_faker.phone_number()
-    email = email or international_faker.email()
-    return [
-        "not-used-timestamp",
-        email,
-        family,
-        name,
-        father,
-        phone,
-    ]
 
 
 class SpreadsheetStub:

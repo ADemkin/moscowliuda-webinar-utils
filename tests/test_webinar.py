@@ -14,12 +14,12 @@ from lib.sheets import Sheet
 from lib.webinar import Webinar
 from tests.common import TEST_SHEET_URL
 from tests.common import CreateDocumentT
-from tests.common import create_row_v2
 
 
 def test_webinar_integration(
     create_document: CreateDocumentT,
     tmp_path_factory,
+    create_row,
 ) -> None:
     # TODO: split test into steps
     contact_tmp_path = tmp_path_factory.mktemp("contacts")
@@ -29,7 +29,7 @@ def test_webinar_integration(
         ),
     )
     size = 2
-    rows = [create_row_v2() for _ in range(size)]
+    rows = [create_row() for _ in range(size)]
     participants = [Participant.from_row_v2(row) for row in rows]
     started_at = date(2024, 12, 31)
     finished_at = date(2025, 1, 1)
@@ -38,6 +38,7 @@ def test_webinar_integration(
     email_service = EmailService(
         email_client=email_client,
         bcc_emails=("abc@abc.com",),
+        send_timeout_sec=0,
     )
     sheet = Sheet(document)  # type: ignore[arg-type]
     webinar = Webinar(
@@ -49,7 +50,6 @@ def test_webinar_integration(
         certificate_service=CertificateService(),
         contact_service=contact_service,
         email_service=email_service,
-        email_sleep=0,
     )
     # prepare certificates
     webinar.prepare_emails()
@@ -87,11 +87,12 @@ def test_webinar_integration(
 def test_webinar_cen_be_created_from_url(
     monkeypatch: pytest.MonkeyPatch,
     create_document: CreateDocumentT,
+    create_row,
 ) -> None:
     monkeypatch.setenv("BCC_EMAILS", "a,b")
     monkeypatch.setenv("GMAILACCOUNT", "some@gmail.com")
     monkeypatch.setenv("GMAILAPPLICATIONPASSWORD", "123")
-    document = create_document([create_row_v2() for _ in range(2)])
+    document = create_document([create_row() for _ in range(2)])
     sheet = Sheet(document)  # type: ignore[arg-type]
     with patch.object(Sheet, Sheet.from_url.__name__, lambda _: sheet):
         webinar = Webinar.from_url(TEST_SHEET_URL)
