@@ -1,9 +1,7 @@
 from datetime import date
-from pathlib import Path
 from random import choice
 from typing import Generator
 from unittest.mock import MagicMock
-from unittest.mock import patch
 
 import pytest
 
@@ -13,11 +11,19 @@ from lib.domain.email.service import EmailService
 from lib.domain.webinar.enums import WebinarTitle
 from lib.environment import EnvironmentVariableNotSetError
 from tests.common import randstr
+from tests.common import ru_faker
 
 
 @pytest.fixture
 def email_client() -> TestEmailClient:
     return TestEmailClient()
+
+
+@pytest.fixture
+def bcc_emails(monkeypatch: pytest.MonkeyPatch) -> tuple[str, ...]:
+    bcc_emails = [randstr() for _ in range(3)]
+    monkeypatch.setenv("BCC_EMAILS", ",".join(bcc_emails))
+    return tuple(bcc_emails)
 
 
 def test_if_environment_not_set_then_raise_exception(email_client: TestEmailClient) -> None:
@@ -26,50 +32,37 @@ def test_if_environment_not_set_then_raise_exception(email_client: TestEmailClie
     assert "BCC_EMAILS" in str(err.value)
 
 
-@pytest.mark.parametrize("size", [1, 3, 5])
 def test_bcc_emails_are_set_from_environment(
-    size: int,
-    monkeypatch: pytest.MonkeyPatch,
     email_client: TestEmailClient,
+    bcc_emails: list[str],
 ) -> None:
-    bcc_emails = [randstr() for _ in range(size)]
-    monkeypatch.setenv("BCC_EMAILS", ",".join(bcc_emails))
     service = EmailService(email_client=email_client)
-    assert len(service.bcc_emails) == size
-    assert set(service.bcc_emails) == set(bcc_emails)
+    assert service.bcc_emails == bcc_emails
 
 
-@pytest.fixture
-def email_service(
-    email_client: TestEmailClient,
-    monkeypatch: pytest.MonkeyPatch,
-) -> EmailService:
-    bcc_emails = ["test1@test.com", "test2@test.com"]
-    monkeypatch.setenv("BCC_EMAILS", ",".join(bcc_emails))
-    return EmailService(
-        email_client=email_client,
-        send_timeout_sec=0,
-    )
-
-
-@pytest.fixture
-def sleep_mock() -> Generator[MagicMock]:
-    with patch("lib.domain.email.service.sleep") as sleep_mock:
+@pytest.fixture(autouse=True)
+def sleep_mock(monkeypatch: pytest.MonkeyPatch) -> Generator[MagicMock]:
+    with monkeypatch.context() as m:
+        sleep_mock = MagicMock()
+        m.setattr("lib.domain.email.service.sleep", sleep_mock)
         yield sleep_mock
 
 
 def test_email_service_send_certificate_email(
     sleep_mock: MagicMock,
-    email_service: EmailService,
     email_client: TestEmailClient,
 ) -> None:
     email = "participant@somemail.com"
     title: WebinarTitle = choice(list(WebinarTitle))  # type: ignore[assignment]
     certificate = Certificate(
         title=title,
-        name="Мельникова Людмила Андреевна",
+        name=ru_faker.name(),
         started_at=date(2024, 12, 30),
         finished_at=date(2024, 12, 31),
+    )
+    email_service = EmailService(
+        email_client=email_client,
+        bcc_emails=("does-not-matter",),
     )
     email_service.send_certificate_email(
         title=title,

@@ -34,6 +34,7 @@ class EmailService:
         certificate: Certificate,
     ) -> None:
         with TemporaryDirectory() as temp_dir:
+            # TODO: get type from certificate
             path = Path(temp_dir) / "certificate.png"
             with path.open("wb") as fd:
                 certificate.write(fd)
