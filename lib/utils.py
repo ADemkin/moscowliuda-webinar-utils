@@ -1,5 +1,4 @@
 import re
-from contextlib import suppress
 from datetime import date
 from textwrap import dedent
 

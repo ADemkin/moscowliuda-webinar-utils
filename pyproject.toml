@@ -106,8 +106,7 @@ ignore = [
     "EM101",  # allow string literals in exceptions
     "RUF009",  # allow custom dataclass field functions
     "TRY003",  # allow long exception messages
-    "EM102",  # allow exception f-string messagrs
-    "F401",  # allow empty imports in __init__.py
+    "EM102",  # allow exception f-string messages
 ]
 
 [tool.ruff.lint.isort]
@@ -118,4 +117,7 @@ force-single-line = true
     "S101",
     "ANN",
     "PLR2004",
+]
+"**/__init__.py" = [
+    "F401",  # allow empty imports in __init__.py
 ]

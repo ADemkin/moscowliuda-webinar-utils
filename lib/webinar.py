@@ -2,13 +2,8 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from dataclasses import replace
 from datetime import date
-from functools import cached_property
-from itertools import count
 from pathlib import Path
 from typing import Self
-
-from gspread import Spreadsheet
-from gspread import Worksheet
 
 from lib.domain.certificate.service import CertificateService
 from lib.domain.contact.service import ContactService

@@ -1,6 +1,6 @@
 from collections.abc import Iterable
-from collections.abc import Sequence
 from collections.abc import Mapping
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 from functools import cache
@@ -13,9 +13,7 @@ from gspread import Spreadsheet
 from gspread import Worksheet
 from gspread import service_account
 from gspread.exceptions import APIError
-from gspread.exceptions import WorksheetNotFound
 
-from lib.const import NAME2MONTH
 from lib.domain.webinar.enums import WebinarTitle
 from lib.logging import logger
 from lib.participants import Participant

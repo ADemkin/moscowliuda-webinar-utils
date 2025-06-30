@@ -1,7 +1,6 @@
 import click
 from dotenv import load_dotenv
 
-from lib.domain.email.service import EmailService
 from lib.webinar import Webinar
 
 

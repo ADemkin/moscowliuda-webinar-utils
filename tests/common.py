@@ -3,7 +3,6 @@ from os import urandom
 from typing import Callable
 from typing import NamedTuple
 
-import pytest
 from faker import Faker
 from gspread.exceptions import WorksheetNotFound
 
