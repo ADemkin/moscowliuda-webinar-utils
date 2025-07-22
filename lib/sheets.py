@@ -1,8 +1,8 @@
 from collections.abc import Iterable
-from collections.abc import Mapping
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
+from enum import StrEnum
 from functools import cache
 from http import HTTPStatus
 from itertools import count
@@ -22,11 +22,13 @@ from lib.utils import text_to_date_range_and_title
 PARTICIPANTS_SHEET_NAME = "Form Responses 1"
 CERTIFICATES_SHEET_NAME = "mailing"
 
-BOOL2STR: Mapping[bool, str] = {
-    True: "TRUE",
-    False: "FALSE",
-}
-STR2BOOL: Mapping[str, bool] = {v: k for k, v in BOOL2STR.items()}
+
+class BooleanCell(StrEnum):
+    TRUE = "TRUE"
+    FALSE = "FALSE"
+
+    def __bool__(self) -> bool:
+        return self is BooleanCell.TRUE
 
 
 class ApiPermissionError(Exception):
@@ -88,7 +90,7 @@ class Sheet:
         rows: Sequence[tuple[str, str, str]],
     ) -> None:
         rows_str: list[tuple[str, str, str, str]] = [
-            (row[0], BOOL2STR[False], row[1], row[2]) for row in rows
+            (row[0], BooleanCell.FALSE, row[1], row[2]) for row in rows
         ]
         cert_sheet = self.create_cert_sheet(len(rows))
         cert_sheet.append_rows(rows_str)
@@ -97,13 +99,13 @@ class Sheet:
         cert_sheet = self.get_cert_sheet()
         rows = cert_sheet.get_all_values()
         for row_id, row in zip(count(1), rows):
-            if STR2BOOL[row[1]]:
+            if BooleanCell(row[1]):
                 continue
             yield (row_id, row[0], row[2], row[3])
 
     def mark_as_sent(self, row_id: int) -> None:
         cert_sheet = self.get_cert_sheet()
-        cert_sheet.update_cell(row_id, 2, BOOL2STR[True])
+        cert_sheet.update_cell(row_id, 2, BooleanCell.TRUE)
 
 
 def get_participants_from_sheet(
