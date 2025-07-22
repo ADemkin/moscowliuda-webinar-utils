@@ -13,8 +13,6 @@ from lib.logging import logger
 from lib.participants import Participant
 from lib.sheets import Sheet
 
-CERTIFICATES_SHEET_NAME = "mailing"
-
 
 @dataclass(frozen=True)
 class Webinar:
