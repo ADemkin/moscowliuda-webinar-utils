@@ -5,7 +5,6 @@ from datetime import date
 from enum import StrEnum
 from functools import cache
 from http import HTTPStatus
-from itertools import count
 from textwrap import dedent
 from typing import Self
 
@@ -98,7 +97,7 @@ class Sheet:
     def get_emails_ready_to_send(self) -> Iterable[tuple[int, str, str, str]]:
         cert_sheet = self.get_cert_sheet()
         rows = cert_sheet.get_all_values()
-        for row_id, row in zip(count(1), rows):
+        for row_id, row in enumerate(rows, start=1):
             if BooleanCell(row[1]):
                 continue
             yield (row_id, row[0], row[2], row[3])
@@ -113,7 +112,6 @@ def get_participants_from_sheet(
     first_row: int = 0,
 ) -> Iterable[Participant]:
     participants: list[Participant] = []
-    # TODO: по первому столбцу определять какой формат
     for row in sheet.get_all_values()[first_row:]:
         try:
             participant = Participant.from_row_v2(row)
