@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from lib.clients.email import TestEmailClient
+from lib.clients.email import EmailTestClient
 from lib.domain.certificate.service import CertificateService
 from lib.domain.contact.repository import VCardRepository
 from lib.domain.contact.service import ContactService
@@ -34,7 +34,7 @@ def test_webinar_integration(
     started_at = date(2024, 12, 31)
     finished_at = date(2025, 1, 1)
     document = create_document(rows)
-    email_client = TestEmailClient()
+    email_client = EmailTestClient()
     email_service = EmailService(
         email_client=email_client,
         bcc_emails=("abc@abc.com",),

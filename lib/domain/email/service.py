@@ -6,8 +6,8 @@ from time import sleep
 from typing import Self
 
 from lib.clients.email import AbstractEmailClient
+from lib.clients.email import EmailTestClient
 from lib.clients.email import GMailClient
-from lib.clients.email import TestEmailClient
 from lib.domain.certificate.model import Certificate
 from lib.domain.webinar.enums import WebinarTitle
 from lib.environment import env_str_tuple_field
@@ -22,7 +22,7 @@ class EmailService:
     @classmethod
     def with_test_client(cls) -> Self:
         return cls(
-            email_client=TestEmailClient(),
+            email_client=EmailTestClient(),
             send_timeout_sec=0,
         )
 

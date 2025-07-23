@@ -56,7 +56,7 @@ class GMailClient(AbstractEmailClient):
 
 
 @dataclass(frozen=True, slots=True)
-class TestEmailClient(AbstractEmailClient):
+class EmailTestClient(AbstractEmailClient):
     _call_args: list[Mapping[str, Any]] = field(default_factory=list)
 
     def send(
@@ -75,7 +75,7 @@ class TestEmailClient(AbstractEmailClient):
             "attachments": attachments,
         }
         self._call_args.append(args)
-        logger.debug("TestEmailClient.send: {args}", args=args)
+        logger.debug("EmailTestClient.send: {args}", args=args)
 
     def is_sent_to(self, to: str) -> bool:
         return to in {call["to"] for call in self._call_args}

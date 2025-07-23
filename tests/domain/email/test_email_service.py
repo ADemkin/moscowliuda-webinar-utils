@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from lib.clients.email import TestEmailClient
+from lib.clients.email import EmailTestClient
 from lib.domain.certificate.model import Certificate
 from lib.domain.email.service import EmailService
 from lib.domain.webinar.enums import WebinarTitle
@@ -15,8 +15,8 @@ from tests.common import ru_faker
 
 
 @pytest.fixture
-def email_client() -> TestEmailClient:
-    return TestEmailClient()
+def email_client() -> EmailTestClient:
+    return EmailTestClient()
 
 
 @pytest.fixture
@@ -26,14 +26,14 @@ def bcc_emails(monkeypatch: pytest.MonkeyPatch) -> tuple[str, ...]:
     return tuple(bcc_emails)
 
 
-def test_if_environment_not_set_then_raise_exception(email_client: TestEmailClient) -> None:
+def test_if_environment_not_set_then_raise_exception(email_client: EmailTestClient) -> None:
     with pytest.raises(EnvironmentVariableNotSetError) as err:
         EmailService(email_client=email_client)
     assert "BCC_EMAILS" in str(err.value)
 
 
 def test_bcc_emails_are_set_from_environment(
-    email_client: TestEmailClient,
+    email_client: EmailTestClient,
     bcc_emails: list[str],
 ) -> None:
     service = EmailService(email_client=email_client)
@@ -50,7 +50,7 @@ def sleep_mock(monkeypatch: pytest.MonkeyPatch) -> Generator[MagicMock]:
 
 def test_email_service_send_certificate_email(
     sleep_mock: MagicMock,
-    email_client: TestEmailClient,
+    email_client: EmailTestClient,
 ) -> None:
     email = "participant@somemail.com"
     title: WebinarTitle = choice(list(WebinarTitle))  # type: ignore[assignment]

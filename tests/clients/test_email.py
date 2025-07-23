@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import pytest
 
+from lib.clients.email import EmailTestClient
 from lib.clients.email import GMailClient
-from lib.clients.email import TestEmailClient
 from tests.common import randstr
 
 
@@ -75,7 +75,7 @@ def test_gmail_calls_smtp_send_with_correct_arguments(
 def test_mailstub_keeps_all_calls(size: int) -> None:
     emails = {randstr() for _ in range(size)}
     assert len(emails) == size
-    mail_stub = TestEmailClient()
+    mail_stub = EmailTestClient()
     for email in emails:
         mail_stub.send(to=email)
     assert mail_stub.total_send_count == size
